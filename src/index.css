@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+@theme {
+
+  /* Brand Colors */
+  --color-brand-50: #feffd2;
+  --color-brand-100: #ffeea9;
+  --color-brand-300: #ffbf78;
+  --color-brand-500: #ff7d29;
+
+  /* Semantic Aliases */
+  --color-brand-bg: #feffd2;
+  --color-brand-surface: #ffeea9;
+  --color-brand-accent: #ffbf78;
+  --color-brand-primary: #ff7d29;
+
+  /* Text Colors */
+  --color-brand-dark: #2b2b2b;
+  --color-brand-muted: #6b7280;
+
+  /* Gradient */
+  --background-image-brand-gradient: linear-gradient(to left,
+      #feffd2 0%,
+      #ffeea9 50%,
+      #ff7d29 100%);
+  --background-image-brand-gradient1: linear-gradient(to top,
+      #feffd2 0%,
+      #ffeea9 50%,
+      #ff7d29 100%);
+  /* --background-image-brand-gradient: linear-gradient(180deg, #feffd2 0%, #ffeea9 50%, #ffbf78 100%); */
+
+  /* Animations & Keyframes */
+  --animate-marquee: marquee 30s linear infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0%);
+    }
+
+    to {
+      transform: translateX(-50%);
+    }
+  }
+}
+
+
+@layer components {
+  .btn-primary {
+    @apply rounded-lg bg-brand-primary px-5 py-2 text-sm font-semibold text-white hover:bg-brand-300 transition;
+  }
+
+  .btn-secondary {
+    @apply rounded-lg border border-brand-accent px-5 py-2 text-sm font-semibold text-brand-dark hover:bg-brand-surface transition;
+  }
+
+  .card {
+    @apply rounded-xl bg-white border border-brand-accent shadow-sm;
+  }
+
+  .section {
+    @apply py-20 px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-title {
+    @apply text-3xl font-bold text-brand-dark sm:text-4xl;
+  }
+
+  .text-muted {
+    @apply text-brand-muted;
+  }
+
+  .input-field {
+    @apply block w-full rounded-xl border border-brand-accent bg-white px-4 py-3 text-brand-dark placeholder:text-brand-muted/50 focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/50 transition-all shadow-sm;
+  }
+
+  .hide-picker-icon::-webkit-calendar-picker-indicator {
+    display: none;
+  }
+}

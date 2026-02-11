@@ -1,4 +1,4 @@
-import { EnvelopeIcon, ClockIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
+import { EnvelopeIcon, ClockIcon, CheckCircleIcon, ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
 
 type Attendee = {
   id: string;
@@ -16,12 +16,14 @@ type Attendee = {
 interface AttendeeRowProps {
   attendee: Attendee;
   onEmailClick?: (email: string) => void;
+  onViewLogs?: (id: string, name: string) => void;
   showEventColumn?: boolean;
 }
 
 export default function AttendeeRow({
   attendee,
   onEmailClick,
+  onViewLogs,
   showEventColumn = true,
 }: AttendeeRowProps) {
   const formatDuration = (minutes?: number) => {
@@ -123,6 +125,7 @@ export default function AttendeeRow({
         </div>
       </td>
 
+
       {/* Registered Date */}
       <td className="px-6 py-4">
         <div className="flex flex-col">
@@ -134,6 +137,31 @@ export default function AttendeeRow({
           </span>
         </div>
       </td>
+
+      {/* Actions */}
+      <td className="px-6 py-4">
+        <div className="flex items-center gap-2">
+          {onViewLogs && (
+            <button
+              onClick={() => onViewLogs(attendee.id, attendee.name)}
+              className="p-2 text-brand-primary hover:bg-brand-primary/10 rounded transition-colors"
+              title="View Activity Logs"
+            >
+              <ClipboardDocumentListIcon className="h-4 w-4" />
+            </button>
+          )}
+          {onEmailClick && (
+            <button
+              onClick={() => onEmailClick(attendee.email)}
+              className="p-2 text-brand-secondary hover:bg-brand-secondary/10 rounded transition-colors"
+              title="Send Email"
+            >
+              <EnvelopeIcon className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+      </td>
     </tr>
   );
 }
+

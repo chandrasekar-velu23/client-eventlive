@@ -5,6 +5,8 @@ export interface Speaker {
   bio: string;
   avatar?: string;
   email?: string;
+  tags?: string[];
+  labels?: string[];
   socialLinks?: {
     linkedin?: string;
     twitter?: string;
@@ -33,10 +35,15 @@ export interface EventData {
   timezone?: string;
   type?: string;
   category?: string;
+  tags?: string[];
   accessType?: 'Free' | 'Paid' | 'Invite-only';
   capacity?: number;
   organizerDisplayName?: string;
   organizerLogo?: string;
+  organizerWebsite?: string;
+  organizerEmail?: string;
+  organizerPhone?: string;
+  organizerDescription?: string;
   brandAccentColor?: string;
   coverImage?: string;
   organizerId?: string;
@@ -591,6 +598,7 @@ export const getAllMyAttendees = async (): Promise<Array<{
   }
 };
 
+
 export const getGlobalAnalytics = async (): Promise<{
   registrations: number;
   attendanceRate: number;
@@ -605,4 +613,40 @@ export const getGlobalAnalytics = async (): Promise<{
     console.warn("Failed to fetch global analytics", error);
     return null;
   }
+};
+
+// Analytics & detailed logs
+
+export interface ActivityLogItem {
+  type: string;
+  timestamp: string;
+  details?: any;
+}
+
+export const getAttendeeDetailedLogs = async (eventId: string, userId: string): Promise<ActivityLogItem[]> => {
+  try {
+    const result = await apiFetch<ActivityLogItem[]>(`analytics/attendees/${eventId}/logs/${userId}`, {
+      method: "GET"
+    });
+    return result.data || [];
+  } catch (error) {
+    console.warn("Failed to fetch attendee logs:", error);
+    return [];
+  }
+};
+
+export const sendAttendeeEmail = async (data: { toEmail: string; subject: string; content: string }): Promise<void> => {
+  const result = await apiFetch<null>("analytics/email/send-attendee", {
+    method: "POST",
+    body: JSON.stringify(data)
+  });
+  if (!result.message) throw new Error("Failed to send email");
+};
+
+export const sendRequestEmail = async (data: { type: "inquiry" | "support"; subject: string; content: string }): Promise<void> => {
+  const result = await apiFetch<null>("analytics/email/request", {
+    method: "POST",
+    body: JSON.stringify(data)
+  });
+  if (!result.message) throw new Error("Failed to send request");
 };

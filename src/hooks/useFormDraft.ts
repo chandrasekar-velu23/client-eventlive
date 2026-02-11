@@ -5,7 +5,12 @@ export function useFormDraft<T>(key: string, initialState: T) {
     const [formData, setFormData] = useState<T>(() => {
         try {
             const saved = sessionStorage.getItem(key);
-            return saved ? JSON.parse(saved) : initialState;
+            if (saved) {
+                const parsedData = JSON.parse(saved);
+                // Merge saved data with initial state to ensure all new properties exist
+                return { ...initialState, ...parsedData };
+            }
+            return initialState;
         } catch {
             return initialState;
         }

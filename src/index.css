@@ -76,4 +76,29 @@
   .hide-picker-icon::-webkit-calendar-picker-indicator {
     display: none;
   }
+
+  /* Timezone Select Styling */
+  .timezone-select > div {
+    @apply rounded-xl border border-brand-accent bg-white shadow-sm;
+  }
+
+  .timezone-select input {
+    @apply px-4 py-3 text-brand-dark;
+  }
+
+  .timezone-select [class*="control"] {
+    @apply border-brand-accent hover:border-brand-primary focus:border-brand-primary rounded-xl;
+  }
+
+  .timezone-select [class*="menu"] {
+    @apply rounded-xl border border-brand-accent shadow-lg;
+  }
+
+  .timezone-select [class*="option"] {
+    @apply hover:bg-brand-surface;
+  }
+
+  .timezone-select [class*="singleValue"] {
+    @apply text-brand-dark;
+  }
 }

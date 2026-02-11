@@ -4,6 +4,8 @@ import { toast } from 'sonner';
 import { useAuth } from '../hooks/useAuth';
 import { useSession } from '../hooks/useSession';
 import DashboardLayout from '../components/layout/DashboardLayout';
+import RequestSupportModal from '../components/dashboard/RequestSupportModal';
+import { QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
 
 interface EventDetails {
   _id: string;
@@ -39,6 +41,9 @@ const EventLobby: React.FC = () => {
   const [videoEnabled, setVideoEnabled] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const videoRef = React.useRef<HTMLVideoElement>(null);
+
+  // Support Modal State
+  const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
 
   // Fetch event details
   useEffect(() => {
@@ -171,16 +176,26 @@ const EventLobby: React.FC = () => {
       <div className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="mb-8">
+          <div className="mb-8 flex justify-between items-start">
+            <div>
+              <button
+                onClick={handleLeave}
+                className="text-gray-400 hover:text-white flex items-center gap-2 transition-all mb-6"
+              >
+                <span>←</span>
+                <span>Back to Events</span>
+              </button>
+              <h1 className="text-4xl font-bold text-white">{eventDetails.title}</h1>
+              <p className="text-gray-400 mt-2">{eventDetails.category}</p>
+            </div>
+
             <button
-              onClick={handleLeave}
-              className="text-gray-400 hover:text-white flex items-center gap-2 transition-all mb-6"
+              onClick={() => setIsSupportModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-white transition-colors"
             >
-              <span>←</span>
-              <span>Back to Events</span>
+              <QuestionMarkCircleIcon className="h-5 w-5" />
+              Help & Support
             </button>
-            <h1 className="text-4xl font-bold text-white">{eventDetails.title}</h1>
-            <p className="text-gray-400 mt-2">{eventDetails.category}</p>
           </div>
 
           {/* Main Content */}
@@ -209,15 +224,13 @@ const EventLobby: React.FC = () => {
 
                   {/* Status Indicators */}
                   <div className="absolute top-4 right-4 flex flex-col gap-2">
-                    <div className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2 ${
-                      isMuted ? 'bg-red-600 text-white' : 'bg-green-600 text-white'
-                    }`}>
+                    <div className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2 ${isMuted ? 'bg-red-600 text-white' : 'bg-green-600 text-white'
+                      }`}>
                       <span>{isMuted ? '🔇' : '🔊'}</span>
                       {isMuted ? 'Muted' : 'Unmuted'}
                     </div>
-                    <div className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2 ${
-                      videoEnabled ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
-                    }`}>
+                    <div className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2 ${videoEnabled ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+                      }`}>
                       <span>{videoEnabled ? '✓' : '✗'}</span>
                       {videoEnabled ? 'Camera On' : 'Camera Off'}
                     </div>
@@ -230,21 +243,19 @@ const EventLobby: React.FC = () => {
                   <div className="flex gap-4">
                     <button
                       onClick={() => setIsMuted(!isMuted)}
-                      className={`flex-1 py-2 rounded-lg font-medium transition-all ${
-                        isMuted
-                          ? 'bg-red-600 hover:bg-red-700 text-white'
-                          : 'bg-green-600 hover:bg-green-700 text-white'
-                      }`}
+                      className={`flex-1 py-2 rounded-lg font-medium transition-all ${isMuted
+                        ? 'bg-red-600 hover:bg-red-700 text-white'
+                        : 'bg-green-600 hover:bg-green-700 text-white'
+                        }`}
                     >
                       {isMuted ? '🔇 Enable Microphone' : '🔊 Disable Microphone'}
                     </button>
                     <button
                       onClick={() => setVideoEnabled(!videoEnabled)}
-                      className={`flex-1 py-2 rounded-lg font-medium transition-all ${
-                        videoEnabled
-                          ? 'bg-green-600 hover:bg-green-700 text-white'
-                          : 'bg-red-600 hover:bg-red-700 text-white'
-                      }`}
+                      className={`flex-1 py-2 rounded-lg font-medium transition-all ${videoEnabled
+                        ? 'bg-green-600 hover:bg-green-700 text-white'
+                        : 'bg-red-600 hover:bg-red-700 text-white'
+                        }`}
                     >
                       {videoEnabled ? '📹 Disable Camera' : '📹 Enable Camera'}
                     </button>
@@ -339,11 +350,10 @@ const EventLobby: React.FC = () => {
               <button
                 onClick={handleJoinSession}
                 disabled={!permissionsAccepted || isJoining || !isEventStarted}
-                className={`w-full py-4 rounded-xl font-bold text-white transition-all text-lg ${
-                  permissionsAccepted && isEventStarted
-                    ? 'bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 cursor-pointer'
-                    : 'bg-gray-700 cursor-not-allowed opacity-50'
-                }`}
+                className={`w-full py-4 rounded-xl font-bold text-white transition-all text-lg ${permissionsAccepted && isEventStarted
+                  ? 'bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 cursor-pointer'
+                  : 'bg-gray-700 cursor-not-allowed opacity-50'
+                  }`}
               >
                 {isJoining ? (
                   <span className="flex items-center justify-center gap-2">
@@ -370,6 +380,12 @@ const EventLobby: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <RequestSupportModal
+        isOpen={isSupportModalOpen}
+        onClose={() => setIsSupportModalOpen(false)}
+        eventId={sessionId}
+      />
     </DashboardLayout>
   );
 };

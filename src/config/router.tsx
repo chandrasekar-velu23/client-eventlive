@@ -22,7 +22,6 @@ const LiveSession = lazy(() => import('../pages/LiveSession'));
 // Other Pages
 const Feature = lazy(() => import('../pages/Feature'));
 const About = lazy(() => import('../pages/About'));
-const Contact = lazy(() => import('../pages/Contact'));
 const Security = lazy(() => import('../pages/Security'));
 const UseCase = lazy(() => import('../pages/UseCase'));
 const GetStarted = lazy(() => import('../pages/GetStarted'));
@@ -66,14 +65,6 @@ const router = createBrowserRouter([
     element: (
       <Suspense fallback={<LoadingFallback />}>
         <About />
-      </Suspense>
-    ),
-  },
-  {
-    path: '/contact',
-    element: (
-      <Suspense fallback={<LoadingFallback />}>
-        <Contact />
       </Suspense>
     ),
   },

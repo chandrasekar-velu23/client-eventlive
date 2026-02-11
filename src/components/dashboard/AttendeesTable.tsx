@@ -25,12 +25,14 @@ type SortDirection = "asc" | "desc" | null;
 interface AttendeesTableProps {
   attendees: Attendee[];
   onEmailClick?: (email: string) => void;
+  onViewLogs?: (id: string, name: string) => void;
   showEventColumn?: boolean;
 }
 
 export default function AttendeeTable({
   attendees,
   onEmailClick,
+  onViewLogs,
   showEventColumn = true,
 }: AttendeesTableProps) {
   const [sortField, setSortField] = useState<SortField | null>(null);
@@ -148,6 +150,7 @@ export default function AttendeeTable({
                   <SortIcon field="enrolledAt" />
                 </div>
               </th>
+              <th className="px-6 py-4">Actions</th>
             </tr>
           </thead>
 
@@ -158,6 +161,7 @@ export default function AttendeeTable({
                   key={`${attendee.id}-${index}`}
                   attendee={attendee}
                   onEmailClick={onEmailClick}
+                  onViewLogs={onViewLogs}
                   showEventColumn={showEventColumn}
                 />
               ))

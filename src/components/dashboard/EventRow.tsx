@@ -17,37 +17,35 @@ export default function EventRow({
   live,
 }: EventRowProps) {
   return (
-    <div className="flex items-center justify-between rounded-lg p-3 hover:bg-brand-surface/30 transition-colors group">
-      <div className="flex items-center gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-surface text-brand-primary">
-          <VideoCameraIcon className="h-4 w-4" />
+    <div className="flex items-center justify-between rounded-xl p-3 hover:bg-surface-50 transition-colors group border border-transparent hover:border-surface-200">
+      <div className="flex items-center gap-4">
+        <div className={`flex h-10 w-10 items-center justify-center rounded-lg shadow-sm ${live ? 'bg-red-50 text-red-600 ring-1 ring-red-100' : 'bg-surface-100 text-muted ring-1 ring-surface-200'}`}>
+          <VideoCameraIcon className="h-5 w-5" />
         </div>
 
         <div>
           <div className="flex items-center gap-2">
-            <p className="text-sm font-bold text-brand-dark group-hover:text-brand-primary transition-colors">
+            <p className="text-sm font-bold text-default group-hover:text-brand-600 transition-colors">
               {title}
             </p>
             {live && (
-              <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-black text-red-600 animate-pulse">
-                LIVE
-              </span>
+              <span className="flex h-2 w-2 rounded-full bg-red-500 animate-pulse ring-2 ring-red-100" />
             )}
           </div>
-          <p className="text-xs text-brand-muted">
-            {time} · <span className="font-semibold text-brand-dark">{attendees} registered</span>
+          <p className="text-xs text-muted font-medium mt-0.5">
+            {time} <span className="mx-1.5 opacity-30">|</span> <span className="text-default">{attendees} registered</span>
           </p>
         </div>
       </div>
 
       <Link
         to={`/dashboard/events/${id}`}
-        className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-all shadow-sm ${live
-          ? "bg-red-600 text-white hover:bg-red-700 shadow-red-200"
-          : "bg-white border border-brand-accent/20 text-brand-dark hover:border-brand-primary hover:text-brand-primary"
+        className={`btn text-xs py-2 px-3 justify-center ${live
+          ? "btn-primary bg-red-600 hover:bg-red-700 shadow-red-200 border-transparent text-white"
+          : "btn-secondary"
           }`}
       >
-        {live ? "Join Session" : "View Details"}
+        {live ? "Join Now" : "Details"}
       </Link>
     </div>
   );

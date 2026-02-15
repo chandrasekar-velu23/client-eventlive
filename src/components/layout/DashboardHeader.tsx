@@ -5,21 +5,28 @@ import {
   BellIcon,
   MagnifyingGlassIcon,
   ChevronLeftIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
+  SunIcon,
+  MoonIcon
 } from "@heroicons/react/24/outline";
 import { useAuth } from "../../hooks/useAuth";
+import { useTheme } from "../../context/ThemeContext";
 import { Popover, Transition, Menu } from '@headlessui/react';
 import { Fragment } from 'react';
 import { useNotificationContext } from '../../context/NotificationContext';
+import CalendarDropdown from './CalendarDropdown';
 
 interface DashboardHeaderProps {
   setIsOpen: (value: boolean) => void;
+  collapsed: boolean;
+  setCollapsed: (value: boolean) => void;
 }
 
-export default function DashboardHeader({ setIsOpen }: DashboardHeaderProps) {
+export default function DashboardHeader({ setIsOpen, collapsed, setCollapsed }: DashboardHeaderProps) {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { unreadCount, notifications, markAsRead } = useNotificationContext();
+  const { theme, toggleTheme } = useTheme();
 
   const userName = user?.name || "Guest";
   const userInitial = userName.charAt(0).toUpperCase();
@@ -35,14 +42,25 @@ export default function DashboardHeader({ setIsOpen }: DashboardHeaderProps) {
 
   return (
     <header className="sticky top-0 z-40 flex h-20 shrink-0 items-center gap-x-6 border-b border-brand-primary/10 bg-white/80 backdrop-blur-md px-4 shadow-sm lg:px-8 transition-all">
-      <div className="flex items-center gap-2 lg:hidden">
+      <div className="flex items-center gap-2">
+        {/* Mobile Toggle */}
         <button
           type="button"
-          className="p-2.5 text-brand-dark hover:bg-brand-surface rounded-lg transition-colors"
+          className="p-2.5 text-brand-dark hover:bg-brand-surface rounded-lg transition-colors lg:hidden"
           onClick={() => setIsOpen(true)}
           aria-label="Open sidebar"
         >
           <Bars3Icon className="h-6 w-6" />
+        </button>
+
+        {/* Desktop Collapse Toggle */}
+        <button
+          type="button"
+          className="hidden p-2 text-brand-muted hover:bg-brand-surface hover:text-brand-primary rounded-lg transition-colors lg:block"
+          onClick={() => setCollapsed(!collapsed)}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          <Bars3Icon className={`h-6 w-6 transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`} />
         </button>
       </div>
 
@@ -68,7 +86,7 @@ export default function DashboardHeader({ setIsOpen }: DashboardHeaderProps) {
         <form className="relative flex flex-1 items-center" onSubmit={(e) => e.preventDefault()}>
           <MagnifyingGlassIcon className="absolute left-3 h-5 w-5 text-brand-muted/70" />
           <input
-            className="h-10 w-full max-w-md rounded-full border-0 bg-brand-surface/50 pl-10 pr-4 text-brand-dark placeholder:text-brand-muted/70 focus:bg-white focus:ring-2 focus:ring-brand-primary/20 sm:text-sm outline-none transition-all"
+            className="h-10 w-full max-w-md rounded-full border-0 bg-brand-50 pl-10 pr-4 text-brand-dark placeholder:text-brand-muted/70 focus:bg-white focus:ring-2 focus:ring-brand-primary/20 sm:text-sm outline-none transition-all"
             placeholder="Search events, analytics, attendees..."
             type="search"
           />
@@ -76,11 +94,23 @@ export default function DashboardHeader({ setIsOpen }: DashboardHeaderProps) {
 
         <div className="flex items-center gap-x-4 lg:gap-x-6">
 
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className={`p-2 rounded-full transition-colors ${theme === 'dark' ? 'bg-brand-50 text-brand-primary' : 'text-brand-muted hover:bg-brand-50 hover:text-brand-dark'}`}
+            title="Toggle Theme"
+          >
+            {theme === 'dark' ? <SunIcon className="h-6 w-6" /> : <MoonIcon className="h-6 w-6" />}
+          </button>
+
+          {/* Calendar Dropdown */}
+          <CalendarDropdown />
+
           {/* Notification Bell */}
           <Popover className="relative">
             {({ open }) => (
               <>
-                <Popover.Button className={`group relative p-2 rounded-full hover:bg-brand-surface/70 transition-colors outline-none ${open ? 'bg-brand-surface text-brand-primary' : 'text-brand-muted'}`}>
+                <Popover.Button className={`group relative p-2 rounded-full hover:bg-brand-50 transition-colors outline-none ${open ? 'bg-brand-50 text-brand-primary' : 'text-brand-muted'}`}>
                   <BellIcon className="h-6 w-6 group-hover:text-brand-dark transition-colors" />
                   {unreadCount > 0 && (
                     <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white animate-pulse" />
@@ -145,8 +175,12 @@ export default function DashboardHeader({ setIsOpen }: DashboardHeaderProps) {
             <Menu as="div" className="relative">
               <Menu.Button className="-m-1.5 flex items-center p-1.5">
                 <span className="sr-only">Open user menu</span>
-                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-brand-primary to-brand-secondary flex items-center justify-center text-white font-bold shadow-lg shadow-brand-primary/20 ring-2 ring-white cursor-pointer hover:ring-brand-primary/30 transition-all">
-                  {userInitial}
+                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-brand-primary to-brand-secondary flex items-center justify-center text-white font-bold shadow-lg shadow-brand-primary/20 ring-2 ring-white cursor-pointer hover:ring-brand-primary/30 transition-all overflow-hidden">
+                  {user?.avatar ? (
+                    <img src={user.avatar} alt={userName} className="h-full w-full object-cover" />
+                  ) : (
+                    userInitial
+                  )}
                 </div>
               </Menu.Button>
               <Transition

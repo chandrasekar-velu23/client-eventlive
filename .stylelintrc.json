@@ -1,0 +1,39 @@
+{
+  "extends": [
+    "stylelint-config-standard"
+  ],
+  "rules": {
+    "at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": [
+          "apply",
+          "layer",
+          "theme",
+          "tailwind",
+          "config",
+          "plugin",
+          "utility",
+          "variant",
+          "custom-variant",
+          "source",
+          "import",
+          "font-face",
+          "keyframes",
+          "supports",
+          "media"
+        ]
+      }
+    ],
+    "selector-pseudo-element-no-unknown": [
+      true,
+      {
+        "ignorePseudoElements": [
+          "webkit-scrollbar",
+          "webkit-scrollbar-track",
+          "webkit-scrollbar-thumb"
+        ]
+      }
+    ]
+  }
+}

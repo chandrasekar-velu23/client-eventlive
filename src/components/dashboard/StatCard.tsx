@@ -14,17 +14,18 @@ export default function StatCard({
   Icon,
 }: StatCardProps) {
   return (
-    <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+    <div className="card flex items-center justify-between p-5 hover:border-brand-primary/20 transition-all duration-300">
       <div>
-        <p className="text-sm text-gray-500">{label}</p>
-        <p className="mt-1 text-2xl font-semibold text-gray-900">{value}</p>
+        <p className="text-sm font-medium text-muted">{label}</p>
+        <p className="mt-1 text-2xl font-bold font-display text-default tracking-tight">{value}</p>
+
         {helper && (
-          <p className="mt-1 text-xs text-gray-500">{helper}</p>
+          <p className="mt-1 text-xs font-medium text-brand-500">{helper}</p>
         )}
       </div>
 
-      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand/10">
-        <Icon className="h-5 w-5 text-brand" />
+      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600 shadow-sm ring-1 ring-brand-100">
+        <Icon className="h-6 w-6" />
       </div>
     </div>
   );

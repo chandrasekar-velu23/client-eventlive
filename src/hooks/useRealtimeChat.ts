@@ -67,7 +67,7 @@ export const useRealtimeChat = (
 
         const token = localStorage.getItem('token');
         const response = await fetch(
-          `http://localhost:5000/api/sessions/${sessionId}/chat?page=${pageNum}&limit=50`,
+          `${import.meta.env.VITE_API_BASE_URL}/sessions/${sessionId}/chat?page=${pageNum}&limit=50`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -117,9 +117,9 @@ export const useRealtimeChat = (
         prev.map((m) =>
           m._id === data.messageId
             ? {
-                ...m,
-                reactions: data.reactions || [],
-              }
+              ...m,
+              reactions: data.reactions || [],
+            }
             : m
         )
       );

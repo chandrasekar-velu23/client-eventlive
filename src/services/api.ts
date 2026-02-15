@@ -53,6 +53,7 @@ export interface EventData {
   agenda?: AgendaItem[];
   sessionCode?: string;
   shareableLink?: string;
+  status?: 'draft' | 'published';
 }
 
 // Export unified image upload utilities

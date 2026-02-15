@@ -187,7 +187,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
                 type="text"
                 onChange={handleChange}
                 required
-                className="mt-1.5 w-full rounded-lg border border-brand-accent bg-brand-surface/20 px-4 py-3"
+                className="mt-1.5 w-full rounded-lg border border-brand-accent bg-brand-50 px-4 py-3"
               />
             </div>
           )}
@@ -201,7 +201,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
               type="email"
               onChange={handleChange}
               required
-              className="mt-1.5 w-full rounded-lg border border-brand-accent bg-brand-surface/20 px-4 py-3"
+              className="mt-1.5 w-full rounded-lg border border-brand-accent bg-brand-50 px-4 py-3"
             />
           </div>
 
@@ -215,7 +215,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
                 type={showPassword ? "text" : "password"}
                 onChange={handleChange}
                 required
-                className="w-full rounded-lg border border-brand-accent bg-brand-surface/20 px-4 py-3 pr-12"
+                className="w-full rounded-lg border border-brand-accent bg-brand-50 px-4 py-3 pr-12"
               />
               <button
                 type="button"
@@ -241,7 +241,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
                 type="password"
                 onChange={handleChange}
                 required
-                className="mt-1.5 w-full rounded-lg border border-brand-accent bg-brand-surface/20 px-4 py-3"
+                className="mt-1.5 w-full rounded-lg border border-brand-accent bg-brand-50 px-4 py-3"
               />
             </div>
           )}

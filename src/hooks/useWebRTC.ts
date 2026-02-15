@@ -33,6 +33,7 @@ export const useWebRTC = ({ sessionId, isHost: _isHost, enabled }: UseWebRTCProp
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [remoteStreams, setRemoteStreams] = useState<{ [userId: string]: MediaStream }>({});
   const [isConnected, setIsConnected] = useState(false);
+  const [socket, setSocket] = useState<Socket | null>(null);
 
   // Helper to create Peer Connection
   // Defined outside useEffect or via useRef to be accessible
@@ -68,12 +69,15 @@ export const useWebRTC = ({ sessionId, isHost: _isHost, enabled }: UseWebRTCProp
     if (socketRef.current?.connected) return;
 
     // Connect to session namespace
-    socketRef.current = io(`${import.meta.env.VITE_API_BASE_URL}/session`, {
+    const newSocket = io(`${import.meta.env.VITE_API_BASE_URL}/session`, {
       auth: { token },
       transports: ['websocket']
     });
 
-    const socket = socketRef.current;
+    socketRef.current = newSocket;
+    setSocket(newSocket);
+
+    const socket = newSocket;
 
     socket.on('connect', () => {
       console.log('Connected to signaling server');
@@ -207,6 +211,7 @@ export const useWebRTC = ({ sessionId, isHost: _isHost, enabled }: UseWebRTCProp
     startLocalStream,
     toggleAudio,
     toggleVideo,
-    shareScreen
+    shareScreen,
+    socket
   };
 };

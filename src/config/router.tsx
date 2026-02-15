@@ -11,9 +11,7 @@ import CreateEvent from '../pages/CreateEvent';
 import ManageEvent from '../pages/ManageEvent';
 import MyProfile from '../pages/MyProfile';
 import Settings from '../pages/Settings';
-import Analytics from '../pages/Analytics';
 import Attendees from '../pages/Attendees';
-import Speakers from '../pages/Speakers';
 
 // Live Event Pages
 const EventLobby = lazy(() => import('../pages/EventLobby'));
@@ -145,26 +143,10 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: '/analytics/:eventId',
-    element: (
-      <ProtectedRoute>
-        <Analytics />
-      </ProtectedRoute>
-    ),
-  },
-  {
     path: '/attendees/:eventId',
     element: (
       <ProtectedRoute>
         <Attendees />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/speakers/:eventId',
-    element: (
-      <ProtectedRoute>
-        <Speakers />
       </ProtectedRoute>
     ),
   },

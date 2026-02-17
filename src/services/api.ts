@@ -1,3 +1,11 @@
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+const joinPaths = (base: string, endpoint: string): string => {
+  const cleanBase = base.endsWith("/") ? base : `${base}/`;
+  const cleanEndpoint = endpoint.startsWith("/") ? endpoint.slice(1) : endpoint;
+  return `${cleanBase}${cleanEndpoint}`;
+};
+
 export interface Speaker {
   _id: string;
   name: string;
@@ -126,13 +134,6 @@ export interface AuthResponse {
 
 
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
-
-const joinPaths = (base: string, endpoint: string): string => {
-  const cleanBase = base.endsWith("/") ? base : `${base}/`;
-  const cleanEndpoint = endpoint.startsWith("/") ? endpoint.slice(1) : endpoint;
-  return `${cleanBase}${cleanEndpoint}`;
-};
 
 
 

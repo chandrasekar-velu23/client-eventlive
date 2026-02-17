@@ -3,7 +3,6 @@ import { Toaster } from "sonner";
 import Header from "./components/layout/Header";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import { useAuth } from "./hooks/useAuth";
-import { ThemeProvider } from "./context/ThemeContext";
 
 // Pages  
 // Pages  
@@ -13,7 +12,6 @@ import GetStarted from "./pages/GetStarted";
 import Dashboard from "./pages/Dashboard";
 import Features from "./pages/Feature";
 import UseCases from "./pages/UseCase";
-import Security from "./pages/Security";
 import CreateEvent from "./pages/CreateEvent";
 import Events from "./pages/MyEvents";
 import Drafts from "./pages/Drafts";
@@ -34,7 +32,7 @@ export default function App() {
 
   return (
     <>
-      <ThemeProvider>
+      <>
         <Toaster position="bottom-right" richColors closeButton />
         {/* Show header only if NOT in dashboard and NOT logged in */}
         {!isDashboardPath && !user && <Header />}
@@ -44,7 +42,6 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/features" element={<Features />} />
           <Route path="/use-cases" element={<UseCases />} />
-          <Route path="/security" element={<Security />} />
           <Route path="/allevents" element={<AllEvent />} />
           <Route path="/join/:code" element={<LiveSession />} />
           {/* Auth Logic */}
@@ -98,7 +95,7 @@ export default function App() {
           {/* Catch-all: Redirects to home if path doesn't exist */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </ThemeProvider>
+      </>
     </>
   );
 }

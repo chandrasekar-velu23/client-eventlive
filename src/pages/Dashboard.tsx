@@ -190,7 +190,7 @@ export default function Dashboard() {
                     return (
                       <>
                         <div className="flex justify-between items-start mb-4">
-                          <Dialog.Title as="h3" className="text-lg font-bold font-display leading-6 text-default flex items-center gap-2">
+                          <Dialog.Title as="h3" className="text-lg font-bold font-display leading-6 text-slate-900 flex items-center gap-2">
                             <span className={`p-2 rounded-lg ${config.bgSoft}`}>
                               <Icon className={`h-5 w-5 ${config.color}`} />
                             </span>
@@ -206,7 +206,7 @@ export default function Dashboard() {
 
                         <div className="mt-2 space-y-4">
                           <div>
-                            <p className="text-sm font-bold text-default mb-1">{selectedNotification.title}</p>
+                            <p className="text-sm font-bold text-slate-900 mb-1">{selectedNotification.title}</p>
                             <p className="text-sm text-muted leading-relaxed">
                               {selectedNotification.message}
                             </p>
@@ -257,7 +257,7 @@ export default function Dashboard() {
       {/* Header Section with Reactive Welcome */}
       <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold font-display text-default tracking-tight">Dashboard</h1>
+          <h1 className="text-3xl font-bold font-display text-slate-900 tracking-tight">Dashboard</h1>
           <p className="text-muted mt-1">
             Welcome back, <span className="font-semibold text-brand-600">{firstName}!</span> Here's what's happening today.
           </p>
@@ -328,7 +328,7 @@ export default function Dashboard() {
           {/* <div className="absolute top-0 right-0 w-64 h-64 bg-brand-50/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" /> */}
 
           <div className="mb-6 flex items-center justify-between border-b border-surface-100 pb-4">
-            <h2 className="text-lg font-bold font-display text-default flex items-center gap-3">
+            <h2 className="text-lg font-bold font-display text-slate-900 flex items-center gap-3">
               {isOrganizer ? "Upcoming Events" : "My Schedule"}
               <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider ${upcomingEvents.length > 0 ? "bg-brand-50 text-brand-600" : "bg-surface-100 text-muted"}`}>
                 {upcomingEvents.length > 0 ? "Active" : "None"}
@@ -379,7 +379,7 @@ export default function Dashboard() {
         {/* Recent Activity Feed - Powered by Notifications */}
         <div className="card p-6 h-full flex flex-col">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-bold font-display text-default">Recent Activity</h2>
+            <h2 className="text-lg font-bold font-display text-slate-900">Recent Activity</h2>
             {notifications.length > 0 && (
               <span className="bg-brand-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm shadow-brand-500/20">
                 {notifications.length} New
@@ -409,12 +409,12 @@ export default function Dashboard() {
                         <span className={`absolute left-2 top-1.5 h-3 w-3 rounded-full border-2 border-white ring-1 ring-surface-200 shadow-sm ${config.borderColor} ${config.bgColor} group-hover:scale-125 transition-transform duration-300 z-10`} />
                         <div className="flex flex-col group-hover:translate-x-1 transition-transform duration-200">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xs font-bold text-default opacity-90 line-clamp-1">{note.title}</span>
+                            <span className="text-xs font-bold text-slate-900 opacity-90 line-clamp-1">{note.title}</span>
                           </div>
                           <span className="text-[11px] font-bold uppercase tracking-wider text-muted opacity-70 mb-1 block">
                             {config.label}
                           </span>
-                          <span className="text-sm text-muted group-hover:text-default transition-colors line-clamp-2 leading-relaxed mb-1">{note.message}</span>
+                          <span className="text-sm text-muted group-hover:text-slate-900 transition-colors line-clamp-2 leading-relaxed mb-1">{note.message}</span>
                           <p className="text-[10px] text-muted/60 font-medium">{new Date(note.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                         </div>
                       </button>

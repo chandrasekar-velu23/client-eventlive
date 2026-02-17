@@ -651,3 +651,16 @@ export const sendRequestEmail = async (data: { type: "inquiry" | "support"; subj
   });
   if (!result.message) throw new Error("Failed to send request");
 };
+
+export const uploadRecording = async (sessionId: string, blob: Blob): Promise<{ url: string }> => {
+  const formData = new FormData();
+  formData.append('recording', blob, `session-${sessionId}-${Date.now()}.webm`);
+
+  const result = await apiFetch<{ url: string }>(`sessions/${sessionId}/recording`, {
+    method: "POST",
+    body: formData
+  });
+
+  if (!result.data) throw new Error("Failed to upload recording");
+  return result.data;
+};

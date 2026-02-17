@@ -72,11 +72,17 @@ export const PollsWidget: React.FC<PollsWidgetProps> = ({
         setNewOptions(updated);
     };
 
+    // Light theme styles
+    const containerClass = 'bg-white border-gray-200 shadow-sm';
+    const textClass = 'text-gray-900';
+    const subTextClass = 'text-gray-500';
+    const inputClass = 'bg-gray-50/50 border-gray-200 text-gray-900 placeholder-gray-400';
+
     return (
         <div className="flex flex-col h-full bg-transparent overflow-hidden">
             {/* Header / Actions */}
             {isHost && (
-                <div className="p-4 border-b border-white/5">
+                <div className="p-4 border-b border-gray-100">
                     {view === 'list' ? (
                         <Button
                             variant="secondary"
@@ -89,7 +95,7 @@ export const PollsWidget: React.FC<PollsWidgetProps> = ({
                         <Button
                             variant="glass"
                             onClick={() => setView('list')}
-                            className="w-full text-xs h-9 text-zinc-400"
+                            className="w-full text-xs h-9 text-gray-500 hover:text-gray-900"
                         >
                             <XMarkIcon className="w-4 h-4 mr-2" /> Cancel
                         </Button>
@@ -100,20 +106,20 @@ export const PollsWidget: React.FC<PollsWidgetProps> = ({
             {/* Content */}
             <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
                 {view === 'create' && isHost ? (
-                    <div className="space-y-4 animate-fade-in bg-white/5 p-4 rounded-xl border border-white/5">
+                    <div className={`space-y-4 animate-fade-in p-4 rounded-xl border ${containerClass}`}>
                         <div>
-                            <label className="block text-xs font-bold mb-1.5 text-zinc-400">Question</label>
+                            <label className={`block text-xs font-bold mb-1.5 ${subTextClass}`}>Question</label>
                             <input
                                 type="text"
                                 placeholder="Ask something..."
                                 value={newQuestion}
                                 onChange={(e) => setNewQuestion(e.target.value)}
-                                className="w-full p-3 rounded-lg text-sm bg-black/50 border border-white/10 text-white placeholder-zinc-600 focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 outline-none transition-all"
+                                className={`w-full p-3 rounded-lg text-sm border focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 outline-none transition-all ${inputClass}`}
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label className="block text-xs font-bold text-zinc-400">Options</label>
+                            <label className={`block text-xs font-bold ${subTextClass}`}>Options</label>
                             {newOptions.map((opt, idx) => (
                                 <div key={idx} className="flex gap-2">
                                     <input
@@ -121,12 +127,12 @@ export const PollsWidget: React.FC<PollsWidgetProps> = ({
                                         placeholder={`Option ${idx + 1}`}
                                         value={opt}
                                         onChange={(e) => updateOption(idx, e.target.value)}
-                                        className="flex-1 p-3 rounded-lg text-sm bg-black/50 border border-white/10 text-white placeholder-zinc-600 focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 outline-none transition-all"
+                                        className={`flex-1 p-3 rounded-lg text-sm border focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 outline-none transition-all ${inputClass}`}
                                     />
                                     {newOptions.length > 2 && (
                                         <button
                                             onClick={() => removeOption(idx)}
-                                            className="p-3 rounded-lg text-zinc-500 hover:text-red-400 hover:bg-white/5 transition-colors"
+                                            className="p-3 rounded-lg transition-colors text-gray-400 hover:text-red-500 hover:bg-red-50"
                                         >
                                             <TrashIcon className="w-5 h-5" />
                                         </button>
@@ -139,7 +145,7 @@ export const PollsWidget: React.FC<PollsWidgetProps> = ({
                             <button
                                 onClick={addOption}
                                 disabled={newOptions.length >= 5}
-                                className="flex-1 py-2.5 rounded-lg text-xs font-bold border border-dashed border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 hover:bg-white/5 transition-all disabled:opacity-50"
+                                className="flex-1 py-2.5 rounded-lg text-xs font-bold border border-dashed transition-all disabled:opacity-50 border-gray-300 text-gray-400 hover:text-brand-600 hover:border-brand-300 hover:bg-brand-50"
                             >
                                 + Add Option
                             </button>
@@ -156,25 +162,25 @@ export const PollsWidget: React.FC<PollsWidgetProps> = ({
                     <div className="space-y-6">
                         {polls.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-12 text-center opacity-50">
-                                <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
-                                    <ChartBarIcon className="w-8 h-8 text-white/50" />
+                                <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 bg-gray-100">
+                                    <ChartBarIcon className="w-8 h-8 text-gray-400" />
                                 </div>
-                                <p className="font-bold text-white">No polls yet</p>
+                                <p className={`font-bold ${textClass}`}>No polls yet</p>
                                 {isHost ? (
-                                    <p className="text-xs text-zinc-400 mt-1">Create a poll to engage your audience</p>
+                                    <p className={`text-xs mt-1 ${subTextClass}`}>Create a poll to engage your audience</p>
                                 ) : (
-                                    <p className="text-xs text-zinc-400 mt-1">Waiting for the host to start a poll</p>
+                                    <p className={`text-xs mt-1 ${subTextClass}`}>Waiting for the host to start a poll</p>
                                 )}
                             </div>
                         ) : (
                             // Reverse to show newest first
                             [...polls].reverse().map((poll) => (
-                                <div key={poll._id} className="p-4 rounded-xl border border-white/10 bg-white/5 shadow-lg">
+                                <div key={poll._id} className={`p-4 rounded-xl border shadow-lg ${containerClass}`}>
                                     <div className="flex justify-between items-start mb-4">
-                                        <h4 className="font-bold text-sm leading-snug text-white">{poll.question}</h4>
+                                        <h4 className={`font-bold text-sm leading-snug ${textClass}`}>{poll.question}</h4>
                                         {poll.isActive && (
-                                            <span className="flex items-center gap-1 text-[10px] font-bold text-green-400 bg-green-900/30 px-2 py-0.5 rounded-full uppercase tracking-wider border border-green-500/20">
-                                                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" /> Live
+                                            <span className="flex items-center gap-1 text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full uppercase tracking-wider border border-green-200">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" /> Live
                                             </span>
                                         )}
                                     </div>
@@ -190,26 +196,26 @@ export const PollsWidget: React.FC<PollsWidgetProps> = ({
                                                     onClick={() => votePoll(poll._id, idx)}
                                                     disabled={poll.userVoted || !poll.isActive}
                                                     className={`relative w-full text-left rounded-lg overflow-hidden group transition-all border border-transparent ${poll.userVoted
-                                                        ? 'bg-zinc-800'
+                                                        ? 'bg-gray-50'
                                                         : (poll.isActive
-                                                            ? 'bg-zinc-800/50 hover:bg-zinc-800 hover:border-white/10'
-                                                            : 'bg-zinc-900 opacity-60 cursor-not-allowed')
+                                                            ? 'bg-gray-50 hover:bg-gray-100 hover:border-gray-200'
+                                                            : 'bg-gray-50 opacity-60' + ' cursor-not-allowed')
                                                         }`}
                                                 >
                                                     {/* Progress Bar Background */}
                                                     {poll.userVoted && (
                                                         <div
-                                                            className={`absolute inset-y-0 left-0 transition-all duration-700 ease-out ${isLeading ? 'bg-brand-600/40' : 'bg-zinc-600/30'}`}
+                                                            className={`absolute inset-y-0 left-0 transition-all duration-700 ease-out ${isLeading ? 'bg-brand-100' : 'bg-gray-200'}`}
                                                             style={{ width: `${percentage}%` }}
                                                         />
                                                     )}
 
                                                     <div className="relative p-3 flex items-center justify-between text-sm z-10">
-                                                        <span className="font-medium text-zinc-200">
+                                                        <span className="font-medium text-gray-700">
                                                             {opt.text}
                                                         </span>
                                                         {poll.userVoted && (
-                                                            <span className={`font-bold tabular-nums text-xs ${isLeading ? 'text-brand-300' : 'text-zinc-400'}`}>
+                                                            <span className={`font-bold tabular-nums text-xs ${isLeading ? 'text-brand-600' : 'text-gray-500'}`}>
                                                                 {percentage}%
                                                             </span>
                                                         )}
@@ -219,10 +225,10 @@ export const PollsWidget: React.FC<PollsWidgetProps> = ({
                                         })}
                                     </div>
 
-                                    <div className="mt-4 flex items-center justify-between text-xs text-zinc-500">
+                                    <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
                                         <span>{poll.totalVotes} votes</span>
                                         {poll.userVoted && (
-                                            <span className="flex items-center gap-1.5 text-brand-400 font-bold bg-brand-400/10 px-2 py-0.5 rounded-full">
+                                            <span className="flex items-center gap-1.5 text-brand-600 font-bold bg-brand-50 px-2 py-0.5 rounded-full">
                                                 <CheckCircleIcon className="w-3.5 h-3.5" /> Voted
                                             </span>
                                         )}

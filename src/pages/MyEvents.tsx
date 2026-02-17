@@ -6,8 +6,6 @@ import {
   CalendarIcon,
   LinkIcon,
   TrashIcon,
-  ArrowRightIcon,
-  VideoCameraIcon,
   MagnifyingGlassIcon,
   XMarkIcon,
   FunnelIcon,

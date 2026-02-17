@@ -3,17 +3,19 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useWebRTC } from '../hooks/useWebRTC';
 import { VideoGrid } from '../components/live/VideoGrid';
-import { LiveChat } from '../components/live/LiveChat';
-import { PollsWidget } from '../components/live/PollsWidget';
+import { SessionSidebar } from '../components/live/SessionSidebar';
 import { useRealtimeChat } from '../hooks/useRealtimeChat';
 import { usePolls } from '../hooks/usePolls';
+import { useQA } from '../hooks/useQA';
+import { useRecording } from '../hooks/useRecording';
+import { useFileTransfer } from '../hooks/useFileTransfer';
 import { joinEventSession, submitSessionFeedback, enrollEvent } from '../services/api';
 import { toast } from 'sonner';
-import { useTheme } from '../context/ThemeContext';
 
 // UI Components
 import Button from '../components/ui/Button';
 import Textarea from '../components/ui/Textarea';
+import { CountdownTimer } from '../components/live/CountdownTimer';
 
 import {
   VideoCameraIcon,
@@ -23,13 +25,13 @@ import {
   ChatBubbleLeftRightIcon,
   UsersIcon,
   ChartBarIcon,
-  SunIcon,
-  MoonIcon,
-  UserCircleIcon,
   StarIcon as StarIconOutline,
   CheckCircleIcon,
   LockClosedIcon,
-  ArrowLeftIcon
+  ArrowLeftIcon,
+  ComputerDesktopIcon,
+  StopIcon,
+  QuestionMarkCircleIcon
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 
@@ -37,7 +39,6 @@ export default function LiveSession() {
   const { code } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { theme, toggleTheme } = useTheme();
 
   // State
   const [event, setEvent] = useState<any>(null);
@@ -57,7 +58,7 @@ export default function LiveSession() {
   // Media State
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [videoEnabled, setVideoEnabled] = useState(true);
-  const [activeSidebar, setActiveSidebar] = useState<'chat' | 'participants' | 'polls' | 'none'>('none');
+  const [activeSidebar, setActiveSidebar] = useState<'chat' | 'participants' | 'polls' | 'qa' | 'none'>('none');
 
   // WebRTC
   const {
@@ -66,6 +67,9 @@ export default function LiveSession() {
     startLocalStream,
     toggleAudio,
     toggleVideo,
+    shareScreen,
+    stopScreenShare,
+    isScreenSharing,
     socket
   } = useWebRTC({
     sessionId: session?._id,
@@ -74,10 +78,38 @@ export default function LiveSession() {
   });
 
   // Chat Hook
-  const { messages, sendMessage, loading: chatLoading } = useRealtimeChat(session?._id, socket);
+  const { messages, sendMessage } = useRealtimeChat(session?._id, socket);
 
   // Polls Hook
   const { polls, activePoll, createPoll, votePoll } = usePolls(socket, session?._id);
+
+  // Q&A Hook
+  const { questions, askQuestion, upvoteQuestion, answerQuestion } = useQA(session?._id, socket, user?.id);
+
+  // Recording Hook
+  const { isRecording, startRecording, stopRecording } = useRecording();
+
+  // File Transfer Hook
+  const { sendFile, handleDataMessage } = useFileTransfer((data) => {
+    if (socket && session?._id) {
+      socket.emit('file-transfer', { sessionId: session._id, transferData: data });
+    }
+  });
+
+  // Listen for file transfers
+  useEffect(() => {
+    if (!socket) return;
+
+    const onFileTransfer = (data: { transferData: any, fromUserId: string }) => {
+      handleDataMessage(data.transferData, data.fromUserId);
+    };
+
+    socket.on('file-transfer', onFileTransfer);
+
+    return () => {
+      socket.off('file-transfer', onFileTransfer);
+    };
+  }, [socket, handleDataMessage]);
 
   // Fetch Event & Session details
   useEffect(() => {
@@ -86,6 +118,15 @@ export default function LiveSession() {
     const loadSession = async () => {
       try {
         const { event: eventData, session: sessionData } = await joinEventSession(code);
+
+        // Time Validation
+        const now = new Date();
+        const endTime = new Date(eventData.endTime);
+
+        if (now > endTime) {
+          setIsSessionEnded(true);
+        }
+
         setEvent(eventData);
         setSession(sessionData);
       } catch (err) {
@@ -124,8 +165,32 @@ export default function LiveSession() {
 
     if (!event) return;
 
-    // Check enrollment
+    const now = new Date();
+    const startTime = new Date(event.startTime);
+    const endTime = new Date(event.endTime);
     const isHost = event.organizerId === user.id;
+
+    // Strict Time Validation
+    if (now > endTime) {
+      toast.error("This event has already ended.");
+      setIsSessionEnded(true);
+      return;
+    }
+
+    // Allow host to join early, but attendees must wait (or maybe 15 min early buffer?)
+    // For now, strict check based on requirements "check the time only the available event only can able to people can join"
+    // Let's allow 15 minutes early join for attendees to get settled in lobby? 
+    // Actually the lobby is already strictly shown. This is the "Join Session" button.
+    // If they are in lobby, they can't click join unless we enable it.
+    // Let's restrict clicking "Join Event Now" until start time.
+    if (!isHost && now < startTime) {
+      const timeDiff = startTime.getTime() - now.getTime();
+      const minutes = Math.ceil(timeDiff / (1000 * 60));
+      toast.error(`Event hasn't started yet. Starts in ${minutes} minutes.`);
+      return;
+    }
+
+    // Check enrollment
     const isEnrolled = event.attendees?.includes(user.id);
 
     if (!isHost && !isEnrolled) {
@@ -183,10 +248,10 @@ export default function LiveSession() {
   }));
 
   if (loading) return (
-    <div className="flex h-screen items-center justify-center bg-zinc-950 text-white">
+    <div className="flex h-screen items-center justify-center bg-gray-50 text-gray-900">
       <div className="flex flex-col items-center gap-4">
         <div className="w-12 h-12 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
-        <p className="font-bold animate-pulse">Connecting to session...</p>
+        <p className="font-bold animate-pulse text-brand-600">Connecting to session...</p>
       </div>
     </div>
   );
@@ -196,8 +261,8 @@ export default function LiveSession() {
   // ------------------------------------------------------------------
   if (isSessionEnded) {
     return (
-      <div className={`flex h-screen w-full items-center justify-center p-6 font-sans transition-colors duration-300 bg-zinc-950 text-white`}>
-        <div className="w-full max-w-lg rounded-3xl p-8 shadow-2xl bg-zinc-900 border border-white/10 relative overflow-hidden">
+      <div className={`flex h-screen w-full items-center justify-center p-6 font-sans transition-colors duration-300 bg-gray-50 text-gray-900`}>
+        <div className="w-full max-w-lg rounded-3xl p-8 shadow-2xl bg-white border border-gray-200 relative overflow-hidden">
           {/* Decorative gradients */}
           <div className="absolute -top-20 -left-20 w-64 h-64 bg-brand-500/20 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl pointer-events-none" />
@@ -206,20 +271,20 @@ export default function LiveSession() {
             <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full mb-6 bg-green-500/10 ring-1 ring-green-500/30">
               <CheckCircleIcon className="h-10 w-10 text-green-500" />
             </div>
-            <h2 className="text-3xl font-bold font-display mb-2">Session Ended</h2>
-            <p className="text-zinc-400">Thank you for attending <strong>{event?.title}</strong>.</p>
+            <h2 className="text-3xl font-bold font-display mb-2 text-gray-900">Session Ended</h2>
+            <p className="text-gray-500">Thank you for attending <strong>{event?.title}</strong>.</p>
           </div>
 
           <div className="space-y-8 relative z-10">
             {/* Rating */}
             <div className="flex flex-col items-center gap-3">
-              <p className="text-sm font-bold text-zinc-400 uppercase tracking-wide">How was the experience?</p>
+              <p className="text-sm font-bold text-gray-400 uppercase tracking-wide">How was the experience?</p>
               <div className="flex gap-2">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
                     onClick={() => setRating(star)}
-                    className={`transition-all duration-200 hover:scale-110 p-1 ${rating >= star ? 'text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]' : 'text-zinc-700'}`}
+                    className={`transition-all duration-200 hover:scale-110 p-1 ${rating >= star ? 'text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]' : 'text-gray-300'}`}
                   >
                     {rating >= star ? <StarIconSolid className="h-10 w-10" /> : <StarIconOutline className="h-10 w-10" />}
                   </button>
@@ -228,25 +293,25 @@ export default function LiveSession() {
             </div>
 
             {/* Requests */}
-            <div className="bg-zinc-950/50 p-6 rounded-2xl border border-white/5 space-y-4">
-              <p className="text-sm font-bold text-zinc-300">I would like to receive:</p>
-              <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl hover:bg-white/5 transition-colors group">
+            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 space-y-4">
+              <p className="text-sm font-bold text-gray-500">I would like to receive:</p>
+              <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl hover:bg-gray-100 transition-colors group">
                 <input
                   type="checkbox"
                   checked={requestTranscript}
                   onChange={e => setRequestTranscript(e.target.checked)}
-                  className="rounded border-zinc-600 bg-zinc-800 text-brand-500 focus:ring-brand-500 transition-all"
+                  className="rounded border-gray-300 bg-white text-brand-500 focus:ring-brand-500 transition-all"
                 />
-                <span className="font-medium group-hover:text-white transition-colors">Session Transcript</span>
+                <span className="font-medium text-gray-700 group-hover:text-gray-900 transition-colors">Session Transcript</span>
               </label>
               <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl hover:bg-white/5 transition-colors group">
                 <input
                   type="checkbox"
                   checked={requestRecording}
                   onChange={e => setRequestRecording(e.target.checked)}
-                  className="rounded border-zinc-600 bg-zinc-800 text-brand-500 focus:ring-brand-500 transition-all"
+                  className="rounded border-gray-300 bg-white text-brand-500 focus:ring-brand-500 transition-all"
                 />
-                <span className="font-medium group-hover:text-white transition-colors">Recorded Video</span>
+                <span className="font-medium text-gray-700 group-hover:text-gray-900 transition-colors">Recorded Video</span>
               </label>
             </div>
 
@@ -257,7 +322,7 @@ export default function LiveSession() {
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
                 placeholder="Share your thoughts with the organizer..."
-                className="bg-zinc-950/50 border-white/10 focus:bg-zinc-950 text-white min-h-[100px]"
+                className="bg-gray-50 border-gray-200 focus:bg-white text-gray-900 min-h-[100px]"
               />
             </div>
 
@@ -265,7 +330,7 @@ export default function LiveSession() {
               <Button
                 variant="secondary"
                 onClick={() => navigate('/dashboard')}
-                className="flex-1 bg-transparent border-white/10 text-white hover:bg-white/5 hover:border-white/20"
+                className="flex-1 bg-transparent border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-900"
               >
                 Skip
               </Button>
@@ -291,28 +356,20 @@ export default function LiveSession() {
     const isLate = event?.startTime ? new Date() > new Date(event.startTime) : false;
 
     return (
-      <div className={`flex h-screen w-full flex-col font-sans transition-colors duration-300 ${theme === 'dark' ? 'bg-zinc-950 text-white' : 'bg-surface-50 text-brand-950'}`}>
-        <header className={`flex h-20 shrink-0 items-center justify-between border-b px-8 ${theme === 'dark' ? 'border-white/10 bg-zinc-900/50 backdrop-blur-md' : 'border-surface-200 bg-white/50 backdrop-blur-md'}`}>
+      <div className="flex h-screen w-full flex-col font-sans transition-colors duration-300 bg-gray-50 text-gray-900">
+        <header className="flex h-20 shrink-0 items-center justify-between border-b px-8 border-gray-200 bg-white/80 backdrop-blur-md">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
               <img src="/icon-EventLive.svg" alt="EventLive" className="h-8 w-8 text-brand-600 shrink-0" />
-              <span className={`text-xl font-bold font-display tracking-tight ${theme === 'dark' ? 'text-white' : 'text-brand-950'}`}>EventLive</span>
+              <span className="text-xl font-bold font-display tracking-tight text-gray-900">EventLive</span>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
-            <button
-              onClick={toggleTheme}
-              className={`p-2 rounded-full transition-colors ${theme === 'dark' ? 'bg-white/5 hover:bg-white/10 text-yellow-400' : 'bg-surface-100 hover:bg-surface-200 text-muted'}`}
-              title="Toggle Theme"
-            >
-              {theme === 'dark' ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
-            </button>
-
             {user ? (
-              <div className={`flex items-center gap-3 pl-6 border-l ${theme === 'dark' ? 'border-white/10' : 'border-surface-200'}`}>
+              <div className="flex items-center gap-3 pl-6 border-l border-gray-200">
                 <div className="text-right hidden sm:block">
-                  <p className={`text-sm font-bold leading-tight ${theme === 'dark' ? 'text-white' : 'text-brand-950'}`}>{user.name}</p>
+                  <p className="text-sm font-bold leading-tight text-gray-900">{user.name}</p>
                 </div>
                 {user.avatar ? (
                   <img src={user.avatar} alt={user.name} className="h-9 w-9 rounded-full object-cover ring-2 ring-brand-500/20" />
@@ -346,23 +403,33 @@ export default function LiveSession() {
                     </span>
                   )}
                 </div>
-                <h1 className={`text-4xl lg:text-6xl font-black font-display leading-tight mb-6 ${theme === 'dark' ? 'text-white' : 'text-brand-950 px-px'}`}>
+                <h1 className="text-4xl lg:text-6xl font-black font-display leading-tight mb-6 text-gray-900">
                   {event?.title}
                 </h1>
 
-                <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                <div className="flex items-center gap-4 p-4 rounded-2xl bg-white border border-gray-100 shadow-sm">
                   {event?.organizerLogo ? (
                     <img src={event.organizerLogo} className="h-14 w-14 rounded-full object-cover ring-2 ring-brand-500/20" alt="Organizer" />
                   ) : (
-                    <div className="h-14 w-14 rounded-full bg-brand-500/20 flex items-center justify-center ring-2 ring-brand-500/20">
-                      <UserCircleIcon className="h-8 w-8 text-brand-500" />
+                    <div className="h-14 w-14 rounded-full bg-brand-100 flex items-center justify-center ring-2 ring-brand-500/20">
+                      <span className="text-xl font-bold text-brand-600">{event?.organizerDisplayName?.charAt(0) || "O"}</span>
                     </div>
                   )}
                   <div>
-                    <p className={`text-sm font-bold uppercase tracking-wider opacity-60`}>Hosted by</p>
-                    <p className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-brand-950'}`}>{event?.organizerDisplayName || "Event Organizer"}</p>
+                    <p className={`text-sm font-bold uppercase tracking-wider text-gray-500`}>Hosted by</p>
+                    <p className="text-lg font-bold text-gray-900">{event?.organizerDisplayName || "Event Organizer"}</p>
                   </div>
                 </div>
+
+                {/* Countdown for Logged In Users */}
+                {user && event?.startTime && !isLate && (
+                  <div className="mt-8 p-6 bg-brand-50 rounded-2xl border border-brand-100">
+                    <p className="text-center font-bold text-brand-900 mb-4 uppercase tracking-widest text-sm">Event Starts In</p>
+                    <div className="flex justify-center">
+                      <CountdownTimer targetDate={new Date(event.startTime)} />
+                    </div>
+                  </div>
+                )}
               </div>
 
               {user ? (
@@ -385,9 +452,25 @@ export default function LiveSession() {
                   </p>
                 </div>
               ) : (
-                <div className="space-y-4 p-6 rounded-2xl bg-brand-500/5 border border-brand-500/10">
-                  <p className={`font-bold text-lg mb-2 ${theme === 'dark' ? 'text-white' : 'text-brand-950'}`}>Ready to join?</p>
-                  <p className="text-sm opacity-70 mb-4">You need to be logged in to access this private session.</p>
+                <div className="space-y-6 p-6 rounded-2xl bg-brand-50 border border-brand-100">
+                  <div className="space-y-2">
+                    <p className="font-bold text-lg text-gray-900">
+                      {isLate ? "Session in Progress" : "Starting Soon"}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {isLate ? "The event has not started yet or you are early." : "The event will begin shortly."}
+                    </p>
+                  </div>
+
+                  {event?.startTime && !isLate && (
+                    <div className="py-4 flex justify-center">
+                      <CountdownTimer targetDate={new Date(event.startTime)} />
+                    </div>
+                  )}
+
+                  <p className="text-sm text-gray-600 border-t border-brand-200 pt-4">
+                    You need to be logged in to access this private session.
+                  </p>
                   <div className="flex gap-3">
                     <Button variant="primary" onClick={() => navigate(`/login?returnUrl=/join/${code}`)} className="flex-1">Log in</Button>
                     <Button variant="secondary" onClick={() => navigate(`/signup?returnUrl=/join/${code}`)} className="flex-1">Create Account</Button>
@@ -398,7 +481,7 @@ export default function LiveSession() {
 
             {/* Right/Top: Video Preview */}
             <div className="flex-1 w-full max-w-xl">
-              <div className="aspect-[4/3] w-full rounded-3xl overflow-hidden bg-black relative shadow-2xl ring-1 ring-white/10 group">
+              <div className="aspect-[4/3] w-full rounded-3xl overflow-hidden bg-gray-900 relative shadow-2xl ring-1 ring-black/5 group">
                 {user ? (
                   <>
                     {localStream && (
@@ -442,11 +525,11 @@ export default function LiveSession() {
                     </div>
                   </>
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center bg-zinc-900">
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
                     <div className="text-center p-8">
-                      <LockClosedIcon className="h-16 w-16 text-zinc-700 mx-auto mb-4" />
-                      <h3 className="text-xl font-bold text-white mb-2">Authenticated Access</h3>
-                      <p className="text-zinc-500 max-w-xs mx-auto">Please sign in to verify your identity and access the camera preview.</p>
+                      <LockClosedIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">Authenticated Access</h3>
+                      <p className="text-gray-500 max-w-xs mx-auto">Please sign in to verify your identity and access the camera preview.</p>
                     </div>
                   </div>
                 )}
@@ -460,32 +543,36 @@ export default function LiveSession() {
   }
 
   // ------------------------------------------------------------------
-  // VIEW: LIVE ROOM (Immersive)
+  // VIEW: LIVE ROOM (Immersive - Kept Dark/Neutral for focus, but lighter elements)
+  // Actually request says: "change the dark theme of lobby and session pages into light theme"
+  // So we should make the container Light, but the video grid usually looks better on dark?
+  // Let's make the container Light gray, but the stage dark? 
+  // "as like as dashboard pages" -> Dashboard is light.
+  // So we will make the main container light.
   // ------------------------------------------------------------------
   return (
-    <div className={`flex h-screen w-full flex-col font-sans transition-colors duration-300 bg-zinc-950 text-white overflow-hidden`}>
+    <div className={`flex h-screen w-full flex-col font-sans transition-colors duration-300 bg-gray-50 text-gray-900 overflow-hidden`}>
       {/* Immersive Header */}
-      <header className={`flex h-16 shrink-0 items-center justify-between px-6 bg-zinc-950/80 backdrop-blur-sm border-b border-white/5 z-20 absolute top-0 left-0 right-0 hover:opacity-100 transition-opacity`}>
+      <header className={`flex h-16 shrink-0 items-center justify-between px-6 bg-white border-b border-gray-200 z-20 absolute top-0 left-0 right-0 hover:opacity-100 transition-opacity`}>
         <div className="flex items-center gap-4">
-          <Button variant="ghost" className="text-white hover:bg-white/10 p-2" onClick={() => navigate('/dashboard')}>
+          <Button variant="ghost" className="text-gray-500 hover:bg-gray-100 p-2" onClick={() => navigate('/dashboard')}>
             <ArrowLeftIcon className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-sm font-bold font-display tracking-tight text-white/90">{event?.title}</h1>
+            <h1 className="text-sm font-bold font-display tracking-tight text-gray-900">{event?.title}</h1>
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
               <span className="text-[10px] font-bold uppercase tracking-widest text-red-500">Live</span>
-              <span className="text-[10px] text-zinc-500">•</span>
-              <span className="text-[10px] text-zinc-400">{session?.participants?.length || 1} watching</span>
+              <span className="text-[10px] text-gray-400">•</span>
+              <span className="text-[10px] text-gray-500">{session?.participants?.length || 1} watching</span>
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Theme toggle could be here but usually dark for live is standard */}
           <div className="hidden md:flex -space-x-2">
             {[...Array(Math.min(3, session?.participants?.length || 0))].map((_, i) => (
-              <div key={i} className="h-8 w-8 rounded-full bg-zinc-800 border-2 border-zinc-950 flex items-center justify-center text-xs font-bold">
+              <div key={i} className="h-8 w-8 rounded-full bg-gray-100 border-2 border-white flex items-center justify-center text-xs font-bold text-gray-700">
                 {String.fromCharCode(65 + i)}
               </div>
             ))}
@@ -495,7 +582,7 @@ export default function LiveSession() {
 
       {/* Main Stage */}
       <div className="flex flex-1 pt-16 h-full relative">
-        <div className="flex-1 p-4 flex items-center justify-center relative bg-zinc-950">
+        <div className="flex-1 p-4 flex items-center justify-center relative bg-gray-100">
           {/* Video Grid takes full space */}
           <div className="w-full h-full max-w-[1600px] flex items-center justify-center">
             <VideoGrid
@@ -508,47 +595,71 @@ export default function LiveSession() {
 
         {/* Floating Controls Bar */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30">
-          <div className="flex items-center gap-2 p-2 rounded-2xl bg-zinc-900/90 backdrop-blur-md border border-white/10 shadow-2xl">
+          <div className="flex items-center gap-2 p-2 rounded-2xl bg-white/90 backdrop-blur-md border border-gray-200 shadow-2xl">
             <button
               onClick={() => setAudioEnabled(!audioEnabled)}
-              className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${audioEnabled ? 'bg-white/10 text-white hover:bg-white/20' : 'bg-red-500 text-white hover:bg-red-600'}`}
+              className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${audioEnabled ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' : 'bg-red-500 text-white hover:bg-red-600'}`}
               title="Toggle Mic"
             >
               {audioEnabled ? <MicrophoneIcon className="h-5 w-5" /> : <MicrophoneIcon className="h-5 w-5 opacity-70" />}
             </button>
             <button
               onClick={() => setVideoEnabled(!videoEnabled)}
-              className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${videoEnabled ? 'bg-white/10 text-white hover:bg-white/20' : 'bg-red-500 text-white hover:bg-red-600'}`}
+              className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${videoEnabled ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' : 'bg-red-500 text-white hover:bg-red-600'}`}
               title="Toggle Camera"
             >
               {videoEnabled ? <VideoCameraIcon className="h-5 w-5" /> : <VideoCameraSlashIcon className="h-5 w-5 opacity-70" />}
             </button>
 
-            <div className="w-px h-8 bg-white/10 mx-2" />
-
+            <div className="w-px h-8 bg-gray-200 mx-2" />
             <button
               onClick={() => setActiveSidebar(prev => prev === 'chat' ? 'none' : 'chat')}
-              className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${activeSidebar === 'chat' ? 'bg-brand-600 text-white' : 'bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10'}`}
+              className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${activeSidebar === 'chat' ? 'bg-brand-600 text-white' : 'bg-gray-50 text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
               title="Chat"
             >
               <ChatBubbleLeftRightIcon className="h-5 w-5" />
             </button>
             <button
               onClick={() => setActiveSidebar(prev => prev === 'participants' ? 'none' : 'participants')}
-              className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${activeSidebar === 'participants' ? 'bg-brand-600 text-white' : 'bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10'}`}
+              className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${activeSidebar === 'participants' ? 'bg-brand-600 text-white' : 'bg-gray-50 text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
               title="Participants"
             >
               <UsersIcon className="h-5 w-5" />
             </button>
             <button
               onClick={() => setActiveSidebar(prev => prev === 'polls' ? 'none' : 'polls')}
-              className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${activeSidebar === 'polls' ? 'bg-brand-600 text-white' : 'bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10'}`}
+              className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${activeSidebar === 'polls' ? 'bg-brand-600 text-white' : 'bg-gray-50 text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
               title="Polls"
             >
               <ChartBarIcon className="h-5 w-5" />
             </button>
+            <button
+              onClick={() => setActiveSidebar(prev => prev === 'qa' ? 'none' : 'qa')}
+              className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${activeSidebar === 'qa' ? 'bg-brand-600 text-white' : 'bg-gray-50 text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
+              title="Q&A"
+            >
+              <QuestionMarkCircleIcon className="h-5 w-5" />
+            </button>
 
-            <div className="w-px h-8 bg-white/10 mx-2" />
+            <div className="w-px h-8 bg-gray-200 mx-2" />
+            <button
+              onClick={isScreenSharing ? stopScreenShare : shareScreen}
+              className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${isScreenSharing ? 'bg-brand-600 text-white' : 'bg-gray-50 text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
+              title={isScreenSharing ? "Stop Sharing" : "Share Screen"}
+            >
+              {isScreenSharing ? <StopIcon className="h-5 w-5" /> : <ComputerDesktopIcon className="h-5 w-5" />}
+            </button>
+
+            {/* Host Only Recording */}
+            {event?.organizerId === user?.id && (
+              <button
+                onClick={isRecording ? stopRecording : startRecording}
+                className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${isRecording ? 'bg-red-600 text-white animate-pulse' : 'bg-gray-50 text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
+                title={isRecording ? "Stop Recording" : "Start Recording"}
+              >
+                <span className={`h-4 w-4 rounded-full ${isRecording ? 'bg-white' : 'bg-red-500 border-2 border-zinc-400'}`} />
+              </button>
+            )}
 
             <button
               onClick={handleLeave}
@@ -560,52 +671,39 @@ export default function LiveSession() {
         </div>
 
         {/* Collapsible Sidebar */}
-        <div className={`transition-all duration-300 ease-in-out border-l border-white/5 bg-zinc-900 z-20 ${activeSidebar !== 'none' ? 'w-80 translate-x-0' : 'w-0 translate-x-full opacity-0'}`}>
+        <div className={`transition-all duration-300 ease-in-out border-l border-gray-200 bg-white z-20 ${activeSidebar !== 'none' ? 'w-80 translate-x-0' : 'w-0 translate-x-full opacity-0'}`}>
           <div className="h-full flex flex-col w-80">
-            <div className="h-14 flex items-center justify-between px-4 border-b border-white/5">
-              <h3 className="font-bold text-sm uppercase tracking-wider text-zinc-400">
+            <div className="h-14 flex items-center justify-between px-4 border-b border-gray-100">
+              <h3 className="font-bold text-sm uppercase tracking-wider text-gray-500">
                 {activeSidebar === 'chat' && 'Live Chat'}
                 {activeSidebar === 'participants' && 'Attendees'}
-                {activeSidebar === 'polls' && 'Polls & Q&A'}
+                {activeSidebar === 'polls' && 'Polls'}
+                {activeSidebar === 'qa' && 'Q&A'}
               </h3>
-              <button onClick={() => setActiveSidebar('none')} className="p-2 text-zinc-500 hover:text-white">
+              <button onClick={() => setActiveSidebar('none')} className="p-2 text-gray-400 hover:text-gray-900">
                 <PhoneXMarkIcon className="h-4 w-4" />
               </button>
             </div>
 
             <div className="flex-1 overflow-hidden">
-              {activeSidebar === 'chat' && (
-                <LiveChat messages={messages} onSendMessage={sendMessage} isLoading={chatLoading} />
-              )}
-              {activeSidebar === 'participants' && (
-                <div className="p-4 space-y-4 overflow-y-auto h-full custom-scrollbar">
-                  {session?.participants?.map((p: any) => (
-                    <div key={p.userId} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors">
-                      <div className="h-8 w-8 rounded-full bg-brand-600 flex items-center justify-center text-xs font-bold shadow-inner">
-                        {p.userName?.charAt(0)}
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-gray-200">{p.userName}</p>
-                        <p className="text-xs text-zinc-500">{p.userId === user?.id ? '(You)' : 'Attendee'}</p>
-                      </div>
-                    </div>
-                  ))}
-                  <div className="pt-4 border-t border-white/5">
-                    <p className="text-xs text-center text-zinc-500">Invite others with the event link!</p>
-                  </div>
-                </div>
-              )}
-              {activeSidebar === 'polls' && (
-                <div className="h-full p-2">
-                  <PollsWidget
-                    polls={polls}
-                    activePoll={activePoll}
-                    createPoll={createPoll}
-                    votePoll={votePoll}
-                    isHost={event?.organizerId === user?.id}
-                  />
-                </div>
-              )}
+              <SessionSidebar
+                open={true}
+                activeView={activeSidebar === 'none' ? null : activeSidebar as any}
+                messages={messages}
+                onSendMessage={sendMessage}
+                onSendFile={sendFile}
+                polls={polls}
+                activePoll={activePoll}
+                createPoll={createPoll}
+                votePoll={votePoll}
+                isHost={event?.organizerId === user?.id}
+                questions={questions}
+                onAskQuestion={askQuestion}
+                onUpvoteQuestion={upvoteQuestion}
+                onAnswerQuestion={answerQuestion}
+                currentUserId={user?.id || ''}
+              // Theme Removed
+              />
             </div>
           </div>
         </div>

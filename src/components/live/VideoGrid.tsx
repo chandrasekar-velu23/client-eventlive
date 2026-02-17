@@ -41,7 +41,7 @@ export const VideoGrid: React.FC<VideoGridProps> = ({
     <div className={`grid ${gridClass} gap-4 w-full h-full content-center p-4 max-h-screen overflow-y-auto custom-scrollbar`}>
       {/* Local Video */}
       {localStream && (
-        <div className={`relative rounded-2xl overflow-hidden shadow-2xl bg-zinc-900 border border-white/10 group ${cardHeight} ring-1 ring-white/5`}>
+        <div className={`relative rounded-2xl overflow-hidden shadow-xl bg-gray-900 border border-gray-200 group ${cardHeight} ring-1 ring-gray-900/5`}>
           <video
             ref={localVideoRef}
             autoPlay
@@ -90,7 +90,7 @@ const RemoteVideoPlayer: React.FC<RemoteVideoPlayerProps> = ({ stream, userId, c
   }, [stream]);
 
   return (
-    <div className={`relative rounded-2xl overflow-hidden shadow-2xl bg-zinc-900 border border-white/10 group ${cardHeight} ring-1 ring-white/5`}>
+    <div className={`relative rounded-2xl overflow-hidden shadow-xl bg-gray-900 border border-gray-200 group ${cardHeight} ring-1 ring-gray-900/5`}>
       <video
         ref={videoRef}
         autoPlay

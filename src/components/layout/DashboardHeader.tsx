@@ -6,11 +6,8 @@ import {
   MagnifyingGlassIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  SunIcon,
-  MoonIcon
 } from "@heroicons/react/24/outline";
 import { useAuth } from "../../hooks/useAuth";
-import { useTheme } from "../../context/ThemeContext";
 import { Popover, Transition, Menu } from '@headlessui/react';
 import { Fragment } from 'react';
 import { useNotificationContext } from '../../context/NotificationContext';
@@ -26,7 +23,6 @@ export default function DashboardHeader({ setIsOpen, collapsed, setCollapsed }: 
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { unreadCount, notifications, markAsRead } = useNotificationContext();
-  const { theme, toggleTheme } = useTheme();
 
   const userName = user?.name || "Guest";
   const userInitial = userName.charAt(0).toUpperCase();
@@ -94,14 +90,7 @@ export default function DashboardHeader({ setIsOpen, collapsed, setCollapsed }: 
 
         <div className="flex items-center gap-x-4 lg:gap-x-6">
 
-          {/* Theme Toggle */}
-          <button
-            onClick={toggleTheme}
-            className={`p-2 rounded-full transition-colors ${theme === 'dark' ? 'bg-brand-50 text-brand-primary' : 'text-brand-muted hover:bg-brand-50 hover:text-brand-dark'}`}
-            title="Toggle Theme"
-          >
-            {theme === 'dark' ? <SunIcon className="h-6 w-6" /> : <MoonIcon className="h-6 w-6" />}
-          </button>
+
 
           {/* Calendar Dropdown */}
           <CalendarDropdown />

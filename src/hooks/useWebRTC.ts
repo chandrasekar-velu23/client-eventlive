@@ -200,18 +200,67 @@ export const useWebRTC = ({ sessionId, isHost: _isHost, enabled }: UseWebRTCProp
     }
   };
 
+  const [isScreenSharing, setIsScreenSharing] = useState(false);
+
+  // ... (existing helper functions)
+
   const shareScreen = async () => {
-    // TODO: Implement replaceTrack logic
+    try {
+      // @ts-ignore - getDisplayMedia exists
+      const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+      const screenTrack = screenStream.getVideoTracks()[0];
+
+      // Replace in all peer connections
+      Object.values(peersRef.current).forEach(pc => {
+        const sender = pc.getSenders().find(s => s.track?.kind === 'video');
+        if (sender) {
+          sender.replaceTrack(screenTrack);
+        }
+      });
+
+      // Handle user stopping via browser UI
+      screenTrack.onended = () => {
+        stopScreenShare();
+      };
+
+      // Create new composite stream: Screen Video + Mic Audio (if active)
+      setLocalStream(prev => {
+        if (!prev) return screenStream;
+        const micTrack = prev.getAudioTracks()[0];
+        const newStream = new MediaStream([screenTrack]);
+        if (micTrack) newStream.addTrack(micTrack);
+        return newStream;
+      });
+
+      setIsScreenSharing(true);
+    } catch (err) {
+      console.error("Screen share failed", err);
+    }
+  };
+
+  const stopScreenShare = async () => {
+    // Revert to camera
+    const stream = await startLocalStream(true, true);
+    if (stream) {
+      const videoTrack = stream.getVideoTracks()[0];
+      Object.values(peersRef.current).forEach(pc => {
+        const sender = pc.getSenders().find(s => s.track?.kind === 'video');
+        if (sender && videoTrack) sender.replaceTrack(videoTrack);
+      });
+    }
+    setIsScreenSharing(false);
   };
 
   return {
     localStream,
     remoteStreams,
     isConnected,
+    isScreenSharing,
     startLocalStream,
     toggleAudio,
     toggleVideo,
     shareScreen,
+    stopScreenShare,
     socket
   };
 };

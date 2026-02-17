@@ -1,29 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { toast } from 'sonner';
-
-interface Question {
-  _id: string;
-  text: string;
-  asker: {
-    _id: string;
-    name: string;
-    avatar?: string;
-  };
-  answers: {
-    _id: string;
-    text: string;
-    responder: {
-      _id: string;
-      name: string;
-      avatar?: string;
-    };
-    createdAt: string;
-  }[];
-  upvotes: number;
-  upvoters: string[];
-  status: 'pending' | 'answered' | 'rejected';
-  createdAt: string;
-}
+import type { Question } from '../../hooks/useQA';
+import { HandThumbUpIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import { HandThumbUpIcon as HandThumbUpIconSolid } from '@heroicons/react/24/solid';
 
 interface QAPanelProps {
   questions: Question[];
@@ -35,10 +14,6 @@ interface QAPanelProps {
   userRole?: 'organizer' | 'speaker' | 'attendee';
 }
 
-/**
- * QAPanel Component
- * Real-time Q&A interface with questions, answers, and upvotes
- */
 export const QAPanel: React.FC<QAPanelProps> = ({
   questions,
   currentUserId,
@@ -61,7 +36,7 @@ export const QAPanel: React.FC<QAPanelProps> = ({
     if (questionsEndRef.current) {
       questionsEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [questions]);
+  }, [questions.length]);
 
   const handleAskQuestion = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,8 +57,8 @@ export const QAPanel: React.FC<QAPanelProps> = ({
       setInputValue('');
       toast.success('Question asked');
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to ask question';
-      toast.error(message);
+      console.error(err);
+      toast.error('Failed to ask question');
     } finally {
       setIsSubmitting(false);
     }
@@ -93,8 +68,7 @@ export const QAPanel: React.FC<QAPanelProps> = ({
     try {
       await onUpvoteQuestion(questionId);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to upvote';
-      toast.error(message);
+      console.error(err);
     }
   };
 
@@ -118,172 +92,126 @@ export const QAPanel: React.FC<QAPanelProps> = ({
         toast.success('Answer submitted');
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to submit answer';
-      toast.error(message);
+      console.error(err);
+      toast.error('Failed to submit answer');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const sortedQuestions = [...questions].sort((a, b) => {
-    // Sort by status (pending first), then by upvotes (descending)
-    if (a.status !== b.status) {
-      const statusOrder = { pending: 0, answered: 1, rejected: 2 };
-      return statusOrder[a.status] - statusOrder[b.status];
+    // Sort by answered status (pending first), then upvotes
+    if (a.isAnswered !== b.isAnswered) {
+      return a.isAnswered ? 1 : -1;
     }
-    return b.upvotes - a.upvotes;
+    return (b.upvotes?.length || 0) - (a.upvotes?.length || 0);
   });
 
   const canAnswer = userRole === 'organizer' || userRole === 'speaker';
 
   return (
-    <div className="flex flex-col h-full bg-gray-900 rounded-lg border border-gray-700 overflow-hidden">
+    <div className="flex flex-col h-full bg-transparent overflow-hidden">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-gray-700 bg-gray-800">
-        <h2 className="text-lg font-bold text-white">Questions & Answers</h2>
-        <p className="text-xs text-gray-400">{questions.length} question{questions.length !== 1 ? 's' : ''}</p>
+      <div className="px-4 py-3 border-b border-gray-100 bg-white/50 backdrop-blur-sm">
+        <h2 className="text-lg font-bold text-gray-900">Q&A</h2>
+        <p className="text-xs text-gray-500">{questions.length} question{questions.length !== 1 ? 's' : ''}</p>
       </div>
 
       {/* Questions List */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
         {questions.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-center">
-            <span className="text-4xl mb-2">❓</span>
+          <div className="flex flex-col items-center justify-center h-full text-center opacity-50">
+            <span className="text-4xl mb-2">💬</span>
+            <span className="text-4xl mb-2">💬</span>
             <p className="text-gray-400">No questions yet</p>
-            <p className="text-xs text-gray-500 mt-1">Be the first to ask a question</p>
+            <p className="text-xs text-gray-400 mt-1">Be the first to ask!</p>
           </div>
         ) : (
           sortedQuestions.map((question) => (
-            <div key={question._id} className="space-y-2">
-              {/* Question Card */}
-              <div className="bg-gray-800 rounded-lg p-3 space-y-2 border border-gray-700">
-                {/* Question Header */}
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-start gap-2 flex-1">
-                    {/* Avatar */}
-                    <div
-                      className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs font-bold"
-                      style={{
-                        backgroundColor: `hsl(${Math.random() * 360}, 70%, 50%)`,
-                        color: 'white',
-                      }}
-                    >
-                      {question.asker.name.charAt(0).toUpperCase()}
-                    </div>
+            <div key={question._id} className={`rounded-xl p-3 border ${question.isAnswered ? 'bg-brand-50 border-brand-100' : 'bg-white border-gray-200 shadow-sm'}`}>
 
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-gray-300">{question.asker.name}</p>
-                      <p className="text-sm text-gray-100 wrap-break-words">{question.text}</p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {new Date(question.createdAt).toLocaleTimeString()}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Status Badge */}
-                  <span
-                    className={`px-2 py-1 rounded text-xs font-medium shrink-0 ${
-                      question.status === 'answered'
-                        ? 'bg-green-900 text-green-200'
-                        : question.status === 'rejected'
-                          ? 'bg-red-900 text-red-200'
-                          : 'bg-yellow-900 text-yellow-200'
-                    }`}
-                  >
-                    {question.status === 'answered' ? '✓ Answered' : question.status === 'rejected' ? '✗ Rejected' : 'Pending'}
-                  </span>
+              {/* Question Header */}
+              <div className="flex items-start gap-3">
+                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white shrink-0">
+                  {question.askedByName?.charAt(0) || '?'}
                 </div>
 
-                {/* Upvote Button */}
-                <div className="flex items-center gap-2">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-bold text-gray-500">{question.askedByName}</span>
+                      <span className="text-[10px] text-gray-400">{new Date(question.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                    <p className="text-sm text-gray-900 leading-relaxed break-words">{question.content}</p>
+                  </div>
+                </div>
+
+                {/* Actions Bar */}
+                <div className="flex items-center justify-between mt-3 pt-2 border-t border-white/5">
                   <button
                     onClick={() => handleUpvote(question._id)}
                     disabled={isLoading}
-                    className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-all ${
-                      question.upvoters.includes(currentUserId)
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-700 hover:bg-gray-600 text-gray-200'
-                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium transition-all ${question.upvotes?.includes(currentUserId)
+                      ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20'
+                      : 'bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-900'
+                      }`}
                   >
-                    <span>👍</span>
-                    <span>{question.upvotes}</span>
+                    {question.upvotes?.includes(currentUserId) ? (
+                      <HandThumbUpIconSolid className="h-3.5 w-3.5" />
+                    ) : (
+                      <HandThumbUpIcon className="h-3.5 w-3.5" />
+                    )}
+                    <span>{question.upvotes?.length || 0}</span>
                   </button>
+
+                  {question.isAnswered ? (
+                    <span className="flex items-center gap-1 text-xs font-medium text-green-400 bg-green-400/10 px-2 py-1 rounded-lg">
+                      <CheckCircleIcon className="h-3.5 w-3.5" /> Answered
+                    </span>
+                  ) : (
+                    canAnswer && (
+                      <button
+                        onClick={() => setAnsweringQuestionId(prev => prev === question._id ? null : question._id)}
+                        className="text-xs font-medium text-brand-400 hover:text-brand-300 transition-colors"
+                      >
+                        {answeringQuestionId === question._id ? 'Cancel' : 'Reply'}
+                      </button>
+                    )
+                  )}
                 </div>
 
-                {/* Answer Section */}
-                {question.answers.length > 0 && (
-                  <div className="mt-3 pt-3 border-t border-gray-700 space-y-2">
-                    {question.answers.map((answer) => (
-                      <div key={answer._id} className="bg-gray-900 rounded p-2 space-y-1">
-                        <div className="flex items-start gap-2">
-                          <div
-                            className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs font-bold"
-                            style={{
-                              backgroundColor: `hsl(${Math.random() * 360}, 70%, 50%)`,
-                              color: 'white',
-                            }}
-                          >
-                            {answer.responder.name.charAt(0).toUpperCase()}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs font-medium text-green-400">{answer.responder.name}</p>
-                            <p className="text-xs text-gray-200 wrap-break-words">{answer.text}</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                {/* Answer Display */}
+                {question.isAnswered && question.answer && (
+                  <div className="mt-3 pl-3 border-l-2 border-green-500/30">
+                    <p className="text-xs font-bold text-green-600 mb-1">Answered by {question.answeredBy || 'Host'}</p>
+                    <p className="text-sm text-gray-700">{question.answer}</p>
                   </div>
                 )}
 
-                {/* Answer Button */}
-                {canAnswer && question.status === 'pending' && (
-                  <button
-                    onClick={() => setAnsweringQuestionId(question._id)}
-                    disabled={isLoading}
-                    className="w-full mt-2 px-2 py-1 rounded text-xs font-medium bg-blue-600 hover:bg-blue-700 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Answer
-                  </button>
-                )}
-
-                {/* Answer Input */}
+                {/* Answer Input (For Host) */}
                 {answeringQuestionId === question._id && canAnswer && (
-                  <div className="mt-2 space-y-2 bg-gray-900 rounded p-2">
+                  <div className="mt-3 space-y-2 animate-in fade-in slide-in-from-top-2">
                     <textarea
                       value={answerInputValue}
                       onChange={(e) => setAnswerInputValue(e.target.value)}
                       placeholder="Type your answer..."
                       maxLength={MAX_ANSWER_LENGTH}
-                      className="w-full px-2 py-2 rounded bg-gray-800 text-gray-100 text-xs placeholder-gray-500 border border-gray-700 focus:border-blue-500 focus:outline-none resize-none"
+                      className="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 text-sm focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none resize-none"
                       rows={2}
+                      autoFocus
                     />
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs text-gray-400">
-                        {answerInputValue.length}/{MAX_ANSWER_LENGTH}
-                      </span>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => {
-                            setAnsweringQuestionId(null);
-                            setAnswerInputValue('');
-                          }}
-                          disabled={isSubmitting}
-                          className="px-2 py-1 rounded text-xs font-medium bg-gray-700 hover:bg-gray-600 text-gray-100 transition-all disabled:opacity-50"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          onClick={() => handleAnswerSubmit(question._id)}
-                          disabled={isSubmitting}
-                          className="px-2 py-1 rounded text-xs font-medium bg-blue-600 hover:bg-blue-700 text-white transition-all disabled:opacity-50"
-                        >
-                          {isSubmitting ? 'Submitting...' : 'Submit'}
-                        </button>
-                      </div>
+                    <div className="flex justify-end gap-2">
+                      <button
+                        onClick={() => handleAnswerSubmit(question._id)}
+                        disabled={isSubmitting}
+                        className="px-3 py-1.5 rounded-lg text-xs font-bold bg-brand-500 text-white hover:bg-brand-400 transition-all shadow-lg"
+                      >
+                        {isSubmitting ? 'Sending...' : 'Send Answer'}
+                      </button>
                     </div>
                   </div>
                 )}
+
               </div>
             </div>
           ))
@@ -291,30 +219,40 @@ export const QAPanel: React.FC<QAPanelProps> = ({
         <div ref={questionsEndRef} />
       </div>
 
-      {/* Input Form */}
-      <form onSubmit={handleAskQuestion} className="border-t border-gray-700 p-3 bg-gray-800 space-y-2">
-        <textarea
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          placeholder="Ask a question..."
-          maxLength={MAX_QUESTION_LENGTH}
-          disabled={isSubmitting || isLoading}
-          className="w-full px-3 py-2 rounded bg-gray-900 text-gray-100 text-sm placeholder-gray-500 border border-gray-700 focus:border-blue-500 focus:outline-none resize-none disabled:opacity-50"
-          rows={2}
-        />
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-xs text-gray-400">
-            {inputValue.length}/{MAX_QUESTION_LENGTH}
-          </span>
+      {/* Input Area */}
+      <div className="p-4 border-t border-gray-100 bg-white">
+        <form onSubmit={handleAskQuestion} className="relative">
+          <textarea
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder="Ask a question..."
+            maxLength={MAX_QUESTION_LENGTH}
+            disabled={isSubmitting || isLoading}
+            className="w-full pl-4 pr-12 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 text-sm placeholder-gray-400 focus:bg-white focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all resize-none shadow-inner"
+            rows={1}
+            style={{ minHeight: '46px', maxHeight: '120px' }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleAskQuestion(e);
+              }
+            }}
+          />
           <button
             type="submit"
             disabled={isSubmitting || isLoading || !inputValue.trim()}
-            className="px-4 py-2 rounded text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="absolute right-2 top-2 p-1.5 rounded-lg bg-brand-500 text-white hover:bg-brand-400 disabled:opacity-50 disabled:bg-zinc-700 transition-all"
+            title="Send Question"
           >
-            {isSubmitting ? 'Asking...' : 'Ask'}
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+              <path d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.925A1.5 1.5 0 005.135 9.25h6.115a.75.75 0 010 1.5H5.135a1.5 1.5 0 00-1.442 1.086l-1.414 4.926a.75.75 0 00.826.95 28.896 28.896 0 0015.293-7.154.75.75 0 000-1.115A28.897 28.897 0 003.105 2.289z" />
+            </svg>
           </button>
-        </div>
-      </form>
+        </form>
+        <p className="text-[10px] text-gray-400 text-center mt-2">
+          Questions are visible to everyone in the session.
+        </p>
+      </div>
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { useState, useEffect, Fragment, useCallback } from "react";
+import { useState, useEffect, Fragment, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useEvents } from "../hooks/useEvents";
@@ -170,14 +170,24 @@ const DragDropFileUpload = ({
 }) => {
     const [dragActive, setDragActive] = useState(false);
     const [mode, setMode] = useState<'upload' | 'link'>('upload');
+    const dragCounter = useRef(0);
 
     const handleDrag = useCallback((e: React.DragEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        if (e.type === "dragenter" || e.type === "dragover") {
-            setDragActive(true);
+
+        if (e.type === "dragenter") {
+            dragCounter.current += 1;
+            if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+                setDragActive(true);
+            }
         } else if (e.type === "dragleave") {
-            setDragActive(false);
+            dragCounter.current -= 1;
+            if (dragCounter.current === 0) {
+                setDragActive(false);
+            }
+        } else if (e.type === "dragover") {
+            // Essential to allow dropping
         }
     }, []);
 
@@ -185,6 +195,7 @@ const DragDropFileUpload = ({
         e.preventDefault();
         e.stopPropagation();
         setDragActive(false);
+        dragCounter.current = 0;
 
         const file = e.dataTransfer.files?.[0];
         if (file) {
@@ -436,6 +447,18 @@ export default function CreateEvent() {
                 }
                 if (new Date(formData.startTime) >= new Date(formData.endTime)) {
                     toast.error("End time must be after start time");
+                    return false;
+                }
+                return true;
+
+            case 4:
+                // Organizer Details Validation
+                if (!formData.organizerDisplayName) {
+                    toast.error("Organizer Name is required");
+                    return false;
+                }
+                if (!formData.organizerEmail) {
+                    toast.error("Organizer Email is required");
                     return false;
                 }
                 return true;
@@ -740,7 +763,7 @@ export default function CreateEvent() {
 
                         <div className="space-y-6">
                             <Input
-                                label="Event Title"
+                                label="Event Title *"
                                 value={formData.title}
                                 onChange={e => updateFormData({ title: e.target.value })}
                                 placeholder="e.g. Annual Tech Conference 2024"
@@ -750,7 +773,7 @@ export default function CreateEvent() {
                             />
 
                             <Input
-                                label="Short Summary"
+                                label="Short Summary *"
                                 value={formData.shortSummary}
                                 onChange={e => updateFormData({ shortSummary: e.target.value })}
                                 placeholder="A catchy one-sentence pitch..."
@@ -758,7 +781,7 @@ export default function CreateEvent() {
                             />
 
                             <Textarea
-                                label="Full Description"
+                                label="Full Description *"
                                 value={formData.description}
                                 onChange={e => updateFormData({ description: e.target.value })}
                                 rows={6}
@@ -805,7 +828,7 @@ export default function CreateEvent() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <Input
                                 type="datetime-local"
-                                label="Start Date & Time"
+                                label="Start Date & Time *"
                                 value={formData.startTime}
                                 onChange={e => updateFormData({ startTime: e.target.value })}
                                 style={{ colorScheme: 'light' }}
@@ -813,7 +836,7 @@ export default function CreateEvent() {
 
                             <Input
                                 type="datetime-local"
-                                label="End Date & Time"
+                                label="End Date & Time *"
                                 value={formData.endTime}
                                 onChange={e => updateFormData({ endTime: e.target.value })}
                                 style={{ colorScheme: 'light' }}
@@ -935,14 +958,14 @@ export default function CreateEvent() {
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                             <div className="space-y-6">
                                 <Input
-                                    label="Organizer Name"
+                                    label="Organizer Name *"
                                     value={formData.organizerDisplayName}
                                     onChange={e => updateFormData({ organizerDisplayName: e.target.value })}
                                     placeholder="Your organization or name"
                                 />
                                 <Input
                                     type="email"
-                                    label="Contact Email"
+                                    label="Contact Email *"
                                     value={formData.organizerEmail}
                                     onChange={e => updateFormData({ organizerEmail: e.target.value })}
                                     placeholder="contact@example.com"

@@ -19,6 +19,7 @@ import { useEvents } from "../hooks/useEvents";
 import { useEventAttendance } from "../hooks/useEventAttendance";
 import { useNotificationContext } from "../context/NotificationContext";
 import { type Notification } from "../hooks/useNotifications";
+import { formatEventDate, formatEventTime, isEventLive } from "../utils/date";
 
 import StatCard from "../components/dashboard/StatCard";
 import EventRow from "../components/dashboard/EventRow";
@@ -134,11 +135,7 @@ export default function Dashboard() {
         .filter(e => new Date(e.endTime) > now)
         .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
 
-      const live = events.filter(e => {
-        const start = new Date(e.startTime);
-        const end = new Date(e.endTime);
-        return start <= now && end >= now;
-      });
+      const live = events.filter(e => isEventLive(e.startTime, e.endTime));
 
       setUpcomingEvents(upcoming);
 
@@ -214,10 +211,7 @@ export default function Dashboard() {
 
                           <div className="flex items-center gap-2 text-xs text-muted font-medium bg-surface-50 p-2 rounded border border-surface-200">
                             <CalendarDaysIcon className="h-4 w-4" />
-                            {new Date(selectedNotification.timestamp).toLocaleString(undefined, {
-                              dateStyle: 'medium',
-                              timeStyle: 'short'
-                            })}
+                            {`${formatEventDate(selectedNotification.timestamp)} • ${formatEventTime(selectedNotification.timestamp)}`}
                           </div>
 
                           {/* Action Buttons based on context */}
@@ -360,15 +354,14 @@ export default function Dashboard() {
           ) : (
             <div className="space-y-3 relative z-10">
               {upcomingEvents.slice(0, 3).map((event) => {
-                const isLive = new Date(event.startTime) <= new Date() && new Date(event.endTime) >= new Date();
                 return (
                   <EventRow
                     key={event.id}
                     id={event.id}
                     title={event.title}
-                    time={`${new Date(event.startTime).toLocaleDateString()} ${new Date(event.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
+                    time={`${formatEventDate(event.startTime)} ${formatEventTime(event.startTime, event.timezone)}`}
                     attendees={event.attendees?.length || 0}
-                    live={isLive}
+                    live={isEventLive(event.startTime, event.endTime)}
                   />
                 );
               })}
@@ -415,7 +408,7 @@ export default function Dashboard() {
                             {config.label}
                           </span>
                           <span className="text-sm text-muted group-hover:text-slate-900 transition-colors line-clamp-2 leading-relaxed mb-1">{note.message}</span>
-                          <p className="text-[10px] text-muted/60 font-medium">{new Date(note.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                          <p className="text-[10px] text-muted/60 font-medium">{formatEventTime(note.timestamp)}</p>
                         </div>
                       </button>
                     </li>

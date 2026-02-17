@@ -6,6 +6,7 @@ import { useSession } from '../hooks/useSession';
 import DashboardLayout from '../components/layout/DashboardLayout';
 import RequestSupportModal from '../components/dashboard/RequestSupportModal';
 import { QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
+import { formatEventDate, formatEventTime, isEventUpcoming, getRelativeTime } from "../utils/date";
 
 interface EventDetails {
   _id: string;
@@ -169,7 +170,7 @@ const EventLobby: React.FC = () => {
     );
   }
 
-  const isEventStarted = new Date(eventDetails.startTime) <= new Date();
+  const isEventStarted = !isEventUpcoming(eventDetails.startTime);
 
   return (
     <DashboardLayout>
@@ -287,16 +288,12 @@ const EventLobby: React.FC = () => {
                   <div>
                     <p className="text-gray-400 text-sm mb-2">Start Time</p>
                     <p className="text-white font-medium">
-                      {new Date(eventDetails.startTime).toLocaleString()}
+                      {formatEventDate(eventDetails.startTime)} • {formatEventTime(eventDetails.startTime)}
                     </p>
                     {!isEventStarted && (
                       <p className="text-yellow-400 text-xs mt-1 flex items-center gap-1">
                         <span>⏱️</span>
-                        Event starts in{' '}
-                        {Math.ceil(
-                          (new Date(eventDetails.startTime).getTime() - new Date().getTime()) / 60000,
-                        )}{' '}
-                        minutes
+                        Event starts {getRelativeTime(eventDetails.startTime)}
                       </p>
                     )}
                   </div>

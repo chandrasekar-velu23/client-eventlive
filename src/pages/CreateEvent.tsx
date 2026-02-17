@@ -516,7 +516,16 @@ export default function CreateEvent() {
             const utcEndTime = localToUTC(formData.endTime.split('T')[0], formData.endTime.split('T')[1], formData.timezone);
 
             if (!utcStartTime || !utcEndTime) {
-                throw new Error("Invalid date or time selection");
+                toast.error("Invalid date or time selection");
+                setLoading(false);
+                return;
+            }
+
+            // Ensure start time is before end time (using UTC comparison)
+            if (new Date(utcStartTime) >= new Date(utcEndTime)) {
+                toast.error("End time must be after start time");
+                setLoading(false);
+                return;
             }
 
             const eventParams: EventData = {

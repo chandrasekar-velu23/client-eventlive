@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useEvents } from "../hooks/useEvents";
+import { formatEventDate, formatEventTime, isEventLive, isEventPast } from "../utils/date";
 import { Link } from "react-router-dom";
 import {
   PlusIcon,
@@ -69,7 +70,7 @@ export default function MyEvents() {
     }
     const now = new Date();
     filtered = filtered.filter(e => {
-      const eventDate = new Date(e.startTime);
+      const eventDate = new Date(e.startTime); // Standard comparison still needs Date object, but we could wrap this too
       if (viewFilter === "All") return true;
       if (viewFilter === "This Year") return eventDate.getFullYear() === now.getFullYear();
       if (viewFilter === "This Month") {
@@ -87,9 +88,10 @@ export default function MyEvents() {
 
   // --- Splitting Logic ---
   const { upcomingEvents, pastEvents } = useMemo(() => {
-    const now = new Date();
-    const upcoming = filteredEvents.filter(e => new Date(e.endTime) >= now);
-    const past = filteredEvents.filter(e => new Date(e.endTime) < now);
+    // strict comparison using helper functions on the ISO strings
+    const upcoming = filteredEvents.filter(e => !isEventPast(e.endTime));
+    const past = filteredEvents.filter(e => isEventPast(e.endTime));
+
     upcoming.sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
     past.sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
     return { upcomingEvents: upcoming, pastEvents: past };
@@ -226,7 +228,7 @@ export default function MyEvents() {
 
 function EventCard({ event, isOrganizer, onDelete, onCopyLink, isPast }: any) {
   const startDate = new Date(event.startTime);
-  const isLive = new Date(event.startTime) <= new Date() && new Date(event.endTime) >= new Date();
+  const isLive = isEventLive(event.startTime, event.endTime);
   const attendeeCount = event.attendees?.length || 0;
 
   return (
@@ -258,9 +260,9 @@ function EventCard({ event, isOrganizer, onDelete, onCopyLink, isPast }: any) {
         <div className="space-y-2 mt-auto text-sm text-brand-400 border-t border-gray-100 pt-4">
           <div className="flex items-center gap-2">
             <CalendarIcon className="h-4 w-4" />
-            <span className="font-medium text-brand-700">{startDate.toLocaleDateString()}</span>
+            <span className="font-medium text-brand-700">{formatEventDate(startDate)}</span>
             <span className="text-xs opacity-70">•</span>
-            <span>{startDate.toLocaleTimeString([], { timeStyle: 'short', timeZoneName: 'short' })}</span>
+            <span>{formatEventTime(startDate, event.timezone)}</span>
           </div>
           <div className="flex items-center gap-2">
             <UserGroupIcon className="h-4 w-4" />

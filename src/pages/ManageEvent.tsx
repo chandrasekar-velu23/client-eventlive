@@ -23,6 +23,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { getAllSpeakers, uploadCoverImage, createGlobalSpeaker } from "../services/api";
 import type { EventData, Speaker, AgendaItem } from "../services/api";
+import { formatEventDate, formatEventTime } from "../utils/date";
 
 // UI Components
 import Button from "../components/ui/Button";
@@ -58,11 +59,16 @@ export default function ManageEvent() {
   const [newSpeakerData, setNewSpeakerData] = useState({ name: "", role: "", bio: "" });
   const [creatingSpeaker, setCreatingSpeaker] = useState(false);
 
-  // Helper to format date for input
+  // Helper to format date for input (datetime-local expects YYYY-MM-DDTHH:mm)
   const toInputDate = (dateStr?: string | Date) => {
     if (!dateStr) return "";
     const date = new Date(dateStr);
     if (isNaN(date.getTime())) return "";
+    // format to local time string for input
+    // Using simple ISO slice is risky if not handling timezone, but input[type="datetime-local"] is local to browser by default.
+    // However, we want to show the event's time in the user's local time (or event's timezone if we want to be fancy, but stick to local for editing usually)
+
+    // Better approach:
     const offset = date.getTimezoneOffset() * 60000;
     const localISOTime = (new Date(date.getTime() - offset)).toISOString().slice(0, 16);
     return localISOTime;
@@ -274,7 +280,7 @@ export default function ManageEvent() {
 
       const payload = {
         ...formData,
-        startTime: new Date(startTimeInput).toISOString(),
+        startTime: new Date(startTimeInput).toISOString(), // This takes browser local time input and converts to UTC ISO
         endTime: new Date(endTimeInput).toISOString(),
       };
 
@@ -548,11 +554,11 @@ export default function ManageEvent() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-brand-400 font-bold">Start Time</p>
-                    <p className="text-brand-900 font-semibold">{new Date(event.startTime).toLocaleString([], { timeZoneName: 'short' })}</p>
+                    <p className="text-brand-900 font-semibold">{formatEventDate(event.startTime)} • {formatEventTime(event.startTime)}</p>
                   </div>
                   <div>
                     <p className="text-sm text-brand-400 font-bold">End Time</p>
-                    <p className="text-brand-900 font-semibold">{new Date(event.endTime).toLocaleString([], { timeZoneName: 'short' })}</p>
+                    <p className="text-brand-900 font-semibold">{formatEventDate(event.endTime)} • {formatEventTime(event.endTime)}</p>
                   </div>
                 </div>
               </div>

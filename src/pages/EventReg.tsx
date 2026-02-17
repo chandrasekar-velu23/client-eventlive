@@ -12,6 +12,7 @@ import {
   CheckCircleIcon,
 } from "@heroicons/react/24/outline";
 import type { EventData } from "../services/api";
+import { formatEventDate, formatEventTime, isEventUpcoming } from "../utils/date";
 
 /**
  * EventReg Component
@@ -100,9 +101,7 @@ export default function EventReg() {
     );
   }
 
-  const startDate = new Date(event.startTime);
-  const endDate = new Date(event.endTime);
-  const isUpcoming = startDate > new Date();
+  const isUpcoming = isEventUpcoming(event.startTime);
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -176,12 +175,7 @@ export default function EventReg() {
                 <div className="flex items-center gap-2 text-brand-dark font-bold">
                   <CalendarIcon className="h-5 w-5 text-brand-primary" />
                   <span>
-                    {startDate.toLocaleDateString()} at{" "}
-                    {startDate.toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      timeZoneName: "short"
-                    })}
+                    {formatEventDate(event.startTime)} at {formatEventTime(event.startTime)}
                   </span>
                 </div>
               </div>
@@ -193,12 +187,7 @@ export default function EventReg() {
                 <div className="flex items-center gap-2 text-brand-dark font-bold">
                   <CalendarIcon className="h-5 w-5 text-brand-primary" />
                   <span>
-                    {endDate.toLocaleDateString()} at{" "}
-                    {endDate.toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      timeZoneName: "short"
-                    })}
+                    {formatEventDate(event.endTime)} at {formatEventTime(event.endTime)}
                   </span>
                 </div>
               </div>

@@ -260,7 +260,7 @@ function EventCard({ event, isOrganizer, onDelete, onCopyLink, isPast }: any) {
             <CalendarIcon className="h-4 w-4" />
             <span className="font-medium text-brand-700">{startDate.toLocaleDateString()}</span>
             <span className="text-xs opacity-70">•</span>
-            <span>{startDate.toLocaleTimeString([], { timeStyle: 'short' })}</span>
+            <span>{startDate.toLocaleTimeString([], { timeStyle: 'short', timeZoneName: 'short' })}</span>
           </div>
           <div className="flex items-center gap-2">
             <UserGroupIcon className="h-4 w-4" />

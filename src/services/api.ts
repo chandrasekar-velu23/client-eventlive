@@ -1,4 +1,8 @@
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+export const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+// Derive SOCKET_URL from BASE_URL (strip /api if present)
+// This ensures we connect to the root domain where socket.io is hosted
+export const SOCKET_URL = BASE_URL.replace(/\/api\/?$/, '');
 
 const joinPaths = (base: string, endpoint: string): string => {
   const cleanBase = base.endsWith("/") ? base : `${base}/`;

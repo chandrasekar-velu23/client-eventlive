@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import io, { Socket } from 'socket.io-client';
 import { useAuth } from './useAuth';
+import { SOCKET_URL } from '../services/api';
 
 const ICE_SERVERS = {
   iceServers: [
@@ -69,9 +70,11 @@ export const useWebRTC = ({ sessionId, isHost: _isHost, enabled }: UseWebRTCProp
     if (socketRef.current?.connected) return;
 
     // Connect to session namespace
-    const newSocket = io(`${import.meta.env.VITE_API_BASE_URL}/session`, {
+    // Use SOCKET_URL + namespace
+    const newSocket = io(`${SOCKET_URL}/session`, {
+      path: '/socket.io',
       auth: { token },
-      transports: ['websocket']
+      transports: ['websocket', 'polling']
     });
 
     socketRef.current = newSocket;

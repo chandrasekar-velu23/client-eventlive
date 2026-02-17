@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
+import { SOCKET_URL, BASE_URL } from '../services/api';
 
 export interface Participant {
   userId: string;
@@ -79,7 +80,7 @@ export const useSession = (sessionId: string | null): UseSessionReturn => {
         setError(null);
 
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:5000/api/sessions/${id}`, {
+        const response = await fetch(`${BASE_URL}/sessions/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -114,12 +115,14 @@ export const useSession = (sessionId: string | null): UseSessionReturn => {
     }
 
     try {
-      const newSocket = io('http://localhost:5000', {
+      const newSocket = io(SOCKET_URL, {
+        path: '/socket.io', // Ensure path matches backend
         auth: { token },
         reconnection: true,
         reconnectionDelay: 1000,
         reconnectionDelayMax: 5000,
         reconnectionAttempts: 5,
+        transports: ['websocket', 'polling'] // Allow fallback
       });
 
       newSocket.on('connect', () => {
@@ -150,11 +153,11 @@ export const useSession = (sessionId: string | null): UseSessionReturn => {
           prev.map((p) =>
             p.userId === data.userId
               ? {
-                  ...p,
-                  isMuted: data.isMuted !== undefined ? data.isMuted : p.isMuted,
-                  videoEnabled:
-                    data.videoEnabled !== undefined ? data.videoEnabled : p.videoEnabled,
-                }
+                ...p,
+                isMuted: data.isMuted !== undefined ? data.isMuted : p.isMuted,
+                videoEnabled:
+                  data.videoEnabled !== undefined ? data.videoEnabled : p.videoEnabled,
+              }
               : p
           )
         );
@@ -188,7 +191,7 @@ export const useSession = (sessionId: string | null): UseSessionReturn => {
         setError(null);
 
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:5000/api/sessions/${id}/join`, {
+        const response = await fetch(`${BASE_URL}/sessions/${id}/join`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -221,7 +224,7 @@ export const useSession = (sessionId: string | null): UseSessionReturn => {
       setError(null);
 
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/sessions/${sessionId}/leave`, {
+      const response = await fetch(`${BASE_URL}/sessions/${sessionId}/leave`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -250,7 +253,7 @@ export const useSession = (sessionId: string | null): UseSessionReturn => {
     try {
       setError(null);
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/sessions/${sessionId}/start`, {
+      const response = await fetch(`${BASE_URL}/sessions/${sessionId}/start`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -275,7 +278,7 @@ export const useSession = (sessionId: string | null): UseSessionReturn => {
     try {
       setError(null);
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/sessions/${sessionId}/end`, {
+      const response = await fetch(`${BASE_URL}/sessions/${sessionId}/end`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -302,7 +305,7 @@ export const useSession = (sessionId: string | null): UseSessionReturn => {
         setError(null);
         const token = localStorage.getItem('token');
         const response = await fetch(
-          `http://localhost:5000/api/sessions/${sessionId}/participants/${userId}/mute`,
+          `${BASE_URL}/sessions/${sessionId}/participants/${userId}/mute`,
           {
             method: 'POST',
             headers: {
@@ -335,7 +338,7 @@ export const useSession = (sessionId: string | null): UseSessionReturn => {
         setError(null);
         const token = localStorage.getItem('token');
         const response = await fetch(
-          `http://localhost:5000/api/sessions/${sessionId}/participants/${userId}/unmute`,
+          `${BASE_URL}/sessions/${sessionId}/participants/${userId}/unmute`,
           {
             method: 'POST',
             headers: {
@@ -368,7 +371,7 @@ export const useSession = (sessionId: string | null): UseSessionReturn => {
         setError(null);
         const token = localStorage.getItem('token');
         const response = await fetch(
-          `http://localhost:5000/api/sessions/${sessionId}/participants/${userId}`,
+          `${BASE_URL}/sessions/${sessionId}/participants/${userId}`,
           {
             method: 'DELETE',
             headers: {

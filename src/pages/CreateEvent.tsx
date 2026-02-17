@@ -5,6 +5,7 @@ import { useEvents } from "../hooks/useEvents";
 import { createGlobalSpeaker, getAllSpeakers } from "../services/api";
 import { uploadCoverImage, uploadSpeakerImage, uploadOrganizerLogo, validateImageFile } from "../utils/imageUpload";
 import { getImageUrl } from "../utils/urlHelpers";
+import { localToUTC } from "../utils/date";
 import type { Speaker, AgendaItem, EventData } from "../services/api";
 import { toast } from "sonner";
 import { Dialog, Transition } from '@headlessui/react';
@@ -509,6 +510,15 @@ export default function CreateEvent() {
         setLoading(true);
 
         try {
+            // Convert local time inputs to UTC strings based on selected timezone
+            // This ensures backend receives the exact absolute time the user intended
+            const utcStartTime = localToUTC(formData.startTime.split('T')[0], formData.startTime.split('T')[1], formData.timezone);
+            const utcEndTime = localToUTC(formData.endTime.split('T')[0], formData.endTime.split('T')[1], formData.timezone);
+
+            if (!utcStartTime || !utcEndTime) {
+                throw new Error("Invalid date or time selection");
+            }
+
             const eventParams: EventData = {
                 // Step 1
                 title: formData.title,
@@ -519,8 +529,8 @@ export default function CreateEvent() {
                 type: "virtual",
 
                 // Step 2
-                startTime: formData.startTime,
-                endTime: formData.endTime,
+                startTime: utcStartTime,
+                endTime: utcEndTime,
                 timezone: formData.timezone,
 
                 // Step 3

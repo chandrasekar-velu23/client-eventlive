@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
+import { SOCKET_URL } from '../services/api';
 
 export type NotificationType =
     | 'event_created'
@@ -24,7 +25,7 @@ export interface Notification {
     data?: any;
 }
 
-const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 
 const formatMessage = (type: NotificationType, data: any): { title: string, message: string } => {
     switch (type) {
@@ -59,8 +60,10 @@ export const useNotifications = () => {
 
         // Connect to notification namespace
         const socket = io(`${SOCKET_URL}/notifications`, {
+            path: '/socket.io',
             auth: { token: user.token },
             reconnectionAttempts: 5,
+            transports: ['websocket', 'polling']
         });
 
         socketRef.current = socket;

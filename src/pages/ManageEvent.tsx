@@ -548,11 +548,11 @@ export default function ManageEvent() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-brand-400 font-bold">Start Time</p>
-                    <p className="text-brand-900 font-semibold">{new Date(event.startTime).toLocaleString()}</p>
+                    <p className="text-brand-900 font-semibold">{new Date(event.startTime).toLocaleString([], { timeZoneName: 'short' })}</p>
                   </div>
                   <div>
                     <p className="text-sm text-brand-400 font-bold">End Time</p>
-                    <p className="text-brand-900 font-semibold">{new Date(event.endTime).toLocaleString()}</p>
+                    <p className="text-brand-900 font-semibold">{new Date(event.endTime).toLocaleString([], { timeZoneName: 'short' })}</p>
                   </div>
                 </div>
               </div>

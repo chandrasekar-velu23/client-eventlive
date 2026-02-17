@@ -180,6 +180,7 @@ export default function EventReg() {
                     {startDate.toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
+                      timeZoneName: "short"
                     })}
                   </span>
                 </div>
@@ -196,6 +197,7 @@ export default function EventReg() {
                     {endDate.toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
+                      timeZoneName: "short"
                     })}
                   </span>
                 </div>

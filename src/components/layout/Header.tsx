@@ -4,10 +4,6 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 const navItems = [
   { name: "Features", path: "/features" },
   { name: "Use Cases", path: "/use-cases" },
-  { name: "Security", path: "/security" },
-  // { name: "Resources", path: "/resources" },
-  // { name: "About", path: "/about" },
-  // { name: "Contact", path: "/contact" },
   { name: "All Events", path: "/allevents" },
 ];
 
@@ -27,7 +23,7 @@ export default function Header() {
             <img
               src="/src/assets/logo.svg"
               alt="EVENTLIVE Logo"
-              className="h-14 w-auto transition-transform duration-300 group-hover:scale-105 brightness-0 invert"
+              className="h-30 w-auto transition-transform duration-300 group-hover:scale-105 brightness-0 invert"
             />
           </Link>
 

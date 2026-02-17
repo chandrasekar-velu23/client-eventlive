@@ -177,12 +177,7 @@ export default function LiveSession() {
       return;
     }
 
-    // Allow host to join early, but attendees must wait (or maybe 15 min early buffer?)
-    // For now, strict check based on requirements "check the time only the available event only can able to people can join"
-    // Let's allow 15 minutes early join for attendees to get settled in lobby? 
-    // Actually the lobby is already strictly shown. This is the "Join Session" button.
-    // If they are in lobby, they can't click join unless we enable it.
-    // Let's restrict clicking "Join Event Now" until start time.
+
     if (!isHost && now < startTime) {
       const timeDiff = startTime.getTime() - now.getTime();
       const minutes = Math.ceil(timeDiff / (1000 * 60));
@@ -542,14 +537,7 @@ export default function LiveSession() {
     );
   }
 
-  // ------------------------------------------------------------------
-  // VIEW: LIVE ROOM (Immersive - Kept Dark/Neutral for focus, but lighter elements)
-  // Actually request says: "change the dark theme of lobby and session pages into light theme"
-  // So we should make the container Light, but the video grid usually looks better on dark?
-  // Let's make the container Light gray, but the stage dark? 
-  // "as like as dashboard pages" -> Dashboard is light.
-  // So we will make the main container light.
-  // ------------------------------------------------------------------
+
   return (
     <div className={`flex h-screen w-full flex-col font-sans transition-colors duration-300 bg-gray-50 text-gray-900 overflow-hidden`}>
       {/* Immersive Header */}

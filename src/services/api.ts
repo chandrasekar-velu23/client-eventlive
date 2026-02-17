@@ -1,7 +1,6 @@
-export const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const RAW_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+export const BASE_URL = RAW_BASE_URL.endsWith('/api') ? RAW_BASE_URL : `${RAW_BASE_URL.replace(/\/$/, '')}/api`;
 
-// Derive SOCKET_URL from BASE_URL (strip /api if present)
-// This ensures we connect to the root domain where socket.io is hosted
 export const SOCKET_URL = BASE_URL.replace(/\/api\/?$/, '');
 
 const joinPaths = (base: string, endpoint: string): string => {
@@ -34,8 +33,6 @@ export interface AgendaItem {
   speakerId?: string;
 }
 
-// Update EventData to include new fields
-// Note: On fetch, speakers might be populated objects, but on create we send IDs.
 export interface EventData {
   id?: string;
   _id?: string;
@@ -68,7 +65,6 @@ export interface EventData {
   status?: 'draft' | 'published';
 }
 
-// Export unified image upload utilities
 export {
   uploadCoverImage,
   uploadSpeakerImage,
@@ -165,7 +161,6 @@ const apiFetch = async <T>(
   }
 
   const headers: any = {
-    // "Content-Type": "application/json", // Don't set default here, set logic below
     ...(token && { Authorization: `Bearer ${token}` }),
     ...options.headers,
   };
@@ -173,7 +168,6 @@ const apiFetch = async <T>(
   if (!(options.body instanceof FormData)) {
     headers["Content-Type"] = "application/json";
   } else {
-    // Remove Content-Type if it exists, let browser set boundary
     delete headers["Content-Type"];
   }
 

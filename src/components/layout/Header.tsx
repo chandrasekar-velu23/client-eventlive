@@ -23,7 +23,7 @@ export default function Header() {
             <img
               src="/src/assets/logo.svg"
               alt="EVENTLIVE Logo"
-              className="h-30 w-auto transition-transform duration-300 group-hover:scale-105 brightness-0 invert"
+              className="h-16 w-auto transition-transform duration-300 group-hover:scale-105 brightness-0 invert"
             />
           </Link>
 

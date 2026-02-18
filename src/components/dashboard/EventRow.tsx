@@ -25,7 +25,7 @@ export default function EventRow({
 
         <div>
           <div className="flex items-center gap-2">
-            <p className="text-sm font-bold text-default group-hover:text-brand-600 transition-colors">
+            <p className="text-sm font-bold text-text-primary group-hover:text-brand-600 transition-colors">
               {title}
             </p>
             {live && (
@@ -33,7 +33,7 @@ export default function EventRow({
             )}
           </div>
           <p className="text-xs text-muted font-medium mt-0.5">
-            {time} <span className="mx-1.5 opacity-30">|</span> <span className="text-default">{attendees} registered</span>
+            {time} <span className="mx-1.5 opacity-30">|</span> <span className="text-text-primary">{attendees} registered</span>
           </p>
         </div>
       </div>

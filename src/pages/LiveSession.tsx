@@ -171,14 +171,16 @@ export default function LiveSession() {
     const isHost = event.organizerId === user.id;
 
     // Strict Time Validation
-    if (now > endTime) {
+    const isValidEnd = endTime instanceof Date && !isNaN(endTime.getTime());
+    const isValidStart = startTime instanceof Date && !isNaN(startTime.getTime());
+
+    if (isValidEnd && now > endTime) {
       toast.error("This event has already ended.");
       setIsSessionEnded(true);
       return;
     }
 
-
-    if (!isHost && now < startTime) {
+    if (!isHost && isValidStart && now < startTime) {
       const timeDiff = startTime.getTime() - now.getTime();
       const minutes = Math.ceil(timeDiff / (1000 * 60));
       toast.error(`Event hasn't started yet. Starts in ${minutes} minutes.`);
@@ -256,8 +258,8 @@ export default function LiveSession() {
   // ------------------------------------------------------------------
   if (isSessionEnded) {
     return (
-      <div className={`flex h-screen w-full items-center justify-center p-6 font-sans transition-colors duration-300 bg-gray-50 text-gray-900`}>
-        <div className="w-full max-w-lg rounded-3xl p-8 shadow-2xl bg-white border border-gray-200 relative overflow-hidden">
+      <div className={`flex h-screen w-full items-center justify-center p-6 font-sans transition-colors duration-300 bg-bg-secondary text-text-primary`}>
+        <div className="w-full max-w-lg rounded-3xl p-8 shadow-2xl bg-bg-primary border border-gray-200 relative overflow-hidden">
           {/* Decorative gradients */}
           <div className="absolute -top-20 -left-20 w-64 h-64 bg-brand-500/20 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl pointer-events-none" />
@@ -266,8 +268,8 @@ export default function LiveSession() {
             <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full mb-6 bg-green-500/10 ring-1 ring-green-500/30">
               <CheckCircleIcon className="h-10 w-10 text-green-500" />
             </div>
-            <h2 className="text-3xl font-bold font-display mb-2 text-gray-900">Session Ended</h2>
-            <p className="text-gray-500">Thank you for attending <strong>{event?.title}</strong>.</p>
+            <h2 className="text-3xl font-bold font-display mb-2 text-text-primary">Session Ended</h2>
+            <p className="text-text-secondary">Thank you for attending <strong>{event?.title}</strong>.</p>
           </div>
 
           <div className="space-y-8 relative z-10">
@@ -306,7 +308,7 @@ export default function LiveSession() {
                   onChange={e => setRequestRecording(e.target.checked)}
                   className="rounded border-gray-300 bg-white text-brand-500 focus:ring-brand-500 transition-all"
                 />
-                <span className="font-medium text-gray-700 group-hover:text-gray-900 transition-colors">Recorded Video</span>
+                <span className="font-medium text-text-primary group-hover:text-text-primary transition-colors">Recorded Video</span>
               </label>
             </div>
 
@@ -317,7 +319,7 @@ export default function LiveSession() {
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
                 placeholder="Share your thoughts with the organizer..."
-                className="bg-gray-50 border-gray-200 focus:bg-white text-gray-900 min-h-[100px]"
+                className="bg-gray-50 border-gray-200 focus:bg-bg-primary text-text-primary min-h-[100px]"
               />
             </div>
 
@@ -325,7 +327,7 @@ export default function LiveSession() {
               <Button
                 variant="secondary"
                 onClick={() => navigate('/dashboard')}
-                className="flex-1 bg-transparent border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                className="flex-1 bg-transparent border-gray-200 text-text-secondary hover:bg-gray-50 hover:text-text-primary"
               >
                 Skip
               </Button>
@@ -348,15 +350,16 @@ export default function LiveSession() {
   // VIEW: LOBBY (Unauthenticated & Authenticated)
   // ------------------------------------------------------------------
   if (inLobby) {
-    const isLate = event?.startTime ? new Date() > new Date(event.startTime) : false;
+    const start = event?.startTime ? new Date(event.startTime) : null;
+    const isLate = start && !isNaN(start.getTime()) ? new Date() > start : false;
 
     return (
-      <div className="flex h-screen w-full flex-col font-sans transition-colors duration-300 bg-gray-50 text-gray-900">
-        <header className="flex h-20 shrink-0 items-center justify-between border-b px-8 border-gray-200 bg-white/80 backdrop-blur-md">
+      <div className="flex h-screen w-full flex-col font-sans transition-colors duration-300 bg-bg-secondary text-text-primary">
+        <header className="flex h-20 shrink-0 items-center justify-between border-b px-8 border-gray-200 bg-bg-primary/80 backdrop-blur-md">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <img src="/icon-EventLive.svg" alt="EventLive" className="h-8 w-8 text-brand-600 shrink-0" />
-              <span className="text-xl font-bold font-display tracking-tight text-gray-900">EventLive</span>
+              <img src="/iconEventLive.svg" alt="EventLive" className="h-8 w-8 text-brand-600 shrink-0" />
+              <span className="text-xl font-bold font-display tracking-tight text-text-primary">EventLive</span>
             </div>
           </div>
 
@@ -539,15 +542,15 @@ export default function LiveSession() {
 
 
   return (
-    <div className={`flex h-screen w-full flex-col font-sans transition-colors duration-300 bg-gray-50 text-gray-900 overflow-hidden`}>
+    <div className={`flex h-screen w-full flex-col font-sans transition-colors duration-300 bg-bg-secondary text-text-primary overflow-hidden`}>
       {/* Immersive Header */}
-      <header className={`flex h-16 shrink-0 items-center justify-between px-6 bg-white border-b border-gray-200 z-20 absolute top-0 left-0 right-0 hover:opacity-100 transition-opacity`}>
+      <header className={`flex h-16 shrink-0 items-center justify-between px-6 bg-bg-primary border-b border-gray-200 z-20 absolute top-0 left-0 right-0 hover:opacity-100 transition-opacity`}>
         <div className="flex items-center gap-4">
-          <Button variant="ghost" className="text-gray-500 hover:bg-gray-100 p-2" onClick={() => navigate('/dashboard')}>
+          <Button variant="ghost" className="text-text-secondary hover:bg-bg-secondary p-2" onClick={() => navigate('/dashboard')}>
             <ArrowLeftIcon className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-sm font-bold font-display tracking-tight text-gray-900">{event?.title}</h1>
+            <h1 className="text-sm font-bold font-display tracking-tight text-text-primary">{event?.title}</h1>
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
               <span className="text-[10px] font-bold uppercase tracking-widest text-red-500">Live</span>
@@ -570,7 +573,7 @@ export default function LiveSession() {
 
       {/* Main Stage */}
       <div className="flex flex-1 pt-16 h-full relative">
-        <div className="flex-1 p-4 flex items-center justify-center relative bg-gray-100">
+        <div className="flex-1 p-4 flex items-center justify-center relative bg-bg-secondary">
           {/* Video Grid takes full space */}
           <div className="w-full h-full max-w-[1600px] flex items-center justify-center">
             <VideoGrid
@@ -586,14 +589,14 @@ export default function LiveSession() {
           <div className="flex items-center gap-2 p-2 rounded-2xl bg-white/90 backdrop-blur-md border border-gray-200 shadow-2xl">
             <button
               onClick={() => setAudioEnabled(!audioEnabled)}
-              className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${audioEnabled ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' : 'bg-red-500 text-white hover:bg-red-600'}`}
+              className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${audioEnabled ? 'bg-gray-100 text-text-primary hover:bg-gray-200' : 'bg-red-500 text-white hover:bg-red-600'}`}
               title="Toggle Mic"
             >
               {audioEnabled ? <MicrophoneIcon className="h-5 w-5" /> : <MicrophoneIcon className="h-5 w-5 opacity-70" />}
             </button>
             <button
               onClick={() => setVideoEnabled(!videoEnabled)}
-              className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${videoEnabled ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' : 'bg-red-500 text-white hover:bg-red-600'}`}
+              className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${videoEnabled ? 'bg-gray-100 text-text-primary hover:bg-gray-200' : 'bg-red-500 text-white hover:bg-red-600'}`}
               title="Toggle Camera"
             >
               {videoEnabled ? <VideoCameraIcon className="h-5 w-5" /> : <VideoCameraSlashIcon className="h-5 w-5 opacity-70" />}

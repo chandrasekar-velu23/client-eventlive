@@ -444,7 +444,7 @@ export const getEventAnalytics = async (
   eventId: string
 ): Promise<{ registrations: number; attendanceRate: number; avgDuration: number; pollResponses: number }> => {
   try {
-    const result = await apiFetch<{ registrations: number; attendanceRate: number; avgDuration: number; pollResponses: number }>(`events/${eventId}/analytics`, {
+    const result = await apiFetch<{ registrations: number; attendanceRate: number; avgDuration: number; pollResponses: number }>(`events/${eventId}/stats`, {
       method: "GET",
     });
     return result.data || { registrations: 0, attendanceRate: 0, avgDuration: 0, pollResponses: 0 };
@@ -575,6 +575,7 @@ export const toggleFavorite = async (eventId: string): Promise<string[]> => {
   return result.data?.favorites || [];
 };
 
+
 export const getAllMyAttendees = async (): Promise<Array<{
   _id: string;
   name: string;
@@ -598,6 +599,30 @@ export const getAllMyAttendees = async (): Promise<Array<{
   }
 };
 
+export const getEventAttendanceLogs = async (eventId: string, limit: number = 500): Promise<any[]> => {
+  try {
+    const result = await apiFetch<any[]>(`events/${eventId}/attendance/logs?limit=${limit}`, {
+      method: "GET",
+    });
+    return result.data || [];
+  } catch (error) {
+    console.warn("Failed to fetch attendance logs:", error);
+    return [];
+  }
+};
+
+export const getEventAttendanceStats = async (eventId: string): Promise<any> => {
+  try {
+    const result = await apiFetch<any>(`events/${eventId}/attendance/stats`, {
+      method: "GET",
+    });
+    return result.data || null;
+  } catch (error) {
+    console.warn("Failed to fetch attendance stats:", error);
+    return null;
+  }
+};
+
 
 export const getGlobalAnalytics = async (): Promise<{
   registrations: number;
@@ -607,7 +632,7 @@ export const getGlobalAnalytics = async (): Promise<{
   totalEvents: number;
 } | null> => {
   try {
-    const result = await apiFetch<any>("events/analytics/global");
+    const result = await apiFetch<any>("events/stats/global");
     return result.data;
   } catch (error) {
     console.warn("Failed to fetch global analytics", error);
@@ -625,7 +650,7 @@ export interface ActivityLogItem {
 
 export const getAttendeeDetailedLogs = async (eventId: string, userId: string): Promise<ActivityLogItem[]> => {
   try {
-    const result = await apiFetch<ActivityLogItem[]>(`analytics/attendees/${eventId}/logs/${userId}`, {
+    const result = await apiFetch<ActivityLogItem[]>(`stats/attendees/${eventId}/logs/${userId}`, {
       method: "GET"
     });
     return result.data || [];
@@ -636,7 +661,7 @@ export const getAttendeeDetailedLogs = async (eventId: string, userId: string): 
 };
 
 export const sendAttendeeEmail = async (data: { toEmail: string; subject: string; content: string }): Promise<void> => {
-  const result = await apiFetch<null>("analytics/email/send-attendee", {
+  const result = await apiFetch<null>("stats/email/send-attendee", {
     method: "POST",
     body: JSON.stringify(data)
   });
@@ -644,7 +669,7 @@ export const sendAttendeeEmail = async (data: { toEmail: string; subject: string
 };
 
 export const sendRequestEmail = async (data: { type: "inquiry" | "support"; subject: string; content: string }): Promise<void> => {
-  const result = await apiFetch<null>("analytics/email/request", {
+  const result = await apiFetch<null>("stats/email/request", {
     method: "POST",
     body: JSON.stringify(data)
   });

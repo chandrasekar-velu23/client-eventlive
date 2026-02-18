@@ -271,14 +271,14 @@ const DragDropFileUpload = ({
                 <button
                     type="button"
                     onClick={() => setMode('upload')}
-                    className={`font-semibold transition-colors ${mode === 'upload' ? 'text-brand-600 underline decoration-2' : 'text-muted hover:text-default'}`}
+                    className={`font-semibold transition-colors ${mode === 'upload' ? 'text-brand-600 underline decoration-2' : 'text-muted hover:text-text-primary'}`}
                 >
                     Upload File
                 </button>
                 <button
                     type="button"
                     onClick={() => setMode('link')}
-                    className={`font-semibold transition-colors ${mode === 'link' ? 'text-brand-600 underline decoration-2' : 'text-muted hover:text-default'}`}
+                    className={`font-semibold transition-colors ${mode === 'link' ? 'text-brand-600 underline decoration-2' : 'text-muted hover:text-text-primary'}`}
                 >
                     Image URL
                 </button>
@@ -726,7 +726,7 @@ export default function CreateEvent() {
             {/* Header */}
             <header className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold font-display text-default">Create Event</h1>
+                    <h1 className="text-3xl font-bold font-display text-text-primary">Create Event</h1>
                     <p className="text-muted mt-1">Follow the steps to publish your event.</p>
                 </div>
                 <div className="flex gap-3">
@@ -761,7 +761,7 @@ export default function CreateEvent() {
                                 >
                                     <step.icon className="h-5 w-5" />
                                 </div>
-                                <span className={`text-xs font-bold transition-colors ${isActive ? "text-brand-700" : isCompleted ? "text-default" : "text-muted"}`}>
+                                <span className={`text-xs font-bold transition-colors ${isActive ? "text-brand-700" : isCompleted ? "text-text-primary" : "text-muted"}`}>
                                     {step.name}
                                 </span>
                             </button>
@@ -776,7 +776,7 @@ export default function CreateEvent() {
                 {currentStep === 1 && (
                     <div className="space-y-6 animate-fade-in">
                         <div className="border-b border-surface-200 pb-4 mb-6">
-                            <h2 className="text-xl font-bold font-display text-default">Event Basics</h2>
+                            <h2 className="text-xl font-bold font-display text-text-primary">Event Basics</h2>
                             <p className="text-sm text-muted">Let's start with the core details of your event.</p>
                         </div>
 

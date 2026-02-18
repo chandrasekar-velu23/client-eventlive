@@ -95,8 +95,8 @@ const Onboarding: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-brand-bg flex items-center justify-center p-4">
-            <div className="bg-white max-w-5xl w-full rounded-2xl grid grid-cols-1 md:grid-cols-2 overflow-hidden shadow-2xl ring-1 ring-black/5">
+        <div className="min-h-screen bg-bg-secondary flex items-center justify-center p-4">
+            <div className="bg-bg-primary max-w-5xl w-full rounded-2xl grid grid-cols-1 md:grid-cols-2 overflow-hidden shadow-2xl ring-1 ring-black/5">
 
                 {/* LEFT COLUMN */}
                 <div className="bg-brand-gradient p-8 md:p-12 text-brand-dark flex flex-col justify-between relative overflow-hidden">
@@ -104,7 +104,7 @@ const Onboarding: React.FC = () => {
                     <div className="absolute bottom-0 right-0 w-64 h-64 bg-brand-primary/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
 
                     <div className="relative z-10">
-                        <img src="/logo-EventLive.svg" alt="EventLive Logo" className="h-12 mb-8" />
+                        <img src="/EventLive.svg" alt="EventLive Logo" className="h-12 mb-8" />
 
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}

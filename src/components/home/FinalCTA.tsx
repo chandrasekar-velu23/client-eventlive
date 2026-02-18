@@ -1,31 +1,35 @@
-import Button from "../ui/Button";
+
 
 export default function FinalCTA() {
   return (
 
-    <section className="section bg-brand-gradient py-24 text-center">
-      <div className="mx-auto max-w-4xl px-6">
-        
-       
-        <h2 className="text-4xl font-extrabold tracking-tight text-brand-dark sm:text-5xl">
+    <section className="relative w-full bg-brand-primary py-24 text-center overflow-hidden">
+      {/* Background Decoration */}
+      <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-20 mix-blend-overlay"></div>
+
+      {/* Glow Effect */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/10 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+
+      <div className="relative mx-auto max-w-4xl px-6">
+        <h2 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl drop-shadow-sm">
           Ready to Go Live with EVENTLIVE?
         </h2>
 
-    
-        <p className="mt-6 text-lg font-medium text-brand-dark/80 sm:text-xl">
-          Create, manage, and scale your virtual events with confidence. 
+        <p className="mt-6 text-lg font-medium text-blue-100 sm:text-xl max-w-2xl mx-auto">
+          Create, manage, and scale your virtual events with confidence.
           Join thousands of organizers hosting world-class experiences.
         </p>
 
         <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
-      
-          <Button className="px-10 py-4 text-base">
+          {/* Inverted Primary Button: White BG, Brand Text */}
+          <button className="px-8 py-4 rounded-full bg-white text-brand-primary font-bold text-lg shadow-xl shadow-brand-900/20 hover:bg-gray-50 hover:scale-105 transition-all duration-300">
             Get Started for Free
-          </Button>
-          
-          <Button variant="secondary" className="px-10 py-4 text-base bg-white/50 backdrop-blur-sm">
+          </button>
+
+          {/* Inverted Secondary Button: Transparent, White Border/Text */}
+          <button className="px-8 py-4 rounded-full bg-transparent border-2 border-white/30 text-white font-semibold text-lg hover:bg-white/10 hover:border-white transition-all duration-300 backdrop-blur-sm">
             Request a Demo
-          </Button>
+          </button>
         </div>
       </div>
     </section>

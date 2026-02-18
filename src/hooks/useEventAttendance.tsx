@@ -5,6 +5,8 @@ import {
   getEventAnalytics,
   getAllMyAttendees,
   getGlobalAnalytics,
+  getEventAttendanceLogs,
+  getEventAttendanceStats,
 } from "../services/api";
 
 export interface AttendeeData {
@@ -140,21 +142,8 @@ export const useEventAttendance = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api"}/events/${eventId}/attendance/logs?limit=${limit}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch attendance logs");
-      }
-
-      const data = await response.json();
-      setAttendanceLogs(data.data || []);
+      const response = await getEventAttendanceLogs(eventId, limit);
+      setAttendanceLogs(response || []);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to fetch attendance logs";
       setError(message);
@@ -170,21 +159,8 @@ export const useEventAttendance = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api"}/events/${eventId}/attendance/stats`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch attendance statistics");
-      }
-
-      const data = await response.json();
-      setAttendanceStats(data.data || null);
+      const response = await getEventAttendanceStats(eventId);
+      setAttendanceStats(response || null);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to fetch attendance statistics";
       setError(message);

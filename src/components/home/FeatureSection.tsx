@@ -44,7 +44,7 @@ const features = [
 
 export default function FeaturesSection() {
   return (
-    <section className="section bg-white">
+    <section className="section bg-bg-secondary border-t border-brand-accent">
       <SectionTitle
         title="Everything You Need to Host Amazing Events"
         subtitle="From live streaming to analytics, EVENTLIVE gives you the tools to create memorable virtual experiences."
@@ -52,7 +52,7 @@ export default function FeaturesSection() {
 
       <div className="mx-auto mt-14 grid max-w-7xl grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {features.map((feature) => (
-      
+
           <FeatureCard key={feature.title} {...feature} />
         ))}
       </div>

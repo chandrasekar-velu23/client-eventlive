@@ -42,18 +42,18 @@ const trustItems: TrustItem[] = [
 
 export default function TrustSection() {
   return (
-    
-    <section className="section bg-brand-surface/20">
+
+    <section className="section bg-bg-secondary">
       {/* Heading */}
       <div className="mx-auto mb-14 max-w-3xl text-center">
         <p className="text-xs font-bold uppercase tracking-widest text-brand-primary">
           Use Cases
         </p>
-        
+
         <h2 className="section-title mt-3">
           Built for Every <span className="text-brand-primary">Event Type</span>
         </h2>
-      
+
         <p className="text-muted mx-auto mt-4 max-w-2xl text-lg">
           Whether you’re an educator, enterprise, or community leader,
           EVENTLIVE adapts to your unique needs.
@@ -83,7 +83,7 @@ function TrustCard({ title, description, points, Icon }: TrustItem) {
         hover:shadow-md
       "
     >
-      
+
       <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-brand-surface text-brand-primary shadow-sm ring-4 ring-white transition-colors group-hover:bg-brand-primary group-hover:text-white">
         <Icon className="h-7 w-7" />
       </div>
@@ -96,7 +96,7 @@ function TrustCard({ title, description, points, Icon }: TrustItem) {
         {description}
       </p>
 
-      
+
       <ul className="mt-6 space-y-3 text-sm text-brand-dark/80">
         {points.map((point) => (
           <li key={point} className="flex items-center gap-3">

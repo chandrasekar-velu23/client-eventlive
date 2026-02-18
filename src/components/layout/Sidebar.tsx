@@ -6,8 +6,6 @@ import {
   TicketIcon,
   DocumentDuplicateIcon,
   InboxStackIcon,
-  ChevronDoubleLeftIcon,
-  ChevronDoubleRightIcon
 } from "@heroicons/react/24/outline";
 
 
@@ -20,10 +18,10 @@ interface SidebarProps {
   isOpen: boolean;
   setIsOpen: (v: boolean) => void;
   collapsed: boolean;
-  setCollapsed: (v: boolean) => void;
+
 }
 
-export default function Sidebar({ isOpen, setIsOpen, collapsed, setCollapsed }: SidebarProps) {
+export default function Sidebar({ isOpen, setIsOpen, collapsed }: SidebarProps) {
   const { user } = useAuth();
   const { events, fetchMyEvents, fetchEnrolledEvents } = useEvents();
 
@@ -64,13 +62,13 @@ export default function Sidebar({ isOpen, setIsOpen, collapsed, setCollapsed }: 
         <div className="fixed inset-0 z-40 bg-brand-950/50 backdrop-blur-sm lg:hidden" onClick={() => setIsOpen(false)} />
       )}
 
-      <aside className={`fixed inset-y-0 left-0 z-50 transform border-r border-surface-200 bg-white/80 backdrop-blur-md transition-all duration-300 lg:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"} ${collapsed ? "w-20" : "w-64"}`}>
+      <aside className={`fixed inset-y-0 left-0 z-50 transform border-r border-white bg-white/80 backdrop-blur-md transition-all duration-300 lg:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"} ${collapsed ? "w-20" : "w-64"}`}>
         <div className="flex h-full flex-col">
           {/* Logo Section */}
-          <div className={`flex h-20 items-center px-6 border-b border-surface-200 ${collapsed ? "justify-center" : "justify-between"}`}>
+          <div className={`flex h-20 items-center px-6 border-b border-white ${collapsed ? "justify-center" : "justify-between"}`}>
             <div className="flex items-center gap-3 overflow-hidden">
-              <img src="/icon-eventlive.svg" alt="EventLive" className="h-8 w-8 text-brand-600 shrink-0" />
-              {!collapsed && <span className="text-xl font-black tracking-tight text-brand-950 font-display truncate">EventLive</span>}
+              <img src="/iconEventLive.svg" alt="EventLive" className="h-10 w-10 text-brand-600 shrink-0" />
+              {!collapsed && <span className="text-2xl font-black tracking-tight text-brand-950 font-display truncate">...</span>}
             </div>
             <button className="lg:hidden p-1 text-muted hover:text-brand-600 transition-colors" onClick={() => setIsOpen(false)} aria-label="Close Sidebar">
               <XMarkIcon className="h-6 w-6" />
@@ -118,23 +116,7 @@ export default function Sidebar({ isOpen, setIsOpen, collapsed, setCollapsed }: 
           </nav>
 
           {/* User Session Block */}
-          <div className="border-t border-surface-200 p-4 space-y-2">
-            {/* Collapse Toggle (Desktop) */}
-            <button
-              onClick={() => setCollapsed(!collapsed)}
-              className="hidden lg:flex w-full items-center justify-center gap-2 p-2 rounded-lg text-muted hover:bg-surface-100 hover:text-default transition-colors"
-              title={collapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-            >
-              {collapsed ? (
-                <ChevronDoubleRightIcon className="h-5 w-5" />
-              ) : (
-                <>
-                  <ChevronDoubleLeftIcon className="h-5 w-5" />
-                  <span className="text-xs font-bold uppercase tracking-wide">Collapse</span>
-                </>
-              )}
-            </button>
-          </div>
+
         </div>
       </aside>
     </>

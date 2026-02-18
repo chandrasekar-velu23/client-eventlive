@@ -96,40 +96,47 @@
   --brand-900: #312E81;
   --brand-950: #1E1B4B;
 
-  /* Light Mode Defaults - Crisp & Clean */
-  --bg-primary: #FFFFFF;
-  --bg-secondary: #F8FAFC; /* Slate 50 */
-  --bg-tertiary: #F1F5F9; /* Slate 100 */
+  /* 
+     60-30-10 Rule Implementation 
+     60% Neutral (Backgrounds)
+     30% Secondary (Cards, Surfaces, Borders)
+     10% Primary (Accents, CTAs)
+  */
+
+  /* Light Mode Defaults */
+  --bg-primary: #FFFFFF;      /* 60% - Neutral */
+  --bg-secondary: #F8FAFC;    /* 30% - Secondary (Slate 50) */
+  --bg-tertiary: #F1F5F9;     /* Deep Secondary (Slate 100) */
   
-  --text-primary: #0F172A; /* Slate 900 */
-  --text-secondary: #64748B; /* Slate 500 */
-  --text-brand: #4F46E5;
+  --text-primary: #0F172A;    /* Slate 900 - High Contrast */
+  --text-secondary: #64748B;  /* Slate 500 - Medium Contrast */
+  --text-brand: #4F46E5;      /* Primary as Text */
 
-  --border-color: #E2E8F0; /* Slate 200 */
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.5);
+  --border-color: #E2E8F0;    /* Secondary Border */
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.6);
 
-  --brand-primary: #4F46E5;
-  --brand-secondary: #0F172A;
-  --brand-accent: #E2E8F0;
+  --brand-primary: #4F46E5;   /* 10% - Primary Action */
+  --brand-secondary: #0F172A; /* Secondary Action (Dark) */
+  --brand-accent: #E2E8F0;    /* Secondary Detail */
 }
 
-/* Dark Mode Overrides - Deep & Immersive */
+/* Dark Mode Overrides */
 .dark {
-  --bg-primary: #020617; /* Slate 950 - Deeper black/blue */
-  --bg-secondary: #0F172A; /* Slate 900 */
-  --bg-tertiary: #1E293B; /* Slate 800 */
+  --bg-primary: #020617;      /* 60% - Neutral (Deepest) */
+  --bg-secondary: #0F172A;    /* 30% - Secondary (Slate 900) */
+  --bg-tertiary: #1E293B;     /* Deep Secondary (Slate 800) */
 
-  --text-primary: #F8FAFC; /* Slate 50 */
-  --text-secondary: #94A3B8; /* Slate 400 */
+  --text-primary: #F8FAFC;    /* Slate 50 */
+  --text-secondary: #94A3B8;  /* Slate 400 */
   --text-brand: #818CF8;
 
-  --border-color: #1E293B; /* Slate 800 */
-  --glass-bg: rgba(15, 23, 42, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.08);
+  --border-color: #1E293B;    /* Slate 800 */
+  --glass-bg: rgba(15, 23, 42, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.1);
 
-  --brand-primary: #6366F1;
-  --brand-secondary: #F8FAFC;
+  --brand-primary: #6366F1;   /* 10% - Primary Action (Lighter for Dark Mode) */
+  --brand-secondary: #F8FAFC; 
   --brand-accent: #1E293B;
 }
 
@@ -174,7 +181,7 @@
 
   /* Modern Card Styles */
   .card {
-    @apply rounded-2xl bg-bg-secondary border border-brand-accent shadow-sm transition-all duration-300 hover:shadow-md hover:border-brand-300/50 dark:hover:border-brand-700/50;
+    @apply rounded-2xl bg-bg-primary border border-brand-accent shadow-sm transition-all duration-300 hover:shadow-md hover:border-brand-300/50 dark:hover:border-brand-700/50;
   }
   
   .card-glass {

@@ -37,7 +37,7 @@ export default function DashboardHeader({ setIsOpen, collapsed, setCollapsed }: 
   };
 
   return (
-    <header className="sticky top-0 z-40 flex h-20 shrink-0 items-center gap-x-6 border-b border-brand-primary/10 bg-white/80 backdrop-blur-md px-4 shadow-sm lg:px-8 transition-all">
+    <header className="sticky top-0 z-40 flex h-20 shrink-0 items-center gap-x-6 border-b border-brand-accent bg-bg-primary/80 backdrop-blur-md px-4 shadow-sm lg:px-8 transition-all">
       <div className="flex items-center gap-2">
         {/* Mobile Toggle */}
         <button

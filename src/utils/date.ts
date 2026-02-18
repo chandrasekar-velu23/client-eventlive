@@ -59,17 +59,35 @@ export const formatEventTime = (dateInput: string | Date, timezone?: string): st
         const date = typeof dateInput === 'string' ? parseISO(dateInput) : dateInput;
         if (!isValid(date)) return "Invalid Time";
 
+        // Validate timezone
+        let safeTimezone = timezone;
+        if (timezone) {
+            try {
+                // Test if timezone is valid
+                Intl.DateTimeFormat(undefined, { timeZone: timezone });
+            } catch (e) {
+                console.warn(`Invalid timezone '${timezone}' fallback to local.`);
+                safeTimezone = undefined;
+            }
+        }
+
         const options: Intl.DateTimeFormatOptions = {
             hour: '2-digit',
             minute: '2-digit',
             hour12: true,
-            ...(timezone && { timeZone: timezone })
+            ...(safeTimezone && { timeZone: safeTimezone })
         };
 
         return new Intl.DateTimeFormat('en-US', options).format(date);
     } catch (error) {
-        // Fallback
-        return "Invalid Time";
+        console.error("Format time error:", error);
+        // Fallback to basic local time
+        try {
+            const date = typeof dateInput === 'string' ? parseISO(dateInput) : dateInput;
+            return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+        } catch {
+            return "Invalid Time";
+        }
     }
 };
 

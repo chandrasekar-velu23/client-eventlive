@@ -103,7 +103,7 @@ export const LiveChat: React.FC<LiveChatProps> = ({
       <div
         ref={containerRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 scroll-smooth relative custom-scrollbar"
+        className="flex-1 overflow-y-auto p-4 space-y-4 bg-bg-secondary scroll-smooth relative custom-scrollbar"
       >
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center opacity-50">
@@ -166,7 +166,7 @@ export const LiveChat: React.FC<LiveChatProps> = ({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type a message..."
-            className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all"
+            className="flex-1 bg-bg-secondary border border-gray-200 rounded-xl px-4 py-3 text-sm text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all"
             disabled={isSending || isLoading}
           />
           <button
@@ -221,12 +221,11 @@ const MessageRow: React.FC<{ message: ChatMessage; isConsecutive: boolean }> = (
             </span>
           </div>
         )}
-        <div className={`text-sm break-words leading-relaxed text-zinc-100 ${!isConsecutive ? 'bg-white/5 p-3 rounded-tr-xl rounded-br-xl rounded-bl-xl border border-white/5' : 'pl-1'}`}>
+        <div className={`text-sm break-words leading-relaxed ${isSelf ? 'bg-brand-50 text-text-primary border border-brand-100' : 'bg-white text-text-primary border border-gray-200 shadow-sm'} p-3 rounded-xl ${isSelf ? 'rounded-tr-none' : 'rounded-tl-none'}`}>
           {message.content}
         </div>
       </div>
     </div>
   );
 };
-
 export default LiveChat;

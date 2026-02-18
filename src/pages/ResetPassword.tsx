@@ -53,7 +53,7 @@ export default function ResetPassword() {
                 <header className="text-center">
                     <Link to="/">
                         <div className="bg-brand-primary/10 inline-flex items-center justify-center p-4 rounded-2xl mb-6">
-                            <img src="/logo-EventLive.svg" alt="EventLive Logo" className="h-10 w-auto" />
+                            <img src="/EventLive.svg" alt="EventLive Logo" className="h-10 w-auto" />
                         </div>
                     </Link>
                     <h1 className="text-2xl font-bold text-brand-dark">Set new password</h1>

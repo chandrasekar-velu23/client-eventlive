@@ -17,7 +17,7 @@ export default function StatCard({
     <div className="card flex items-center justify-between p-5 hover:border-brand-primary/20 transition-all duration-300">
       <div>
         <p className="text-sm font-medium text-muted">{label}</p>
-        <p className="mt-1 text-2xl font-bold font-display text-default tracking-tight">{value}</p>
+        <p className="mt-1 text-2xl font-bold font-display text-text-primary tracking-tight">{value}</p>
 
         {helper && (
           <p className="mt-1 text-xs font-medium text-brand-500">{helper}</p>

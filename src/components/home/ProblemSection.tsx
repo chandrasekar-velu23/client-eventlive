@@ -9,11 +9,11 @@ import SectionTitle from "../ui/SectionTitle";
 
 export default function ProblemSolution() {
   return (
-    <section className="section bg-brand-bg">
+    <section className="section bg-bg-primary">
       <SectionTitle title="Why EVENTLIVE Exists" />
 
       <div className="mx-auto mt-12 grid max-w-6xl gap-8 md:grid-cols-2">
-        
+
         {/* Problem Card */}
         <div className="card border-brand-dark/10 p-8 shadow-sm">
           <div className="mb-6 flex items-center gap-3">

@@ -140,10 +140,10 @@ const EventLobby: React.FC = () => {
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center h-screen bg-gray-900">
+        <div className="flex items-center justify-center h-screen bg-bg-secondary">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4" />
-            <p className="text-gray-300">Loading event details...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary mx-auto mb-4" />
+            <p className="text-text-secondary">Loading event details...</p>
           </div>
         </div>
       </DashboardLayout>
@@ -153,14 +153,14 @@ const EventLobby: React.FC = () => {
   if (error || !eventDetails) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center h-screen bg-gray-900">
+        <div className="flex items-center justify-center h-screen bg-bg-secondary">
           <div className="text-center max-w-md">
             <div className="text-4xl mb-4">⚠️</div>
-            <p className="text-xl font-bold text-white mb-2">Error Loading Event</p>
-            <p className="text-gray-300 mb-6">{error || 'Event details not found'}</p>
+            <p className="text-xl font-bold text-text-primary mb-2">Error Loading Event</p>
+            <p className="text-text-secondary mb-6">{error || 'Event details not found'}</p>
             <button
               onClick={handleLeave}
-              className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition-all"
+              className="px-6 py-2 rounded-lg bg-brand-primary hover:bg-brand-primary/90 text-white font-medium transition-all"
             >
               Go Back
             </button>
@@ -174,27 +174,27 @@ const EventLobby: React.FC = () => {
 
   return (
     <DashboardLayout>
-      <div className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
+      <div className="min-h-screen bg-bg-secondary p-6">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="mb-8 flex justify-between items-start">
             <div>
               <button
                 onClick={handleLeave}
-                className="text-gray-400 hover:text-white flex items-center gap-2 transition-all mb-6"
+                className="text-text-secondary hover:text-text-primary flex items-center gap-2 transition-all mb-6 group"
               >
-                <span>←</span>
+                <span className="group-hover:-translate-x-1 transition-transform">←</span>
                 <span>Back to Events</span>
               </button>
-              <h1 className="text-4xl font-bold text-white">{eventDetails.title}</h1>
-              <p className="text-gray-400 mt-2">{eventDetails.category}</p>
+              <h1 className="text-4xl font-bold text-text-primary">{eventDetails.title}</h1>
+              <p className="text-text-secondary mt-2">{eventDetails.category}</p>
             </div>
 
             <button
               onClick={() => setIsSupportModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-white transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 border border-gray-200 rounded-lg text-text-primary transition-colors shadow-sm"
             >
-              <QuestionMarkCircleIcon className="h-5 w-5" />
+              <QuestionMarkCircleIcon className="h-5 w-5 text-brand-primary" />
               Help & Support
             </button>
           </div>
@@ -204,7 +204,7 @@ const EventLobby: React.FC = () => {
             {/* Left Column - Video Preview */}
             <div className="lg:col-span-2 space-y-6">
               {/* Video Preview Card */}
-              <div className="bg-gray-800 rounded-2xl overflow-hidden border border-gray-700 shadow-xl">
+              <div className="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm">
                 <div className="aspect-video bg-black relative">
                   <video
                     ref={videoRef}
@@ -225,12 +225,12 @@ const EventLobby: React.FC = () => {
 
                   {/* Status Indicators */}
                   <div className="absolute top-4 right-4 flex flex-col gap-2">
-                    <div className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2 ${isMuted ? 'bg-red-600 text-white' : 'bg-green-600 text-white'
+                    <div className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2 ${isMuted ? 'bg-red-500 text-white' : 'bg-green-500 text-white'
                       }`}>
                       <span>{isMuted ? '🔇' : '🔊'}</span>
                       {isMuted ? 'Muted' : 'Unmuted'}
                     </div>
-                    <div className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2 ${videoEnabled ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+                    <div className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2 ${videoEnabled ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
                       }`}>
                       <span>{videoEnabled ? '✓' : '✗'}</span>
                       {videoEnabled ? 'Camera On' : 'Camera Off'}
@@ -239,23 +239,23 @@ const EventLobby: React.FC = () => {
                 </div>
 
                 {/* Controls */}
-                <div className="p-6 bg-gray-900 border-t border-gray-700 space-y-4">
-                  <h3 className="text-white font-semibold">Audio & Video Settings</h3>
+                <div className="p-6 bg-white border-t border-gray-100 space-y-4">
+                  <h3 className="text-text-primary font-semibold">Audio & Video Settings</h3>
                   <div className="flex gap-4">
                     <button
                       onClick={() => setIsMuted(!isMuted)}
-                      className={`flex-1 py-2 rounded-lg font-medium transition-all ${isMuted
-                        ? 'bg-red-600 hover:bg-red-700 text-white'
-                        : 'bg-green-600 hover:bg-green-700 text-white'
+                      className={`flex-1 py-2.5 rounded-lg font-medium transition-all ${isMuted
+                        ? 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200'
+                        : 'bg-green-50 text-green-700 hover:bg-green-100 border border-green-200'
                         }`}
                     >
                       {isMuted ? '🔇 Enable Microphone' : '🔊 Disable Microphone'}
                     </button>
                     <button
                       onClick={() => setVideoEnabled(!videoEnabled)}
-                      className={`flex-1 py-2 rounded-lg font-medium transition-all ${videoEnabled
-                        ? 'bg-green-600 hover:bg-green-700 text-white'
-                        : 'bg-red-600 hover:bg-red-700 text-white'
+                      className={`flex-1 py-2.5 rounded-lg font-medium transition-all ${videoEnabled
+                        ? 'bg-green-50 text-green-700 hover:bg-green-100 border border-green-200'
+                        : 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200'
                         }`}
                     >
                       {videoEnabled ? '📹 Disable Camera' : '📹 Enable Camera'}
@@ -265,33 +265,33 @@ const EventLobby: React.FC = () => {
               </div>
 
               {/* Event Description */}
-              <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-                <h3 className="text-xl font-bold text-white mb-4">Event Details</h3>
-                <p className="text-gray-300 leading-relaxed">{eventDetails.description}</p>
+              <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+                <h3 className="text-xl font-bold text-text-primary mb-4">Event Details</h3>
+                <p className="text-text-secondary leading-relaxed">{eventDetails.description}</p>
               </div>
             </div>
 
             {/* Right Column - Session Info & Join */}
             <div className="space-y-6">
               {/* Session Info Card */}
-              <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-                <h3 className="text-xl font-bold text-white mb-6">Session Information</h3>
+              <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+                <h3 className="text-xl font-bold text-text-primary mb-6">Session Information</h3>
 
                 <div className="space-y-4">
                   {/* Participants */}
                   <div>
-                    <p className="text-gray-400 text-sm mb-2">Participants</p>
-                    <p className="text-2xl font-bold text-white">{eventDetails.participantCount || 0}</p>
+                    <p className="text-text-secondary text-sm mb-2">Participants</p>
+                    <p className="text-2xl font-bold text-text-primary">{eventDetails.participantCount || 0}</p>
                   </div>
 
                   {/* Start Time */}
                   <div>
-                    <p className="text-gray-400 text-sm mb-2">Start Time</p>
-                    <p className="text-white font-medium">
+                    <p className="text-text-secondary text-sm mb-2">Start Time</p>
+                    <p className="text-text-primary font-medium">
                       {formatEventDate(eventDetails.startTime)} • {formatEventTime(eventDetails.startTime)}
                     </p>
                     {!isEventStarted && (
-                      <p className="text-yellow-400 text-xs mt-1 flex items-center gap-1">
+                      <p className="text-amber-600 text-xs mt-1 flex items-center gap-1">
                         <span>⏱️</span>
                         Event starts {getRelativeTime(eventDetails.startTime)}
                       </p>
@@ -301,19 +301,19 @@ const EventLobby: React.FC = () => {
                   {/* Speakers */}
                   {eventDetails.speakers.length > 0 && (
                     <div>
-                      <p className="text-gray-400 text-sm mb-3">Speakers</p>
+                      <p className="text-text-secondary text-sm mb-3">Speakers</p>
                       <div className="space-y-2">
                         {eventDetails.speakers.map((speaker) => (
-                          <div key={speaker._id} className="flex items-center gap-3 p-2 rounded-lg bg-gray-900">
+                          <div key={speaker._id} className="flex items-center gap-3 p-2 rounded-lg bg-gray-50 border border-gray-100">
                             <div
-                              className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white"
+                              className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white shadow-sm"
                               style={{
                                 backgroundColor: `hsl(${Math.random() * 360}, 70%, 50%)`,
                               }}
                             >
                               {speaker.name.charAt(0)}
                             </div>
-                            <p className="text-white text-sm">{speaker.name}</p>
+                            <p className="text-text-primary text-sm font-medium">{speaker.name}</p>
                           </div>
                         ))}
                       </div>
@@ -323,22 +323,22 @@ const EventLobby: React.FC = () => {
               </div>
 
               {/* Permissions Card */}
-              <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-                <h3 className="text-lg font-bold text-white mb-4">Permissions</h3>
+              <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+                <h3 className="text-lg font-bold text-text-primary mb-4">Permissions</h3>
 
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={permissionsAccepted}
                     onChange={(e) => setPermissionsAccepted(e.target.checked)}
-                    className="w-5 h-5 rounded bg-gray-700 border-gray-600 text-blue-600 focus:ring-2 focus:ring-blue-500 mt-1 cursor-pointer"
+                    className="w-5 h-5 rounded bg-white border-gray-300 text-brand-primary focus:ring-2 focus:ring-brand-primary mt-1 cursor-pointer"
                   />
-                  <span className="text-gray-300 text-sm leading-relaxed">
+                  <span className="text-text-secondary text-sm leading-relaxed">
                     I agree to allow access to my camera and microphone during this session
                   </span>
                 </label>
 
-                <p className="text-gray-500 text-xs mt-4 leading-relaxed">
+                <p className="text-text-tertiary text-xs mt-4 leading-relaxed">
                   Your audio and video will only be shared with other session participants. You can disable them at any time during the session.
                 </p>
               </div>
@@ -347,9 +347,9 @@ const EventLobby: React.FC = () => {
               <button
                 onClick={handleJoinSession}
                 disabled={!permissionsAccepted || isJoining || !isEventStarted}
-                className={`w-full py-4 rounded-xl font-bold text-white transition-all text-lg ${permissionsAccepted && isEventStarted
-                  ? 'bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 cursor-pointer'
-                  : 'bg-gray-700 cursor-not-allowed opacity-50'
+                className={`w-full py-4 rounded-xl font-bold text-white transition-all text-lg shadow-lg ${permissionsAccepted && isEventStarted
+                  ? 'bg-brand-primary hover:bg-brand-primary/90 cursor-pointer shadow-brand-primary/20'
+                  : 'bg-gray-300 cursor-not-allowed opacity-70'
                   }`}
               >
                 {isJoining ? (
@@ -369,7 +369,7 @@ const EventLobby: React.FC = () => {
               {/* Leave Button */}
               <button
                 onClick={handleLeave}
-                className="w-full py-3 rounded-xl font-medium text-gray-300 bg-gray-700 hover:bg-gray-600 transition-all"
+                className="w-full py-3 rounded-xl font-medium text-text-secondary bg-transparent border border-gray-200 hover:bg-gray-50 transition-all"
               >
                 Cancel
               </button>

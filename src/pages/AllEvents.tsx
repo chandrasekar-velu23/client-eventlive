@@ -118,7 +118,7 @@ export default function AllEvents() {
   const isDashboard = location.pathname.includes("/dashboard");
 
   return (
-    <main className={isDashboard ? "animate-fade-in" : "min-h-screen bg-brand-bg"}>
+    <main className={isDashboard ? "animate-fade-in" : "min-h-screen bg-bg-secondary"}>
       <div className={isDashboard ? "" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24 animate-fade-in"}>
         {/* Header Section */}
         <div className="mb-10">

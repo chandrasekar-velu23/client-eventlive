@@ -44,7 +44,8 @@ export const SessionLobby: React.FC<SessionLobbyProps> = ({
 }) => {
     const navigate = useNavigate();
     const { code } = useParams();
-    const isLate = event?.startTime ? new Date() > new Date(event.startTime) : false;
+    const start = event?.startTime ? new Date(event.startTime) : null;
+    const isLate = start && !isNaN(start.getTime()) ? new Date() > start : false;
 
     return (
         <div className={`flex h-screen w-full flex-col font-sans transition-colors duration-300 ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>

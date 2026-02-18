@@ -125,7 +125,7 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-h-screen bg-bg-secondary relative overflow-hidden">
+    <div className="flex min-h-screen bg-bg-primary relative overflow-hidden">
       {/* Left Decoration - Desktop Only */}
       <div className="hidden lg:flex flex-1 relative bg-brand-950 items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2940&auto=format&fit=crop')] bg-cover bg-center opacity-40 mix-blend-overlay"></div>
@@ -141,7 +141,7 @@ export default function Login() {
       </div>
 
       {/* Right Form Section */}
-      <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 lg:px-20 xl:px-24 bg-bg-secondary relative z-20">
+      <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 lg:px-20 xl:px-24 bg-bg-primary relative z-20">
         <div className="mx-auto w-full max-w-sm lg:w-96 space-y-8">
 
           <div className="text-center lg:text-left">
@@ -262,7 +262,7 @@ export default function Login() {
               <div className="w-full border-t border-brand-accent"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-bg-secondary text-text-secondary">Or continue with</span>
+              <span className="px-2 bg-bg-primary text-text-secondary">Or continue with</span>
             </div>
           </div>
 

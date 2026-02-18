@@ -14,15 +14,7 @@ import {
 import type { EventData } from "../services/api";
 import { formatEventDate, formatEventTime, isEventUpcoming } from "../utils/date";
 
-/**
- * EventReg Component
- * 
- * Allows attendees to:
- * - View event details
- * - Register/enroll in events
- * - Confirm registration
- * - View event information before joining
- */
+
 export default function EventReg() {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
@@ -104,7 +96,7 @@ export default function EventReg() {
   const isUpcoming = isEventUpcoming(event.startTime);
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-8 animate-fade-in pt-32 px-6 max-w-7xl mx-auto">
       {/* Header with Back Button */}
       <div className="flex items-center gap-4">
         <button

@@ -16,14 +16,14 @@ export default function Header() {
 
   return (
 
-    <header className="fixed inset-x-0 top-0 z-100 h-20 bg-brand-gradient border-b border-white/10 shadow-lg backdrop-blur-sm">
+    <header className="fixed inset-x-0 top-0 z-100 h-20 bg-glass/80 border-b border-brand-accent shadow-sm backdrop-blur-md">
       <div className="mx-auto max-w-7xl h-full px-4 sm:px-6 lg:px-8">
         <div className="flex h-full items-center justify-between">
           <Link to="/" className="flex items-center group">
             <img
-              src="/src/assets/logo.svg"
+              src="/EventLive.svg"
               alt="EVENTLIVE Logo"
-              className="h-16 w-auto transition-transform duration-300 group-hover:scale-105 brightness-0 invert"
+              className="h-30 w-auto transition-transform duration-300 group-hover:scale-105"
             />
           </Link>
 
@@ -35,8 +35,8 @@ export default function Header() {
                 to={item.path}
                 className={({ isActive }) =>
                   `text-sm font-medium transition-all duration-300 ${isActive
-                    ? "text-white underline underline-offset-8 decoration-2 decoration-white"
-                    : "text-white/80 hover:text-white hover:underline hover:underline-offset-4 hover:decoration-white/50"
+                    ? "text-brand-primary font-semibold"
+                    : "text-text-secondary hover:text-text-primary"
                   }`
                 }
               >
@@ -49,14 +49,14 @@ export default function Header() {
           <div className="hidden lg:flex items-center gap-6">
             <Link
               to="/login"
-              className="text-sm font-medium text-white/90 hover:text-white transition-colors duration-200"
+              className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors duration-200"
             >
               Login
             </Link>
 
             <Link
               to="/get-started"
-              className="px-6 py-2.5 rounded-full bg-white text-brand-600 font-semibold text-sm shadow-lg hover:bg-brand-50 hover:scale-105 transition-all duration-300"
+              className="px-6 py-2.5 rounded-full bg-brand-primary text-white font-semibold text-sm shadow-lg shadow-brand-primary/25 hover:bg-brand-600 hover:scale-105 transition-all duration-300"
             >
               Get Started
             </Link>
@@ -65,7 +65,7 @@ export default function Header() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setOpen((v) => !v)}
-            className="lg:hidden bg-white/10 rounded-md p-2 text-white hover:bg-white/20 transition"
+            className="lg:hidden text-text-primary p-2 hover:bg-brand-surface rounded-md transition"
             aria-label="Toggle menu"
           >
             {open ? "✕" : "☰"}

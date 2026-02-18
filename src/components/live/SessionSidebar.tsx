@@ -59,8 +59,8 @@ export const SessionSidebar: React.FC<SessionSidebarProps> = ({
 
             {activeView === 'participants' && (
                 <div className="p-4">
-                    <h3 className="font-bold mb-4 text-gray-900">Participants</h3>
-                    <p className="text-gray-500 text-sm">Participant list coming soon...</p>
+                    <h3 className="font-bold mb-4 text-text-primary">Participants</h3>
+                    <p className="text-text-secondary text-sm">Participant list coming soon...</p>
                 </div>
             )}
 

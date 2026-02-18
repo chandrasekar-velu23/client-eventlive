@@ -2,7 +2,9 @@ import HeroSection from "../components/home/HeroSection";
 import TrustSection from "../components/home/TrustSection";
 import ProblemSolution from "../components/home/ProblemSection";
 import FeaturesSection from "../components/home/FeatureSection";
+import UseCasesSection from "../components/home/UseCasesSection";
 import FinalCTA from "../components/home/FinalCTA";
+import Footer from "../components/layout/Footer";
 
 import { useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
@@ -20,9 +22,11 @@ export default function Home() {
     <>
       <HeroSection />
       <FeaturesSection />
+      <UseCasesSection />
       <ProblemSolution />
       <TrustSection />
       <FinalCTA />
+      <Footer />
     </>
   );
 }

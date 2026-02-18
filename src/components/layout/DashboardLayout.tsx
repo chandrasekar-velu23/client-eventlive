@@ -12,7 +12,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <NotificationProvider>
-      <div className="flex min-h-screen bg-bg-primary transition-colors duration-300">
+      <div className="flex min-h-screen bg-bg-secondary transition-colors duration-300">
         <Sidebar
           isOpen={isSidebarOpen}
           setIsOpen={setIsSidebarOpen}

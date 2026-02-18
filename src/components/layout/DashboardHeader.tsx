@@ -15,11 +15,9 @@ import CalendarDropdown from './CalendarDropdown';
 
 interface DashboardHeaderProps {
   setIsOpen: (value: boolean) => void;
-  collapsed: boolean;
-  setCollapsed: (value: boolean) => void;
 }
 
-export default function DashboardHeader({ setIsOpen, collapsed, setCollapsed }: DashboardHeaderProps) {
+export default function DashboardHeader({ setIsOpen }: DashboardHeaderProps) {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { unreadCount, notifications, markAsRead } = useNotificationContext();
@@ -49,15 +47,7 @@ export default function DashboardHeader({ setIsOpen, collapsed, setCollapsed }: 
           <Bars3Icon className="h-6 w-6" />
         </button>
 
-        {/* Desktop Collapse Toggle */}
-        <button
-          type="button"
-          className="hidden p-2 text-brand-muted hover:bg-brand-surface hover:text-brand-primary rounded-lg transition-colors lg:block"
-          onClick={() => setCollapsed(!collapsed)}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          <Bars3Icon className={`h-6 w-6 transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`} />
-        </button>
+
       </div>
 
       {/* Navigation History Controls - Desktop */}

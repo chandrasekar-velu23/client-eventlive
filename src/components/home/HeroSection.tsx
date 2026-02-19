@@ -1,4 +1,5 @@
 import Button from "../ui/Button";
+import { Link } from "react-router-dom";
 
 export default function HeroSection() {
   return (
@@ -23,9 +24,12 @@ export default function HeroSection() {
         </p>
 
         <div className="mt-8 flex justify-center gap-4">
-
-          <Button>Get Started for Free</Button>
-          <Button variant="secondary">Watch Demo</Button>
+          <Link to="/get-started">
+            <Button>Get Started for Free</Button>
+          </Link>
+          <Link to="/all-events">
+            <Button variant="secondary">Watch Demo</Button>
+          </Link>
         </div>
       </div>
     </section>

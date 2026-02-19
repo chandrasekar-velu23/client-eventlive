@@ -21,7 +21,7 @@ import {
   PencilSquareIcon,
   XMarkIcon
 } from "@heroicons/react/24/outline";
-import { getAllSpeakers, uploadCoverImage, createGlobalSpeaker } from "../services/api";
+import { getAllSpeakers, uploadCoverImage, createGlobalSpeaker, BASE_URL } from "../services/api";
 import type { EventData, Speaker, AgendaItem } from "../services/api";
 import { formatEventDate, formatEventTime } from "../utils/date";
 
@@ -157,7 +157,7 @@ export default function ManageEvent() {
     if (!event || !user) return;
     setRequestingTranscript(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/events/${eventId}/request-transcript`, {
+      const response = await fetch(`${BASE_URL}/events/${eventId}/request-transcript`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.token}` },
         body: JSON.stringify({ attendeeEmail: user.email, attendeeName: user.name, eventTitle: event.title })
@@ -176,7 +176,7 @@ export default function ManageEvent() {
     if (!event || !user) return;
     setRequestingRecording(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/events/${eventId}/request-recording`, {
+      const response = await fetch(`${BASE_URL}/events/${eventId}/request-recording`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.token}` },
         body: JSON.stringify({ attendeeEmail: user.email, attendeeName: user.name, eventTitle: event.title })
@@ -344,14 +344,14 @@ export default function ManageEvent() {
                     <Input value={event.sessionCode ? `${window.location.origin}/join/${event.sessionCode}` : ''} readOnly className="bg-gray-50 font-mono text-sm" />
                     <Button onClick={copyEventLink} disabled={!event.sessionCode}>Copy</Button>
                     {event.sessionCode && (
-                      <a
-                        href={`/join/${event.sessionCode}`}
+                      <Link
+                        to={`/join/${event.sessionCode}`}
                         target="_blank"
-                        rel="noreferrer"
+                        rel="noopener noreferrer"
                         className="btn-primary inline-flex items-center justify-center px-6"
                       >
                         Join
-                      </a>
+                      </Link>
                     )}
                   </div>
                 </div>

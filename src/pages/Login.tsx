@@ -132,7 +132,7 @@ export default function Login() {
         <div className="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/80 to-transparent"></div>
 
         <div className="relative z-10 max-w-xl px-12 text-center text-white space-y-6">
-          <img src="/EventLive.svg" alt="EventLive" className="h-24 w-auto mx-auto mb-8" />
+          <img src="/EventLive.svg" alt="EventLive" className="h-32 w-auto mx-auto mb-8" />
           <h1 className="text-4xl font-bold font-display tracking-tight">Experience Events Like Never Before</h1>
           <p className="text-lg text-white/70 font-light leading-relaxed">
             Join the thousands of organizers creating unforgettable virtual and hybrid experiences with EventLive's powerful platform.
@@ -146,7 +146,7 @@ export default function Login() {
 
           <div className="text-center lg:text-left">
             <Link to="/" className="lg:hidden inline-block mb-8">
-              <img src="/EventLive.svg" alt="EventLive" className="h-10 w-auto" />
+              <img src="/EventLive.svg" alt="EventLive" className="h-32 w-auto" />
             </Link>
             <h2 className="text-3xl font-bold font-display text-text-primary tracking-tight">Welcome back</h2>
             <p className="mt-2 text-sm text-text-secondary">

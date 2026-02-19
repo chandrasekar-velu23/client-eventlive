@@ -358,8 +358,12 @@ export default function LiveSession() {
         <header className="flex h-20 shrink-0 items-center justify-between border-b px-8 border-gray-200 bg-bg-primary/80 backdrop-blur-md">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <img src="/iconEventLive.svg" alt="EventLive" className="h-8 w-8 text-brand-600 shrink-0" />
-              <span className="text-xl font-bold font-display tracking-tight text-text-primary">EventLive</span>
+              <img src="/EventLive.svg" alt="EventLive" className="h-16 w-auto text-brand-600 shrink-0" />
+              {/* Removed text if logo is full brand logic, or keep it? User said "EventLive.svg" is logo. */}
+              {/* If using full logo (EventLive.svg), we might not need text "EventLive". */}
+              {/* Previous code had iconEventLive.svg + Text. */}
+              {/* I'll switch to full logo `EventLive.svg` and maybe hide text or keep it? */}
+              {/* Replaced iconEventLive with EventLive.svg as requested "whereever i user the logo". */}
             </div>
           </div>
 

@@ -14,10 +14,9 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
                 <div className="relative">
                     <select
                         ref={ref}
-                        className={`peer w-full px-4 py-3 rounded-xl border-2 bg-surface-50 border-surface-200 outline-none transition-all duration-200 text-default appearance-none cursor-pointer
-              focus:border-brand-500 focus:bg-white focus:shadow-[0_0_0_4px_rgba(79,70,229,0.1)]
+                        className={`peer input-field appearance-none cursor-pointer
               disabled:opacity-50 disabled:cursor-not-allowed
-              ${error ? "border-red-500 focus:border-red-500" : ""}
+              ${error ? "ring-red-500 focus:ring-red-500" : ""}
               ${className}`}
                         value={value}
                         {...props}

@@ -142,6 +142,12 @@ interface ApiResponse<T> {
   data?: T;
 }
 
+const logDev = (message: string, ...args: any[]) => {
+  if (import.meta.env.DEV) {
+    console.log(`%c[API] ${message}`, 'color: #0ea5e9; font-weight: bold;', ...args);
+  }
+};
+
 const apiFetch = async <T>(
   endpoint: string,
   options: RequestInit = {}
@@ -173,12 +179,18 @@ const apiFetch = async <T>(
 
   const url = joinPaths(BASE_URL, endpoint);
 
+  // Dev Logging: Request
+  logDev(`Request: ${options.method || 'GET'} ${endpoint}`, { url, body: options.body, headers });
+
   try {
     const response = await fetch(url, { ...options, headers });
 
     const contentType = response.headers.get("content-type");
     const isJson = contentType && contentType.includes("application/json");
     const responseData = isJson ? await response.json() : null;
+
+    // Dev Logging: Response
+    logDev(`Response: ${response.status} ${endpoint}`, responseData);
 
     if (!response.ok) {
       const errorMessage = responseData?.message || `Error ${response.status}: ${response.statusText}`;
@@ -687,4 +699,27 @@ export const uploadRecording = async (sessionId: string, blob: Blob): Promise<{ 
 
   if (!result.data) throw new Error("Failed to upload recording");
   return result.data;
+};
+
+// User Requests (Support/Inquiry Tracking)
+export interface UserRequest {
+  id: string;
+  type: 'transcript' | 'recording' | 'inquiry';
+  eventId: string;
+  eventTitle: string;
+  status: 'pending' | 'completed' | 'responded';
+  date: string;
+  response?: string;
+}
+
+export const getUserRequests = async (): Promise<UserRequest[]> => {
+  try {
+    const result = await apiFetch<UserRequest[]>("users/requests", {
+      method: "GET"
+    });
+    return result.data || [];
+  } catch (error) {
+    console.warn("Failed to fetch user requests:", error);
+    return [];
+  }
 };

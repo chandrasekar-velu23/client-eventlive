@@ -15,9 +15,11 @@ import CalendarDropdown from './CalendarDropdown';
 
 interface DashboardHeaderProps {
   setIsOpen: (value: boolean) => void;
+  collapsed: boolean;
+  setCollapsed: (value: boolean) => void;
 }
 
-export default function DashboardHeader({ setIsOpen }: DashboardHeaderProps) {
+export default function DashboardHeader({ setIsOpen, collapsed, setCollapsed }: DashboardHeaderProps) {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { unreadCount, notifications, markAsRead } = useNotificationContext();
@@ -47,7 +49,15 @@ export default function DashboardHeader({ setIsOpen }: DashboardHeaderProps) {
           <Bars3Icon className="h-6 w-6" />
         </button>
 
-
+        {/* Desktop Collapse Toggle */}
+        <button
+          type="button"
+          className="hidden p-2 text-brand-muted hover:bg-brand-surface hover:text-brand-primary rounded-lg transition-colors lg:block"
+          onClick={() => setCollapsed(!collapsed)}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          <Bars3Icon className={`h-6 w-6 transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`} />
+        </button>
       </div>
 
       {/* Navigation History Controls - Desktop */}
@@ -104,8 +114,8 @@ export default function DashboardHeader({ setIsOpen }: DashboardHeaderProps) {
                   leaveFrom="opacity-100 translate-y-0"
                   leaveTo="opacity-0 translate-y-1"
                 >
-                  <Popover.Panel className="absolute right-0 z-50 mt-4 w-80 transform px-0 lg:max-w-xs">
-                    <div className="overflow-hidden rounded-xl shadow-2xl ring-1 ring-black/5 bg-white">
+                  <Popover.Panel className="absolute right-0 z-50 mt-4 w-screen max-w-[20rem] sm:max-w-xs transform px-0">
+                    <div className="overflow-hidden rounded-xl shadow-2xl ring-1 ring-black/5 bg-white mx-4 sm:mx-0">
                       <div className="p-4 bg-brand-primary/5 border-b border-brand-primary/10 flex justify-between items-center">
                         <h3 className="text-sm font-bold text-brand-dark">Notifications</h3>
                         {unreadCount > 0 && <span className="text-xs font-bold text-brand-primary bg-brand-primary/10 px-2 py-0.5 rounded-full">{unreadCount} new</span>}

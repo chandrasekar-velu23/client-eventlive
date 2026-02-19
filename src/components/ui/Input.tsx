@@ -11,9 +11,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         return (
             <div className="relative w-full group">
                 <input
-                    className={`input-field peer placeholder-transparent ${error ? "border-red-500 focus:border-red-500 focus:ring-red-500/20" : ""
+                    className={`input-field peer placeholder-transparent ${error ? "ring-red-500 focus:ring-red-500" : ""
                         } ${rightElement ? "pr-12" : ""} ${className}`}
-                    placeholder={label || placeholder || " "}
+                    placeholder={placeholder || label || " "}
                     value={value}
                     ref={ref}
                     {...props}

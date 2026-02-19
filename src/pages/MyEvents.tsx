@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useEvents } from "../hooks/useEvents";
 import { formatEventDate, formatEventTime, isEventLive, isEventPast } from "../utils/date";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   PlusIcon,
   CalendarIcon,
@@ -32,13 +32,16 @@ export default function MyEvents() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [viewFilter, setViewFilter] = useState<ViewFilter>("All");
 
+  const location = useLocation();
+  const isEnrolledView = location.pathname.includes('/enrolled');
+
   useEffect(() => {
-    if (isOrganizer) {
+    if (isOrganizer && !isEnrolledView) {
       fetchMyEvents();
     } else {
       fetchEnrolledEvents();
     }
-  }, [fetchMyEvents, fetchEnrolledEvents, isOrganizer]);
+  }, [fetchMyEvents, fetchEnrolledEvents, isOrganizer, isEnrolledView]);
 
   const handleDeleteEvent = async (eventId: string) => {
     if (window.confirm("Are you sure you want to delete this event? This action cannot be undone.")) {
@@ -101,16 +104,21 @@ export default function MyEvents() {
     return [...filteredEvents].sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
   }, [filteredEvents]);
 
+  const headerTitle = isOrganizer && !isEnrolledView ? "Hosted Events" : "My Schedule";
+  const headerDesc = isOrganizer && !isEnrolledView
+    ? "Manage and track all your created events."
+    : "View your upcoming sessions and history.";
+
   return (
     <section className="space-y-8 animate-fade-in relative min-h-screen pb-24">
       {/* Header & Controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-brand-100">
         <div>
           <h1 className="text-3xl font-bold font-display text-brand-950 tracking-tight">
-            {isOrganizer ? "Hosted Events" : "My Schedule"}
+            {headerTitle}
           </h1>
           <p className="text-brand-500 mt-1 font-medium">
-            {isOrganizer ? "Manage and track all your created events." : "View your upcoming sessions and history."}
+            {headerDesc}
           </p>
         </div>
 
@@ -184,7 +192,7 @@ export default function MyEvents() {
             <div className="flex items-center gap-3">
               <div className="h-8 w-1 bg-brand-600 rounded-full" />
               <h2 className="text-xl font-bold text-brand-950 uppercase tracking-wide">
-                {isOrganizer ? "Created Events" : "Upcoming Events"}
+                {isOrganizer && !isEnrolledView ? "Created Events" : "Upcoming Events"}
               </h2>
               <span className="bg-brand-100 text-brand-700 px-2.5 py-0.5 rounded-full text-xs font-bold shadow-sm">
                 {(isOrganizer ? hostedEvents : upcomingEvents).length}
@@ -192,22 +200,22 @@ export default function MyEvents() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
-              {(isOrganizer ? hostedEvents : upcomingEvents).length === 0 ? (
+              {(isOrganizer && !isEnrolledView ? hostedEvents : upcomingEvents).length === 0 ? (
                 <div className="col-span-full py-16 text-center border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/50">
                   <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-gray-100"><CalendarIcon className="h-8 w-8 text-gray-300" /></div>
                   <h3 className="text-lg font-bold text-brand-900">No events found</h3>
                   <p className="text-brand-400 text-sm">Adjust your filters or create a new event.</p>
                 </div>
               ) : (
-                (isOrganizer ? hostedEvents : upcomingEvents).map(event => (
-                  <EventCard key={event.id} event={event} isOrganizer={isOrganizer} onDelete={handleDeleteEvent} onCopyLink={copyEventLink} />
+                (isOrganizer && !isEnrolledView ? hostedEvents : upcomingEvents).map(event => (
+                  <EventCard key={event.id} event={event} isOrganizer={isOrganizer && !isEnrolledView} onDelete={handleDeleteEvent} onCopyLink={copyEventLink} />
                 ))
               )}
             </div>
           </div>
 
-          {/* Past Events (Attendee only) */}
-          {!isOrganizer && pastEvents.length > 0 && (
+          {/* Past Events (Attendee / Enrolled View) */}
+          {(!isOrganizer || isEnrolledView) && pastEvents.length > 0 && (
             <div className="space-y-6 pt-8 border-t border-dashed border-brand-100">
               <div className="flex items-center gap-3 opacity-60">
                 <div className="h-8 w-1 bg-gray-400 rounded-full" />
@@ -232,7 +240,7 @@ function EventCard({ event, isOrganizer, onDelete, onCopyLink, isPast }: any) {
   const attendeeCount = event.attendees?.length || 0;
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-brand-100 hover:border-brand-200 group flex flex-col h-full ring-1 ring-black/5">
+    <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-brand-primary/20 hover:shadow-sm transition-all duration-300 group flex flex-col h-full">
       <div className="relative h-48 overflow-hidden bg-brand-50">
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent z-10 opacity-60"></div>
         {event.coverImage ? (
@@ -245,6 +253,11 @@ function EventCard({ event, isOrganizer, onDelete, onCopyLink, isPast }: any) {
           {isLive && !isPast && (
             <span className="flex items-center gap-1 bg-red-500 text-white px-3 py-1 rounded-full text-[10px] font-bold shadow-lg animate-pulse uppercase tracking-wider">
               <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" /> Live
+            </span>
+          )}
+          {!isLive && event.category && (
+            <span className="bg-brand-primary/90 text-white px-3 py-1 rounded-full text-[10px] font-bold shadow-sm backdrop-blur-sm">
+              {event.category}
             </span>
           )}
           {event.visibility === 'private' && <span className="bg-black/50 backdrop-blur-md text-white px-2 py-1 rounded-lg text-[10px] font-bold border border-white/10">Private</span>}

@@ -16,10 +16,11 @@ export const localToUTC = (dateStr: string, timeStr: string, timezone: string): 
     if (!dateStr || !timeStr || !timezone) return "";
 
     try {
+        const decodedTimezone = decodeURIComponent(timezone);
         // Combine to get "2023-10-25T10:00:00"
         const localDateTimeString = `${dateStr}T${timeStr}:00`;
         // Convert this "local" time in the specific timezone to a JS Date (which is UTC)
-        const utcDate = fromZonedTime(localDateTimeString, timezone);
+        const utcDate = fromZonedTime(localDateTimeString, decodedTimezone);
         return utcDate.toISOString();
     } catch (error) {
         console.error("Error converting date to UTC:", error);
@@ -32,8 +33,9 @@ export const localToUTC = (dateStr: string, timeStr: string, timezone: string): 
  */
 export const getCurrentTimeInZone = (timezone: string): string => {
     try {
+        const decodedTimezone = decodeURIComponent(timezone);
         return new Date().toLocaleTimeString('en-US', {
-            timeZone: timezone,
+            timeZone: decodedTimezone,
             hour12: false,
             hour: '2-digit',
             minute: '2-digit'
@@ -60,13 +62,13 @@ export const formatEventTime = (dateInput: string | Date, timezone?: string): st
         if (!isValid(date)) return "Invalid Time";
 
         // Validate timezone
-        let safeTimezone = timezone;
-        if (timezone) {
+        let safeTimezone = timezone ? decodeURIComponent(timezone) : undefined;
+        if (safeTimezone) {
             try {
                 // Test if timezone is valid
-                Intl.DateTimeFormat(undefined, { timeZone: timezone });
+                Intl.DateTimeFormat(undefined, { timeZone: safeTimezone });
             } catch (e) {
-                console.warn(`Invalid timezone '${timezone}' fallback to local.`);
+                console.warn(`Invalid timezone '${safeTimezone}' fallback to local.`);
                 safeTimezone = undefined;
             }
         }

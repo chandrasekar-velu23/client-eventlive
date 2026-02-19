@@ -49,19 +49,19 @@ export default function AllEvents() {
     loadFavorites();
   }, [user]);
 
-  // Extract unique event types for filter
-  const eventTypes = useMemo(() => {
-    const types = new Set(apiEvents.map(e => e.type || "Other"));
-    return ["All", ...Array.from(types)];
+  // Extract unique event categories for filter
+  const eventCategories = useMemo(() => {
+    const categories = new Set(apiEvents.map(e => e.category || "Other"));
+    return ["All", ...Array.from(categories)];
   }, [apiEvents]);
 
   const filteredEvents = useMemo(() => {
     return apiEvents.filter((event) => {
       const matchesSearch = event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         event.description?.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesType = selectedType === "All" || event.type === selectedType;
+      const matchesCategory = selectedType === "All" || event.category === selectedType;
 
-      return matchesSearch && matchesType;
+      return matchesSearch && matchesCategory;
     });
   }, [apiEvents, searchQuery, selectedType]);
 
@@ -137,7 +137,7 @@ export default function AllEvents() {
               <Listbox value={selectedType} onChange={setSelectedType}>
                 <div className="relative mt-1">
                   <Listbox.Button className="relative w-full cursor-default rounded-xl bg-white py-3 pl-4 pr-10 text-left shadow-sm focus:outline-none focus-visible:border-brand-primary focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-brand-primary sm:text-sm border border-gray-200">
-                    <span className="block truncate font-medium text-brand-dark"><span className="text-brand-muted font-normal">Type:</span> {selectedType}</span>
+                    <span className="block truncate font-medium text-brand-dark"><span className="text-brand-muted font-normal">Category:</span> {selectedType}</span>
                     <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                       <FunnelIcon className="h-5 w-5 text-brand-muted" aria-hidden="true" />
                     </span>
@@ -149,7 +149,7 @@ export default function AllEvents() {
                     leaveTo="opacity-0"
                   >
                     <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm z-50">
-                      {eventTypes.map((type, typeIdx) => (
+                      {eventCategories.map((type, typeIdx) => (
                         <Listbox.Option
                           key={typeIdx}
                           className={({ active }) =>
@@ -233,7 +233,7 @@ export default function AllEvents() {
                 return (
                   <div
                     key={event.id}
-                    className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-brand-primary/30 group flex flex-col h-full cursor-pointer"
+                    className="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-brand-primary/20 hover:shadow-sm transition-all duration-300 group flex flex-col h-full cursor-pointer"
                     onClick={() => setSelectedEvent(event)}
                   >
                     {/* Cover Image */}
@@ -253,7 +253,7 @@ export default function AllEvents() {
 
                       <div className="absolute top-3 right-3 flex gap-2">
                         {isUpcoming && <div className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">Upcoming</div>}
-                        {event.type && <div className="bg-brand-primary text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">{event.type}</div>}
+                        {event.category && <div className="bg-brand-primary text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">{event.category}</div>}
                       </div>
                     </div>
 

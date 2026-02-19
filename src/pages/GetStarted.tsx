@@ -160,7 +160,7 @@ export default function GetStarted() {
         <div className="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/80 to-transparent"></div>
 
         <div className="relative z-10 max-w-xl px-12 text-center text-white space-y-6">
-          <img src="/EventLive.svg" alt="EventLive" className="h-24 w-auto mx-auto mb-8" />
+          <img src="/EventLive.svg" alt="EventLive" className="h-40 w-auto mx-auto mb-15" />
           <h1 className="text-4xl font-bold font-display tracking-tight">Hosted Locally, Experienced Globally</h1>
           <p className="text-lg text-white/70 font-light leading-relaxed">
             Create, manage, and scale your events with the best-in-class tools designed for modern organizers.
@@ -172,7 +172,7 @@ export default function GetStarted() {
         <div className="mx-auto w-full max-w-sm lg:w-96 space-y-8">
           <div className="text-center lg:text-left">
             <Link to="/" className="lg:hidden inline-block mb-8">
-              <img src="/EventLive.svg" alt="EventLive" className="h-10 w-auto" />
+              <img src="/EventLive.svg" alt="EventLive" className="h-16 w-auto" />
             </Link>
             <h2 className="text-3xl font-bold font-display text-text-primary tracking-tight">Create your account</h2>
             <p className="mt-2 text-sm text-text-secondary">

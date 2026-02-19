@@ -3,6 +3,7 @@ import { Toaster } from "sonner";
 import Header from "./components/layout/Header";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import { useAuth } from "./hooks/useAuth";
+import { NotificationProvider } from "./context/NotificationContext";
 
 // Pages  
 // Pages  
@@ -32,7 +33,7 @@ export default function App() {
 
   return (
     <>
-      <>
+      <NotificationProvider>
         <Toaster position="bottom-right" richColors closeButton />
         {/* Show header only if NOT in dashboard and NOT logged in */}
         {!isDashboardPath && !user && <Header />}
@@ -42,7 +43,8 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/features" element={<Features />} />
           <Route path="/use-cases" element={<UseCases />} />
-          <Route path="/allevents" element={<AllEvent />} />
+          <Route path="/use-cases" element={<UseCases />} />
+          <Route path="/all-events" element={<AllEvent />} />
           <Route path="/join/:code" element={<LiveSession />} />
           {/* Auth Logic */}
           <Route
@@ -95,7 +97,7 @@ export default function App() {
           {/* Catch-all: Redirects to home if path doesn't exist */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </>
+      </NotificationProvider>
     </>
   );
 }

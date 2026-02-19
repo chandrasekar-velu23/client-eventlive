@@ -47,8 +47,8 @@ export default function CalendarDropdown() {
                         leaveFrom="opacity-100 translate-y-0"
                         leaveTo="opacity-0 translate-y-1"
                     >
-                        <Popover.Panel className="absolute right-0 z-50 mt-4 w-96 transform px-0 lg:max-w-sm">
-                            <div className="overflow-hidden rounded-xl shadow-2xl ring-1 ring-black/5 bg-white">
+                        <Popover.Panel className="absolute right-0 z-50 mt-4 w-screen max-w-[20rem] sm:max-w-sm transform px-0">
+                            <div className="overflow-hidden rounded-xl shadow-2xl ring-1 ring-black/5 bg-white mx-4 sm:mx-0">
                                 <div className="p-4 bg-brand-primary/5 border-b border-brand-primary/10 flex justify-between items-center">
                                     <h3 className="text-sm font-bold text-brand-dark flex items-center gap-2">
                                         <CalendarIcon className="h-4 w-4" /> My Schedule

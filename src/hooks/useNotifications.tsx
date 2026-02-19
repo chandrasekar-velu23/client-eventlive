@@ -58,23 +58,33 @@ export const useNotifications = () => {
     useEffect(() => {
         if (!user?.token) return;
 
+        // Prevent multiple connections
+        if (socketRef.current?.connected) return;
+
         // Connect to notification namespace
         const socket = io(`${SOCKET_URL}/notifications`, {
             path: '/socket.io',
             auth: { token: user.token },
             reconnectionAttempts: 5,
-            transports: ['websocket', 'polling']
+            transports: ['websocket', 'polling'],
+            autoConnect: false // Important for StrictMode
         });
 
         socketRef.current = socket;
+        socket.connect();
 
         socket.on('connect', () => {
-            console.log('Connected to notification service');
+            console.log('✅ Connected to notification service');
             setIsConnected(true);
         });
 
-        socket.on('disconnect', () => {
-            console.log('Disconnected from notification service');
+        socket.on('connect_error', (err) => {
+            console.warn('⚠️ Notification socket connection error:', err.message);
+            setIsConnected(false);
+        });
+
+        socket.on('disconnect', (reason) => {
+            console.log('❌ Disconnected from notification service:', reason);
             setIsConnected(false);
         });
 
@@ -99,7 +109,15 @@ export const useNotifications = () => {
         });
 
         return () => {
-            socket.disconnect();
+            if (socket) {
+                socket.offAny(); // Remove all listeners
+                if (socket.connected) {
+                    socket.disconnect();
+                } else {
+                    socket.close();
+                }
+            }
+            socketRef.current = null;
         };
     }, [user?.token]);
 

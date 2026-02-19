@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-
+import { getUserRequests, type UserRequest } from "../services/api";
 import {
     InboxStackIcon,
     EnvelopeIcon,
@@ -7,48 +7,26 @@ import {
     DocumentTextIcon
 } from "@heroicons/react/24/outline";
 
-// Mock data for requests since backend API endpoint doesn't exist yet for listing them
-const MOCK_REQUESTS = [
-    {
-        id: '1',
-        type: 'transcript',
-        eventId: 'evt_123',
-        eventTitle: 'Future of AI Conference',
-        status: 'completed',
-        date: '2023-10-15T10:30:00Z',
-        response: 'Transcript is ready and sent to your email.'
-    },
-    {
-        id: '2',
-        type: 'recording',
-        eventId: 'evt_456',
-        eventTitle: 'React Summit 2024',
-        status: 'pending',
-        date: '2023-10-18T14:20:00Z',
-        response: null
-    },
-    {
-        id: '3',
-        type: 'inquiry',
-        eventId: 'evt_789',
-        eventTitle: 'Web3 Workshop',
-        status: 'responded',
-        date: '2023-10-20T09:15:00Z',
-        response: 'Hi, yes, the workshop materials will be shared after the session.'
-    }
-];
-
 export default function Requests() {
-    const [requests, setRequests] = useState<any[]>([]);
+    const [requests, setRequests] = useState<UserRequest[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Simulate API fetch
-        const timer = setTimeout(() => {
-            setRequests(MOCK_REQUESTS);
-            setLoading(false);
-        }, 800);
-        return () => clearTimeout(timer);
+        const fetchRequests = async () => {
+            try {
+                // If backend is not ready, this will likely return empty list or error
+                // But we are now connected to the API
+                const data = await getUserRequests();
+                setRequests(data);
+            } catch (error) {
+                console.warn("Failed to fetch requests", error);
+                // Fallback to empty list or minimal feedback, avoid alert spam
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchRequests();
     }, []);
 
     const getStatusColor = (status: string) => {

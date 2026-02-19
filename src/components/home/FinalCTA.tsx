@@ -1,5 +1,6 @@
 
 
+import { Link } from "react-router-dom";
 export default function FinalCTA() {
   return (
 
@@ -22,14 +23,18 @@ export default function FinalCTA() {
 
         <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
           {/* Inverted Primary Button: White BG, Brand Text */}
-          <button className="px-8 py-4 rounded-full bg-white text-brand-primary font-bold text-lg shadow-xl shadow-brand-900/20 hover:bg-gray-50 hover:scale-105 transition-all duration-300">
-            Get Started for Free
-          </button>
+          <Link to="/get-started">
+            <button className="px-8 py-4 rounded-full bg-white text-brand-primary font-bold text-lg shadow-xl shadow-brand-900/20 hover:bg-gray-50 hover:scale-105 transition-all duration-300">
+              Get Started for Free
+            </button>
+          </Link>
 
           {/* Inverted Secondary Button: Transparent, White Border/Text */}
-          <button className="px-8 py-4 rounded-full bg-transparent border-2 border-white/30 text-white font-semibold text-lg hover:bg-white/10 hover:border-white transition-all duration-300 backdrop-blur-sm">
-            Request a Demo
-          </button>
+          <Link to="/all-events">
+            <button className="px-8 py-4 rounded-full bg-transparent border-2 border-white/30 text-white font-semibold text-lg hover:bg-white/10 hover:border-white transition-all duration-300 backdrop-blur-sm">
+              Request a Demo
+            </button>
+          </Link>
         </div>
       </div>
     </section>

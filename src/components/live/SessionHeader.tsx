@@ -40,7 +40,7 @@ export const SessionHeader: React.FC<SessionHeaderProps> = ({
             {/* Center: Logo */}
             <div className="flex items-center justify-center w-1/3">
                 <div className="flex items-center gap-2">
-                    <img src="/EventLive.svg" alt="EventLive" className="h-8 w-auto" />
+                    <img src="/EventLive.svg" alt="EventLive" className="h-12 w-auto" />
                     <span className="rounded bg-red-500/20 px-2 py-0.5 text-[10px] font-bold text-red-500 uppercase tracking-wider animate-pulse">
                         Live
                     </span>

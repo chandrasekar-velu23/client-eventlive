@@ -11,10 +11,8 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             <div className="relative w-full group">
                 <textarea
                     ref={ref}
-                    className={`peer w-full px-4 py-3 rounded-xl border-2 bg-surface-50 border-surface-200 outline-none transition-all duration-200 placeholder-transparent text-default min-h-[120px] resize-y
-            focus:border-brand-500 focus:bg-white focus:shadow-[0_0_0_4px_rgba(79,70,229,0.1)]
-            disabled:opacity-50 disabled:cursor-not-allowed
-            ${error ? "border-red-500 focus:border-red-500 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.1)]" : ""}
+                    className={`peer input-field min-h-[120px] resize-y
+            ${error ? "ring-red-500 focus:ring-red-500" : ""}
             ${className}`}
                     placeholder={label || placeholder || " "}
                     value={value}

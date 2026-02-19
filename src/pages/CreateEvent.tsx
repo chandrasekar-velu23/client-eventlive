@@ -24,7 +24,6 @@ import {
     EyeIcon,
     XMarkIcon,
     CloudArrowUpIcon,
-    TagIcon,
     BuildingOfficeIcon,
     VideoCameraIcon,
     LockClosedIcon
@@ -233,8 +232,8 @@ const DragDropFileUpload = ({
 
             {/* Preview */}
             <div
-                className={`w-full max-w-2xl rounded-xl bg-surface-50 overflow-hidden border-2 border-dashed relative group transition-all duration-300
-                    ${dragActive ? 'border-brand-500 bg-brand-50' : 'border-surface-200'}`}
+                className={`w-full max-w-2xl rounded-xl bg-bg-secondary/50 overflow-hidden border-2 border-dashed relative group transition-all duration-200
+                    ${dragActive ? 'border-brand-primary bg-brand-primary/5' : 'border-brand-accent hover:border-brand-300'}`}
                 style={{ aspectRatio }}
             >
                 {value ? (
@@ -314,8 +313,21 @@ const DragDropFileUpload = ({
 // TAG INPUT COMPONENT
 // ============================================================================
 
-const TagInput = ({ tags, onChange, placeholder = "Add tags..." }: { tags: string[]; onChange: (tags: string[]) => void; placeholder?: string }) => {
+const TagInput = ({
+    tags,
+    onChange,
+    placeholder = "Add tags...",
+    label,
+    error
+}: {
+    tags: string[];
+    onChange: (tags: string[]) => void;
+    placeholder?: string;
+    label?: string;
+    error?: string;
+}) => {
     const [input, setInput] = useState("");
+    const [isFocused, setIsFocused] = useState(false);
 
     // Defensive: ensure tags is always an array
     const safeTags = tags || [];
@@ -333,38 +345,59 @@ const TagInput = ({ tags, onChange, placeholder = "Add tags..." }: { tags: strin
     };
 
     return (
-        <div className="space-y-3">
-            <div className="flex gap-2">
-                <Input
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                            e.preventDefault();
-                            addTag();
-                        }
-                    }}
-                    placeholder={placeholder}
-                    className="flex-1"
-                />
-                <Button type="button" onClick={addTag} variant="secondary">
-                    <PlusIcon className="h-5 w-5" />
-                </Button>
-            </div>
-            {safeTags.length > 0 && (
+        <div className="relative w-full group">
+            <div
+                className={`min-h-[56px] w-full rounded-xl bg-bg-secondary/50 px-4 py-3 transition-all duration-200 shadow-sm ring-1 ring-inset
+                    ${error ? "ring-red-500" : isFocused ? "ring-2 ring-brand-primary/20 bg-white" : "ring-brand-accent/50 hover:ring-brand-accent"}
+                `}
+            >
                 <div className="flex flex-wrap gap-2">
                     {safeTags.map((tag, idx) => (
-                        <span key={idx} className="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-50 text-brand-700 rounded-lg text-xs font-bold border border-brand-100">
-                            <TagIcon className="h-3 w-3" />
+                        <span key={idx} className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-brand-primary/10 text-brand-700 rounded-md text-xs font-bold border border-brand-primary/20 animate-fade-in">
                             {tag}
                             <button type="button" onClick={() => removeTag(idx)} className="hover:text-red-500 transition-colors">
-                                <XMarkIcon className="h-3.5 w-3.5" />
+                                <XMarkIcon className="h-3 w-3" />
                             </button>
                         </span>
                     ))}
+                    <div className="flex-1 min-w-[120px] flex gap-2">
+                        <input
+                            type="text"
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    addTag();
+                                }
+                            }}
+                            onFocus={() => setIsFocused(true)}
+                            onBlur={() => {
+                                setIsFocused(false);
+                                addTag(); // Auto-add on blur
+                            }}
+                            placeholder={safeTags.length === 0 ? (label || placeholder) : placeholder}
+                            className="bg-transparent outline-none w-full text-text-primary text-sm placeholder:text-transparent"
+                        />
+                        <button type="button" onClick={addTag} className={`${input ? 'opacity-100' : 'opacity-0'} transition-opacity text-brand-primary`}>
+                            <PlusIcon className="h-5 w-5" />
+                        </button>
+                    </div>
                 </div>
+            </div>
+
+            {label && (
+                <label className={`absolute left-4 transition-all duration-200 pointer-events-none text-text-secondary/70
+                    ${(isFocused || safeTags.length > 0 || input)
+                        ? "-top-2.5 text-xs bg-bg-secondary px-2 rounded text-brand-primary"
+                        : "top-3.5 text-sm"}
+                    ${error ? "text-red-500" : ""}
+                `}>
+                    {label}
+                </label>
             )}
+
+            {error && <p className="mt-1 text-xs text-red-500 pl-1 font-medium">{error}</p>}
         </div>
     );
 };
@@ -818,19 +851,15 @@ export default function CreateEvent() {
                                     <option>Workshop</option>
                                     <option>Conference</option>
                                     <option>Meetup</option>
-                                    <option>Panel Discussion</option>
-                                    <option>Training</option>
-                                    <option>Networking</option>
+                                    <option>Discussion</option>
                                 </Select>
 
-                                <div>
-                                    <label className="block text-sm font-medium text-muted mb-2">Tags</label>
-                                    <TagInput
-                                        tags={formData.tags}
-                                        onChange={(tags) => updateFormData({ tags })}
-                                        placeholder="e.g. AI, Technology..."
-                                    />
-                                </div>
+                                <TagInput
+                                    label="Tags"
+                                    tags={formData.tags}
+                                    onChange={(tags) => updateFormData({ tags })}
+                                    placeholder="e.g. AI, Technology..."
+                                />
                             </div>
                         </div>
                     </div>
@@ -861,21 +890,25 @@ export default function CreateEvent() {
                                 style={{ colorScheme: 'light' }}
                             />
 
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-muted mb-2">Event Timezone</label>
-                                <div className="p-1 border-2 border-surface-200 rounded-xl bg-surface-50 focus-within:border-brand-500 focus-within:ring-4 focus-within:ring-brand-500/10 transition-all">
+                            <div className="md:col-span-2 relative w-full group">
+                                <div className="rounded-xl border border-brand-accent bg-bg-secondary/50 p-1 focus-within:border-brand-primary focus-within:ring-2 focus-within:ring-brand-primary/20 transition-all duration-200">
                                     <TimezoneSelect
                                         value={formData.timezone}
                                         onChange={(tz) => updateFormData({ timezone: tz.value })}
                                         className="timezone-select-container"
                                         classNames={{
-                                            control: () => "!border-0 !shadow-none !bg-transparent",
-                                            menu: () => "!bg-white !shadow-xl !rounded-xl !border !border-surface-200 !mt-2",
-                                            option: ({ isFocused }) => isFocused ? "!bg-brand-50 !text-brand-700" : "!text-default"
+                                            control: () => "!border-0 !shadow-none !bg-transparent !min-h-[44px]",
+                                            menu: () => "!bg-bg-primary !shadow-xl !rounded-xl !border !border-brand-accent !mt-2",
+                                            option: ({ isFocused }) => isFocused ? "!bg-brand-50 !text-brand-primary" : "!text-text-primary",
+                                            singleValue: () => "!text-text-primary",
+                                            placeholder: () => "!text-text-secondary/60"
                                         }}
                                     />
                                 </div>
-                                <p className="text-xs text-muted mt-2">Attendees will see times converted to their local timezone automatically.</p>
+                                <label className="absolute -top-2.5 left-4 text-xs bg-bg-secondary px-2 rounded text-brand-primary font-medium pointer-events-none transition-all">
+                                    Event Timezone
+                                </label>
+                                <p className="text-xs text-text-secondary mt-1 pl-1">Attendees will see times converted to their local timezone automatically.</p>
                             </div>
                         </div>
                     </div>
@@ -891,48 +924,46 @@ export default function CreateEvent() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="space-y-4">
-                                <label className="block text-sm font-bold text-default">Visibility</label>
+                                <label className="block text-sm font-bold text-text-primary">Visibility</label>
                                 <div className="space-y-3">
                                     {[
                                         { value: 'public', label: 'Public', desc: 'Anyone can discover and join' },
                                         { value: 'private', label: 'Private', desc: 'Only invited attendees can join' }
                                     ].map(opt => (
-                                        <label key={opt.value} className={`cursor-pointer p-4 rounded-xl border-2 flex items-start gap-4 transition-all hover:shadow-md ${formData.visibility === opt.value ? "bg-brand-50 border-brand-500 shadow-sm" : "border-surface-200 hover:bg-surface-50"}`}>
-                                            <input
-                                                type="radio"
-                                                name="visibility"
-                                                value={opt.value}
-                                                checked={formData.visibility === opt.value}
-                                                onChange={e => updateFormData({ visibility: e.target.value as 'public' | 'private' })}
-                                                className="mt-1 w-4 h-4 text-brand-600 focus:ring-brand-500 border-gray-300"
-                                            />
+                                        <label key={opt.value} className={`cursor-pointer p-4 rounded-xl border flex items-center gap-4 transition-all duration-200 shadow-sm
+                                            ${formData.visibility === opt.value
+                                                ? "bg-brand-primary/5 border-brand-primary ring-1 ring-brand-primary/20"
+                                                : "bg-bg-secondary/50 border-brand-accent hover:border-brand-300 hover:bg-bg-secondary"}`}>
+                                            <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors
+                                                ${formData.visibility === opt.value ? "border-brand-primary bg-brand-primary" : "border-brand-400 bg-transparent"}`}>
+                                                {formData.visibility === opt.value && <div className="w-2 h-2 rounded-full bg-white" />}
+                                            </div>
                                             <div className="flex-1">
-                                                <span className="font-bold text-sm text-default block">{opt.label}</span>
-                                                <span className="text-xs text-muted">{opt.desc}</span>
+                                                <span className="font-bold text-sm text-text-primary block">{opt.label}</span>
+                                                <span className="text-xs text-text-secondary">{opt.desc}</span>
                                             </div>
                                         </label>
                                     ))}
                                 </div>
                             </div>
                             <div className="space-y-4">
-                                <label className="block text-sm font-bold text-default">Access Type</label>
+                                <label className="block text-sm font-bold text-text-primary">Access Type</label>
                                 <div className="space-y-3">
                                     {[
                                         { value: 'Free', label: 'Free', desc: 'No payment required' },
                                         { value: 'Invite-only', label: 'Invite-only', desc: 'Requires invitation code' }
                                     ].map(opt => (
-                                        <label key={opt.value} className={`cursor-pointer p-4 rounded-xl border-2 flex items-start gap-4 transition-all hover:shadow-md ${formData.accessType === opt.value ? "bg-brand-50 border-brand-500 shadow-sm" : "border-surface-200 hover:bg-surface-50"}`}>
-                                            <input
-                                                type="radio"
-                                                name="accessType"
-                                                value={opt.value}
-                                                checked={formData.accessType === opt.value}
-                                                onChange={e => updateFormData({ accessType: e.target.value as 'Free' | 'Invite-only' })}
-                                                className="mt-1 w-4 h-4 text-brand-600 focus:ring-brand-500 border-gray-300"
-                                            />
+                                        <label key={opt.value} className={`cursor-pointer p-4 rounded-xl border flex items-center gap-4 transition-all duration-200 shadow-sm
+                                            ${formData.accessType === opt.value
+                                                ? "bg-brand-primary/5 border-brand-primary ring-1 ring-brand-primary/20"
+                                                : "bg-bg-secondary/50 border-brand-accent hover:border-brand-300 hover:bg-bg-secondary"}`}>
+                                            <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors
+                                                ${formData.accessType === opt.value ? "border-brand-primary bg-brand-primary" : "border-brand-400 bg-transparent"}`}>
+                                                {formData.accessType === opt.value && <div className="w-2 h-2 rounded-full bg-white" />}
+                                            </div>
                                             <div className="flex-1">
-                                                <span className="font-bold text-sm text-default block">{opt.label}</span>
-                                                <span className="text-xs text-muted">{opt.desc}</span>
+                                                <span className="font-bold text-sm text-text-primary block">{opt.label}</span>
+                                                <span className="text-xs text-text-secondary">{opt.desc}</span>
                                             </div>
                                         </label>
                                     ))}
@@ -946,7 +977,7 @@ export default function CreateEvent() {
                                         placeholder="Unlimited"
                                         min="1"
                                     />
-                                    <p className="text-xs text-muted mt-1 ml-1">Leave empty for unlimited participants</p>
+                                    <p className="text-xs text-text-secondary mt-1 ml-1">Leave empty for unlimited participants</p>
                                 </div>
                             </div>
                         </div>
@@ -1038,7 +1069,7 @@ export default function CreateEvent() {
                         <div>
                             <div className="flex items-center justify-between border-b border-surface-200 pb-4 mb-6">
                                 <div>
-                                    <h2 className="text-xl font-bold font-display text-default">Agenda</h2>
+                                    <h2 className="text-xl font-display text-default">Agenda</h2>
                                     <p className="text-sm text-muted">Plan your event schedule.</p>
                                 </div>
                                 <Button variant="secondary" onClick={addAgendaItem} className="text-xs px-3 py-1.5 flex items-center gap-1">
@@ -1243,28 +1274,30 @@ export default function CreateEvent() {
             </div>
 
             {/* Navigation Footer */}
-            <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-surface-200 p-4 z-40">
-                <div className="max-w-5xl mx-auto flex justify-between items-center">
-                    <Button
-                        variant="ghost"
-                        onClick={handleBack}
-                        className="flex items-center gap-2 text-muted hover:text-default"
-                    >
-                        <ChevronLeftIcon className="h-5 w-5" /> Back
-                    </Button>
+            <div className="fixed bottom-6 left-0 right-0 z-40 pointer-events-none">
+                <div className="max-w-5xl mx-auto px-4 lg:px-8">
+                    <div className="bg-white/90 backdrop-blur-xl border border-white/20 shadow-2xl shadow-brand-900/10 rounded-2xl p-4 flex justify-between items-center pointer-events-auto">
+                        <Button
+                            variant="ghost"
+                            onClick={handleBack}
+                            className="flex items-center gap-2 text-muted hover:text-default"
+                        >
+                            <ChevronLeftIcon className="h-5 w-5" /> Back
+                        </Button>
 
-                    <div className="text-xs font-bold text-muted uppercase tracking-widest hidden sm:block opacity-50">
-                        Step {currentStep} of {STEPS.length}: {STEPS[currentStep - 1].name}
+                        <div className="text-xs font-bold text-muted uppercase tracking-widest hidden sm:block opacity-50">
+                            Step {currentStep} of {STEPS.length}: {STEPS[currentStep - 1].name}
+                        </div>
+
+                        <Button
+                            variant="primary"
+                            onClick={currentStep === STEPS.length ? handleSubmit : handleNext}
+                            disabled={loading}
+                            className="px-8 shadow-lg shadow-brand-500/20"
+                        >
+                            {loading ? "Processing..." : currentStep === STEPS.length ? "Publish Event" : (<>Next <ChevronRightIcon className="h-5 w-5" /></>)}
+                        </Button>
                     </div>
-
-                    <Button
-                        variant="primary"
-                        onClick={currentStep === STEPS.length ? handleSubmit : handleNext}
-                        disabled={loading}
-                        className="px-8 shadow-lg shadow-brand-500/20"
-                    >
-                        {loading ? "Processing..." : currentStep === STEPS.length ? "Publish Event" : (<>Next <ChevronRightIcon className="h-5 w-5" /></>)}
-                    </Button>
                 </div>
             </div>
 
@@ -1360,22 +1393,18 @@ export default function CreateEvent() {
                                         />
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div>
-                                                <label className="block text-sm font-medium text-muted mb-2">Expertise Tags</label>
-                                                <TagInput
-                                                    tags={newSpeakerData.tags}
-                                                    onChange={(tags) => setNewSpeakerData({ ...newSpeakerData, tags })}
-                                                    placeholder="AI, Ethics, Design..."
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-muted mb-2">Display Labels</label>
-                                                <TagInput
-                                                    tags={newSpeakerData.labels}
-                                                    onChange={(labels) => setNewSpeakerData({ ...newSpeakerData, labels })}
-                                                    placeholder="Keynote, Panelist..."
-                                                />
-                                            </div>
+                                            <TagInput
+                                                label="Expertise Tags"
+                                                tags={newSpeakerData.tags}
+                                                onChange={(tags) => setNewSpeakerData({ ...newSpeakerData, tags })}
+                                                placeholder="AI, Ethics, Design..."
+                                            />
+                                            <TagInput
+                                                label="Display Labels"
+                                                tags={newSpeakerData.labels}
+                                                onChange={(labels) => setNewSpeakerData({ ...newSpeakerData, labels })}
+                                                placeholder="Keynote, Panelist..."
+                                            />
                                         </div>
 
                                         <div className="bg-surface-50 p-4 rounded-xl border border-surface-200">

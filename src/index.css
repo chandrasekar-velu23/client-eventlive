@@ -84,17 +84,18 @@
 */
 :root {
   /* Brand Constants (Refined for Premium Feel) */
+  /* Brand Constants (Refined to Indigo Blue) */
   --brand-50: #EEF2FF;
   --brand-100: #E0E7FF;
   --brand-200: #C7D2FE;
   --brand-300: #A5B4FC;
   --brand-400: #818CF8;
   --brand-500: #6366F1;
-  --brand-600: #4F46E5;
-  --brand-700: #4338CA;
-  --brand-800: #3730A3;
-  --brand-900: #312E81;
-  --brand-950: #1E1B4B;
+  --brand-600: #4338CA; /* Shifted to deeper Indigo 700 as primary base */
+  --brand-700: #3730A3;
+  --brand-800: #312E81;
+  --brand-900: #1E1B4B;
+  --brand-950: #0F0E2A;
 
   /* 
      60-30-10 Rule Implementation 
@@ -116,7 +117,7 @@
   --glass-bg: rgba(255, 255, 255, 0.8);
   --glass-border: rgba(255, 255, 255, 0.6);
 
-  --brand-primary: #4F46E5;   /* 10% - Primary Action */
+  --brand-primary: #4338CA;   /* 10% - Primary Action (Indigo Blue) */
   --brand-secondary: #0F172A; /* Secondary Action (Dark) */
   --brand-accent: #E2E8F0;    /* Secondary Detail */
 }

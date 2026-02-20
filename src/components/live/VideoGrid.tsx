@@ -30,15 +30,17 @@ export const VideoGrid: React.FC<VideoGridProps> = ({
 
   let gridClass = 'grid-cols-1';
   if (totalParticipants === 2) gridClass = 'grid-cols-1 md:grid-cols-2';
-  if (totalParticipants >= 3 && totalParticipants <= 4) gridClass = 'grid-cols-1 md:grid-cols-2';
+  if (totalParticipants >= 3 && totalParticipants <= 4) gridClass = 'grid-cols-1 sm:grid-cols-2';
   if (totalParticipants >= 5 && totalParticipants <= 6) gridClass = 'grid-cols-2 md:grid-cols-3';
   if (totalParticipants > 6) gridClass = 'grid-cols-2 md:grid-cols-4';
 
   // Handle aspect ratio based on count
-  const cardHeight = totalParticipants <= 2 ? 'h-full' : 'h-auto aspect-video';
+  // On mobile with 2 participants, we want them stacked 50% height each, taking full width.
+  // On desktop, we want them side by side.
+  const cardHeight = totalParticipants <= 2 ? 'h-full w-full' : 'h-auto w-full aspect-video';
 
   return (
-    <div className={`grid ${gridClass} gap-4 w-full h-full content-center p-4 max-h-screen overflow-y-auto custom-scrollbar`}>
+    <div className={`grid ${gridClass} gap-2 md:gap-4 w-full h-full content-center p-2 md:p-4 overflow-y-auto custom-scrollbar`}>
       {/* Local Video */}
       {localStream && (
         <div className={`relative rounded-2xl overflow-hidden shadow-xl bg-gray-900 border border-gray-200 group ${cardHeight} ring-1 ring-gray-900/5`}>
@@ -49,7 +51,7 @@ export const VideoGrid: React.FC<VideoGridProps> = ({
             muted
             className="w-full h-full object-cover transform scale-x-[-1]"
           />
-          <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 border border-white/10">
+          <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 border border-white/10 z-10 transition-opacity">
             <span className="w-2 h-2 rounded-full bg-green-500"></span> You
           </div>
         </div>

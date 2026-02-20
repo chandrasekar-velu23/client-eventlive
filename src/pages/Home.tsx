@@ -1,5 +1,4 @@
 import HeroSection from "../components/home/HeroSection";
-import TrustSection from "../components/home/TrustSection";
 import ProblemSolution from "../components/home/ProblemSection";
 import FeaturesSection from "../components/home/FeatureSection";
 import UseCasesSection from "../components/home/UseCasesSection";
@@ -24,7 +23,6 @@ export default function Home() {
       <FeaturesSection />
       <UseCasesSection />
       <ProblemSolution />
-      <TrustSection />
       <FinalCTA />
       <Footer />
     </>

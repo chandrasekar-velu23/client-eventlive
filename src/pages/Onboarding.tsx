@@ -104,7 +104,7 @@ const Onboarding: React.FC = () => {
                     <div className="absolute bottom-0 right-0 w-64 h-64 bg-brand-primary/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
 
                     <div className="relative z-10">
-                        <img src="/EventLive.svg" alt="EventLive Logo" className="h-24 w-auto mb-8" />
+                        <img src="/EventLive.png" alt="EventLive Logo" className="h-24 w-auto mb-8" />
 
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}

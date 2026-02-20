@@ -41,12 +41,12 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetDate, onCo
 
     const TimeBox = ({ value, label }: { value: number; label: string }) => (
         <div className="flex flex-col items-center">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-2xl shadow-lg border border-gray-100 flex items-center justify-center mb-2">
-                <span className="text-2xl sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-brand-600 to-brand-400 font-display">
+            <div className="w-14 h-14 sm:w-20 sm:h-20 bg-white rounded-2xl shadow-lg border border-gray-100 flex items-center justify-center mb-2">
+                <span className="text-xl sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-brand-600 to-brand-400 font-display">
                     {value.toString().padStart(2, '0')}
                 </span>
             </div>
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{label}</span>
+            <span className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest">{label}</span>
         </div>
     );
 

@@ -21,9 +21,9 @@ export default function Header() {
         <div className="flex h-full items-center justify-between">
           <Link to="/" className="flex items-center group">
             <img
-              src="/EventLive.svg"
+              src="/EventLive.png"
               alt="EVENTLIVE Logo"
-              className="h-16 w-auto transition-transform duration-300 group-hover:scale-105"
+              className="h-12 w-auto transition-transform duration-300 group-hover:scale-105"
             />
           </Link>
 

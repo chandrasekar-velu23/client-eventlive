@@ -17,22 +17,21 @@ export default function FinalCTA() {
         </h2>
 
         <p className="mt-6 text-lg font-medium text-blue-100 sm:text-xl max-w-2xl mx-auto">
-          Create, manage, and scale your virtual events with confidence.
-          Join thousands of organizers hosting world-class experiences.
+          Create, manage, and scale professional virtual experiences — all from one secure, unified platform.
         </p>
 
         <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
           {/* Inverted Primary Button: White BG, Brand Text */}
           <Link to="/get-started">
             <button className="px-8 py-4 rounded-full bg-white text-brand-primary font-bold text-lg shadow-xl shadow-brand-900/20 hover:bg-gray-50 hover:scale-105 transition-all duration-300">
-              Get Started for Free
+              Start Hosting Free
             </button>
           </Link>
 
           {/* Inverted Secondary Button: Transparent, White Border/Text */}
           <Link to="/all-events">
             <button className="px-8 py-4 rounded-full bg-transparent border-2 border-white/30 text-white font-semibold text-lg hover:bg-white/10 hover:border-white transition-all duration-300 backdrop-blur-sm">
-              Request a Demo
+              See How It Works
             </button>
           </Link>
         </div>

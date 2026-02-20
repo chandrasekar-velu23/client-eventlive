@@ -5,7 +5,7 @@ export default function Footer() {
 
                 {/* Brand */}
                 <div className="flex items-center gap-2 opacity-80 hover:opacity-100 transition-opacity">
-                    <img src="/iconEventLive.svg" alt="EventLive" className="h-10 w-10" />
+                    <img src="/iconEventLive.png" alt="EventLive" className="h-10 w-10" />
                     <span className="text-xl font-bold text-brand-dark font-display">EventLive</span>
                 </div>
 

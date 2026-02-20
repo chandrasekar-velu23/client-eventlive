@@ -122,18 +122,18 @@ export default function MyEvents() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           {/* Search & Filter Group */}
-          <div className="flex items-center bg-white rounded-xl shadow-sm border border-brand-100 p-1">
-            <div className={`relative transition-all duration-300 ${isSearchOpen ? "w-48 sm:w-64" : "w-10"}`}>
+          <div className="flex items-center bg-white rounded-xl shadow-sm border border-brand-100 p-1 flex-1 sm:flex-none justify-between sm:justify-start">
+            <div className={`relative transition-all duration-300 ${isSearchOpen ? "w-full sm:w-64" : "w-10 sm:w-10"}`}>
               {isSearchOpen ? (
-                <div className="relative">
+                <div className="relative w-full">
                   <input
                     autoFocus
-                    placeholder="Search events..."
+                    placeholder="Search..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-3 pr-8 py-1.5 rounded-lg text-sm outline-none bg-transparent placeholder-gray-400"
+                    className="w-full pl-3 pr-8 py-1.5 rounded-lg text-sm outline-none bg-transparent placeholder-gray-400 min-w-[120px]"
                     onBlur={() => !searchQuery && setIsSearchOpen(false)}
                   />
                   <button onClick={() => { setSearchQuery(""); setIsSearchOpen(false); }} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500">
@@ -151,9 +151,9 @@ export default function MyEvents() {
 
             <Listbox value={viewFilter} onChange={setViewFilter}>
               <div className="relative">
-                <Listbox.Button className="flex items-center gap-2 px-3 py-1.5 text-sm font-bold text-brand-700 hover:bg-brand-50 rounded-lg transition-colors">
+                <Listbox.Button className="flex items-center gap-2 px-3 py-1.5 text-sm font-bold text-brand-700 hover:bg-brand-50 rounded-lg transition-colors whitespace-nowrap">
                   <FunnelIcon className="h-4 w-4 text-brand-400" />
-                  <span className="hidden sm:inline">{viewFilter}</span>
+                  <span className={`${isSearchOpen ? 'hidden sm:inline' : 'inline'}`}>{viewFilter}</span>
                 </Listbox.Button>
                 <Transition as={Fragment} leave="transition ease-in duration-100" leaveFrom="opacity-100" leaveTo="opacity-0">
                   <Listbox.Options className="absolute right-0 mt-2 w-40 overflow-hidden rounded-xl bg-white shadow-xl ring-1 ring-black/5 focus:outline-none text-sm z-30">
@@ -170,7 +170,7 @@ export default function MyEvents() {
 
           {isOrganizer && (
             <Link to="/dashboard/create-event">
-              <Button className="shadow-lg shadow-brand-500/20">
+              <Button className="shadow-lg shadow-brand-500/20 shrink-0">
                 <PlusIcon className="h-5 w-5" /> <span className="hidden sm:inline ml-2">New Event</span>
               </Button>
             </Link>
@@ -286,15 +286,36 @@ function EventCard({ event, isOrganizer, onDelete, onCopyLink, isPast }: any) {
         <div className="flex gap-2 mt-5">
           {isOrganizer ? (
             <>
-              <Link to={`/dashboard/events/${event.id}`} className="flex-1 btn-primary py-2 text-sm justify-center">Manage</Link>
-              <button onClick={() => onCopyLink(event.sessionCode)} className="p-2 rounded-xl border border-gray-200 text-gray-400 hover:text-brand-600 hover:bg-gray-50 transition-colors"><LinkIcon className="h-5 w-5" /></button>
-              <button onClick={() => onDelete(event.id)} className="p-2 rounded-xl border border-gray-200 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"><TrashIcon className="h-5 w-5" /></button>
+              <Link to={`/dashboard/events/${event.id}`} className="flex-1">
+                <Button variant="primary" className="w-full justify-center">Manage</Button>
+              </Link>
+              <Button
+                variant="secondary"
+                size="icon"
+                onClick={() => onCopyLink(event.sessionCode)}
+                title="Copy Event Link"
+                className="text-gray-400 hover:text-brand-600"
+              >
+                <LinkIcon className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="danger"
+                size="icon"
+                onClick={() => onDelete(event.id)}
+                title="Delete Event"
+              >
+                <TrashIcon className="h-5 w-5" />
+              </Button>
             </>
           ) : (
             isLive && !isPast ? (
-              <Link to={`/join/${event.sessionCode}`} className="flex-1 btn-primary py-2 text-sm justify-center bg-green-500 hover:bg-green-600 border-transparent shadow-green-500/20">Join Live</Link>
+              <Link to={`/join/${event.sessionCode}`} className="flex-1">
+                <Button variant="primary" className="w-full justify-center bg-green-500 hover:bg-green-600 border-transparent shadow-green-500/20">Join Live</Button>
+              </Link>
             ) : (
-              <Link to={`/dashboard/events/${event.id}`} className="flex-1 btn-secondary py-2 text-sm justify-center">View Details</Link>
+              <Link to={`/dashboard/events/${event.id}`} className="flex-1">
+                <Button variant="secondary" className="w-full justify-center">View Details</Button>
+              </Link>
             )
           )}
         </div>

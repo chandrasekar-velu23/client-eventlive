@@ -70,7 +70,6 @@ export const useWebRTC = ({ sessionId, isHost: _isHost, enabled }: UseWebRTCProp
     if (socketRef.current?.connected) return;
 
     // Connect to session namespace
-    // Use SOCKET_URL + namespace
     const newSocket = io(`${SOCKET_URL}/session`, {
       path: '/socket.io',
       auth: { token },
@@ -93,8 +92,11 @@ export const useWebRTC = ({ sessionId, isHost: _isHost, enabled }: UseWebRTCProp
       if (userId !== user.id) {
         const pc = createPeerConnection(userId);
         peersRef.current[userId] = pc;
-        // Add local tracks
-        localStream?.getTracks().forEach(track => pc.addTrack(track, localStream));
+
+        // Add local tracks if they exist
+        if (localStream) {
+          localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+        }
 
         try {
           const offer = await pc.createOffer();
@@ -116,7 +118,7 @@ export const useWebRTC = ({ sessionId, isHost: _isHost, enabled }: UseWebRTCProp
       const pc = createPeerConnection(from);
       peersRef.current[from] = pc;
 
-      // Add local tracks if available (so they can see us too)
+      // Add local tracks if they exist
       if (localStream) {
         localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
       }
@@ -143,7 +145,11 @@ export const useWebRTC = ({ sessionId, isHost: _isHost, enabled }: UseWebRTCProp
     socket.on('ice-candidate', async ({ from, candidate }) => {
       const pc = peersRef.current[from];
       if (pc && candidate) {
-        await pc.addIceCandidate(new RTCIceCandidate(candidate));
+        try {
+          await pc.addIceCandidate(new RTCIceCandidate(candidate));
+        } catch (e) {
+          console.error("Error adding ice candidate", e);
+        }
       }
     });
 
@@ -165,7 +171,34 @@ export const useWebRTC = ({ sessionId, isHost: _isHost, enabled }: UseWebRTCProp
       Object.values(peersRef.current).forEach(pc => pc.close());
       peersRef.current = {};
     };
-  }, [enabled, sessionId, token, localStream]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled, sessionId, token]); // Removed localStream dependency
+
+
+  // Logic to update tracks when localStream changes
+  useEffect(() => {
+    if (localStream) {
+      Object.values(peersRef.current).forEach(pc => {
+        // Remove old tracks? RTCPeerConnection usually handles this via sender.replaceTrack
+        // But for simplicity/robustness in this hook architecture:
+        const senders = pc.getSenders();
+        const audioTrack = localStream.getAudioTracks()[0];
+        const videoTrack = localStream.getVideoTracks()[0];
+
+        if (audioTrack) {
+          const sender = senders.find(s => s.track?.kind === 'audio');
+          if (sender) sender.replaceTrack(audioTrack);
+          else pc.addTrack(audioTrack, localStream);
+        }
+
+        if (videoTrack) {
+          const sender = senders.find(s => s.track?.kind === 'video');
+          if (sender) sender.replaceTrack(videoTrack);
+          else pc.addTrack(videoTrack, localStream);
+        }
+      });
+    }
+  }, [localStream]);
 
   // Handle Local Stream extraction
   const startLocalStream = useCallback(async (video = true, audio = true) => {

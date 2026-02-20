@@ -16,8 +16,8 @@ const features = [
     Icon: VideoCameraIcon,
   },
   {
-    title: "Breakout Rooms",
-    description: "Create smaller group sessions for workshops, networking, and collaboration.",
+    title: "Control Room",
+    description: "Create smaller group sessions for workshops, conferences, meetings and discussions.",
     Icon: UsersIcon,
   },
   {
@@ -46,8 +46,8 @@ export default function FeaturesSection() {
   return (
     <section className="section bg-bg-secondary border-t border-brand-accent">
       <SectionTitle
-        title="Everything You Need to Host Amazing Events"
-        subtitle="From live streaming to analytics, EVENTLIVE gives you the tools to create memorable virtual experiences."
+        title="Your Complete Virtual Event Infrastructure"
+        subtitle="From registration to real-time engagement and post-event insights — everything runs on one powerful platform."
       />
 
       <div className="mx-auto mt-14 grid max-w-7xl grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">

@@ -166,7 +166,7 @@ export const LiveChat: React.FC<LiveChatProps> = ({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type a message..."
-            className="flex-1 bg-bg-secondary border border-gray-200 rounded-xl px-4 py-3 text-sm text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all"
+            className="flex-1 bg-bg-secondary border border-gray-200 rounded-xl px-4 py-3 text-base md:text-sm text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all"
             disabled={isSending || isLoading}
           />
           <button

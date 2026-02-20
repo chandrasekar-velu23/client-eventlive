@@ -128,12 +128,12 @@ export default function Login() {
     <div className="flex min-h-screen bg-bg-primary relative overflow-hidden">
       {/* Left Decoration - Desktop Only */}
       <div className="hidden lg:flex flex-1 relative bg-brand-950 items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2940&auto=format&fit=crop')] bg-cover bg-center opacity-40 mix-blend-overlay"></div>
+        <div className="absolute inset-0 bg-secondary bg-cover bg-center opacity-40 mix-blend-overlay"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/80 to-transparent"></div>
 
         <div className="relative z-10 max-w-xl px-12 text-center text-white space-y-6">
-          <img src="/EventLive.svg" alt="EventLive" className="h-32 w-auto mx-auto mb-8" />
-          <h1 className="text-4xl font-bold font-display tracking-tight">Experience Events Like Never Before</h1>
+          <img src="/EventLive.png" alt="EventLive" className="h-24 w-auto mx-auto mb-8" />
+          <h1 className="text-4xl text-white/50 font-bold font-display tracking-tight">Experience Events Like Never Before</h1>
           <p className="text-lg text-white/70 font-light leading-relaxed">
             Join the thousands of organizers creating unforgettable virtual and hybrid experiences with EventLive's powerful platform.
           </p>
@@ -141,14 +141,14 @@ export default function Login() {
       </div>
 
       {/* Right Form Section */}
-      <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 lg:px-20 xl:px-24 bg-bg-primary relative z-20">
+      <div className="flex-1 flex flex-col justify-center px-6 sm:px-8 lg:px-20 xl:px-24 bg-bg-primary relative z-20">
         <div className="mx-auto w-full max-w-sm lg:w-96 space-y-8">
 
           <div className="text-center lg:text-left">
             <Link to="/" className="lg:hidden inline-block mb-8">
-              <img src="/EventLive.svg" alt="EventLive" className="h-32 w-auto" />
+              <img src="/EventLive.png" alt="EventLive" className="h-12 w-auto" />
             </Link>
-            <h2 className="text-3xl font-bold font-display text-text-primary tracking-tight">Welcome back</h2>
+            <h2 className="text-3xl text-primary font-bold font-display tracking-tight">Welcome back</h2>
             <p className="mt-2 text-sm text-text-secondary">
               Don't have an account?{' '}
               <Link to="/get-started" className="font-semibold text-brand-primary hover:text-brand-600 transition-colors">

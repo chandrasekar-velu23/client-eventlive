@@ -90,7 +90,71 @@ export default function AttendeeTable({
 
   return (
     <div className="card p-0 overflow-hidden border border-brand-accent/10 bg-white rounded-xl shadow-sm">
-      <div className="overflow-x-auto">
+      {/* Mobile Card View (Visible < md) */}
+      <div className="block md:hidden divide-y divide-brand-accent/5">
+        {sortedAttendees.length > 0 ? (
+          sortedAttendees.map((attendee, index) => (
+            <div key={`${attendee.id}-${index}-mobile`} className="p-4 space-y-3">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="font-semibold text-brand-dark">{attendee.name}</h3>
+                  <button
+                    onClick={() => onEmailClick?.(attendee.email)}
+                    className="text-sm text-brand-primary hover:underline flex items-center gap-1 mt-0.5"
+                  >
+                    {attendee.email}
+                  </button>
+                </div>
+                {/* Status Badge */}
+                <span className={`px-2 py-1 rounded-full text-xs font-semibold
+                  ${attendee.status === "Present" ? "bg-green-100 text-green-700" :
+                    attendee.status === "Late" ? "bg-yellow-100 text-yellow-700" :
+                      attendee.status === "Left Early" ? "bg-orange-100 text-orange-700" :
+                        "bg-gray-100 text-gray-700"}`}
+                >
+                  {attendee.status || "Registered"}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-xs text-brand-muted">
+                {showEventColumn && attendee.eventTitle && (
+                  <div className="col-span-2">
+                    <span className="font-medium">Event:</span> {attendee.eventTitle}
+                  </div>
+                )}
+                <div>
+                  <span className="font-medium">Joined:</span> {attendee.checkInTime ? new Date(attendee.checkInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "-"}
+                </div>
+                <div>
+                  <span className="font-medium">Duration:</span> {attendee.durationMinutes ? `${attendee.durationMinutes}m` : "-"}
+                </div>
+                <div className="col-span-2">
+                  <span className="font-medium">Registered:</span> {new Date(attendee.enrolledAt).toLocaleDateString()}
+                </div>
+              </div>
+
+              {/* Mobile Actions */}
+              <div className="pt-2 flex gap-3">
+                {onViewLogs && (
+                  <button
+                    onClick={() => onViewLogs(attendee.id, attendee.name)}
+                    className="text-xs font-medium text-brand-primary border border-brand-primary/20 px-3 py-1.5 rounded-lg hover:bg-brand-primary/5 transition-colors"
+                  >
+                    View Logs
+                  </button>
+                )}
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="p-8 text-center text-brand-muted text-sm">
+            No attendees found
+          </div>
+        )}
+      </div>
+
+      {/* Desktop Table View (Visible >= md) */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-sm text-left">
           <thead className="bg-brand-surface border-b border-brand-accent/10 text-brand-muted uppercase text-xs font-bold tracking-wider">
             <tr>

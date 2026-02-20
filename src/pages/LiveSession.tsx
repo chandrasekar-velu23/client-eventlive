@@ -358,7 +358,7 @@ export default function LiveSession() {
         <header className="flex h-20 shrink-0 items-center justify-between border-b px-8 border-gray-200 bg-bg-primary/80 backdrop-blur-md">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <img src="/EventLive.svg" alt="EventLive" className="h-16 w-auto text-brand-600 shrink-0" />
+              <img src="/EventLive.png" alt="EventLive" className="h-12 w-auto shrink-0" />
               {/* Removed text if logo is full brand logic, or keep it? User said "EventLive.svg" is logo. */}
               {/* If using full logo (EventLive.svg), we might not need text "EventLive". */}
               {/* Previous code had iconEventLive.svg + Text. */}
@@ -546,25 +546,31 @@ export default function LiveSession() {
 
 
   return (
-    <div className={`flex h-screen w-full flex-col font-sans transition-colors duration-300 bg-bg-secondary text-text-primary overflow-hidden`}>
-      {/* Immersive Header */}
-      <header className={`flex h-16 shrink-0 items-center justify-between px-6 bg-bg-primary border-b border-gray-200 z-20 absolute top-0 left-0 right-0 hover:opacity-100 transition-opacity`}>
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" className="text-text-secondary hover:bg-bg-secondary p-2" onClick={() => navigate('/dashboard')}>
+    <div className={`flex h-screen w-full flex-col font-sans transition-colors duration-300 bg-bg-secondary text-text-primary overflow-hidden relative`}>
+      {/* Immersive Header - Sticky on Mobile, Absolute on Desktop if needed, but sticky is safer for layout */}
+      <header className={`flex h-16 shrink-0 items-center justify-between px-4 md:px-6 bg-bg-primary/95 backdrop-blur-sm border-b border-gray-200 z-40 absolute top-0 left-0 right-0`}>
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" className="text-text-secondary hover:bg-bg-secondary p-2 -ml-2" onClick={() => navigate('/dashboard')}>
             <ArrowLeftIcon className="h-5 w-5" />
           </Button>
-          <div>
-            <h1 className="text-sm font-bold font-display tracking-tight text-text-primary">{event?.title}</h1>
+          <div className="flex flex-col">
+            <h1 className="text-sm font-bold font-display tracking-tight text-text-primary max-w-[150px] md:max-w-md truncate">{event?.title}</h1>
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
               <span className="text-[10px] font-bold uppercase tracking-widest text-red-500">Live</span>
-              <span className="text-[10px] text-gray-400">•</span>
-              <span className="text-[10px] text-gray-500">{session?.participants?.length || 1} watching</span>
+              <span className="text-[10px] text-gray-400 hidden sm:inline">•</span>
+              <span className="text-[10px] text-gray-500 hidden sm:inline">{session?.participants?.length || 1} watching</span>
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Mobile Participant Count for space saving */}
+          <div className="md:hidden flex items-center gap-1 bg-gray-100 rounded-full px-2 py-1">
+            <UsersIcon className="h-3 w-3 text-gray-500" />
+            <span className="text-xs font-bold text-gray-700">{session?.participants?.length || 1}</span>
+          </div>
+
           <div className="hidden md:flex -space-x-2">
             {[...Array(Math.min(3, session?.participants?.length || 0))].map((_, i) => (
               <div key={i} className="h-8 w-8 rounded-full bg-gray-100 border-2 border-white flex items-center justify-center text-xs font-bold text-gray-700">
@@ -575,71 +581,91 @@ export default function LiveSession() {
         </div>
       </header>
 
-      {/* Main Stage */}
-      <div className="flex flex-1 pt-16 h-full relative">
-        <div className="flex-1 p-4 flex items-center justify-center relative bg-bg-secondary">
-          {/* Video Grid takes full space */}
-          <div className="w-full h-full max-w-[1600px] flex items-center justify-center">
-            <VideoGrid
-              localStream={localStream}
-              remoteStreams={remoteStreamArray}
-              isSelf={true}
-            />
+      {/* Main Stage - Sidebar Awareness moved to parent flex container */}
+      <div className="flex flex-1 pt-16 h-full relative overflow-hidden">
+
+        {/* Content Area (Video Grid) */}
+        <div className={`flex-1 flex flex-col items-center justify-center relative bg-bg-secondary transition-all duration-300 ${activeSidebar !== 'none' ? 'hidden md:flex md:w-[calc(100%-20rem)]' : 'w-full'}`}>
+          {/* Video Grid takes available space - accounting for bottom bar on mobile */}
+          <div className="w-full h-full pb-20 md:pb-0 px-2 md:px-4 py-2 flex items-center justify-center">
+            <div className="w-full h-full max-w-[1600px] flex items-center justify-center">
+              <VideoGrid
+                localStream={localStream}
+                remoteStreams={remoteStreamArray}
+                isSelf={true}
+              />
+            </div>
           </div>
         </div>
 
-        {/* Floating Controls Bar */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30">
-          <div className="flex items-center gap-2 p-2 rounded-2xl bg-white/90 backdrop-blur-md border border-gray-200 shadow-2xl">
+        {/* Floating Controls Bar - Bottom Sheet on Mobile / Floating Pill on Desktop */}
+        <div className={`
+            fixed bottom-0 left-0 right-0 z-50 p-4 bg-white/95 backdrop-blur-md border-t border-gray-200 
+            md:absolute md:bottom-8 md:left-1/2 md:-translate-x-1/2 md:w-auto md:bg-white/90 md:rounded-2xl md:border md:shadow-2xl md:p-2
+            flex justify-between md:justify-center items-center gap-2 md:gap-4 transition-all duration-300
+            ${activeSidebar !== 'none' ? 'md:left-[calc(50%-10rem)]' : ''} /* Adjust center when sidebar open on desktop */
+        `}>
+
+          {/* Main Actions Group */}
+          <div className="flex items-center gap-2 md:gap-4 flex-1 justify-center md:flex-none">
             <button
               onClick={() => setAudioEnabled(!audioEnabled)}
-              className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${audioEnabled ? 'bg-gray-100 text-text-primary hover:bg-gray-200' : 'bg-red-500 text-white hover:bg-red-600'}`}
+              className={`h-10 w-10 md:h-12 md:w-12 rounded-full md:rounded-xl flex items-center justify-center transition-all ${audioEnabled ? 'bg-gray-100 text-text-primary hover:bg-gray-200' : 'bg-red-500 text-white hover:bg-red-600'}`}
               title="Toggle Mic"
             >
               {audioEnabled ? <MicrophoneIcon className="h-5 w-5" /> : <MicrophoneIcon className="h-5 w-5 opacity-70" />}
             </button>
             <button
               onClick={() => setVideoEnabled(!videoEnabled)}
-              className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${videoEnabled ? 'bg-gray-100 text-text-primary hover:bg-gray-200' : 'bg-red-500 text-white hover:bg-red-600'}`}
+              className={`h-10 w-10 md:h-12 md:w-12 rounded-full md:rounded-xl flex items-center justify-center transition-all ${videoEnabled ? 'bg-gray-100 text-text-primary hover:bg-gray-200' : 'bg-red-500 text-white hover:bg-red-600'}`}
               title="Toggle Camera"
             >
               {videoEnabled ? <VideoCameraIcon className="h-5 w-5" /> : <VideoCameraSlashIcon className="h-5 w-5 opacity-70" />}
             </button>
 
-            <div className="w-px h-8 bg-gray-200 mx-2" />
-            <button
-              onClick={() => setActiveSidebar(prev => prev === 'chat' ? 'none' : 'chat')}
-              className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${activeSidebar === 'chat' ? 'bg-brand-600 text-white' : 'bg-gray-50 text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
-              title="Chat"
-            >
-              <ChatBubbleLeftRightIcon className="h-5 w-5" />
-            </button>
-            <button
-              onClick={() => setActiveSidebar(prev => prev === 'participants' ? 'none' : 'participants')}
-              className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${activeSidebar === 'participants' ? 'bg-brand-600 text-white' : 'bg-gray-50 text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
-              title="Participants"
-            >
-              <UsersIcon className="h-5 w-5" />
-            </button>
-            <button
-              onClick={() => setActiveSidebar(prev => prev === 'polls' ? 'none' : 'polls')}
-              className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${activeSidebar === 'polls' ? 'bg-brand-600 text-white' : 'bg-gray-50 text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
-              title="Polls"
-            >
-              <ChartBarIcon className="h-5 w-5" />
-            </button>
-            <button
-              onClick={() => setActiveSidebar(prev => prev === 'qa' ? 'none' : 'qa')}
-              className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${activeSidebar === 'qa' ? 'bg-brand-600 text-white' : 'bg-gray-50 text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
-              title="Q&A"
-            >
-              <QuestionMarkCircleIcon className="h-5 w-5" />
-            </button>
+            <div className="w-px h-6 md:h-8 bg-gray-200 mx-1 md:mx-2" />
 
-            <div className="w-px h-8 bg-gray-200 mx-2" />
+            {/* Feature Toggles - Hidden on very small screens if needed, or scrollable */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setActiveSidebar(prev => prev === 'chat' ? 'none' : 'chat')}
+                className={`h-10 w-10 md:h-12 md:w-12 rounded-full md:rounded-xl flex items-center justify-center relative transition-all ${activeSidebar === 'chat' ? 'bg-brand-600 text-white' : 'bg-gray-50 text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
+                title="Chat"
+              >
+                <ChatBubbleLeftRightIcon className="h-5 w-5" />
+                {/* Unread dot could go here */}
+              </button>
+              <button
+                onClick={() => setActiveSidebar(prev => prev === 'participants' ? 'none' : 'participants')}
+                className={`h-10 w-10 md:h-12 md:w-12 rounded-full md:rounded-xl flex items-center justify-center transition-all ${activeSidebar === 'participants' ? 'bg-brand-600 text-white' : 'bg-gray-50 text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
+                title="Participants"
+              >
+                <UsersIcon className="h-5 w-5" />
+              </button>
+              {/* Hidden on small mobile to save space, maybe put in a 'More' menu later? Keeping for now. */}
+              <button
+                onClick={() => setActiveSidebar(prev => prev === 'polls' ? 'none' : 'polls')}
+                className={`hidden xs:flex h-10 w-10 md:h-12 md:w-12 rounded-full md:rounded-xl items-center justify-center transition-all ${activeSidebar === 'polls' ? 'bg-brand-600 text-white' : 'bg-gray-50 text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
+                title="Polls"
+              >
+                <ChartBarIcon className="h-5 w-5" />
+              </button>
+              <button
+                onClick={() => setActiveSidebar(prev => prev === 'qa' ? 'none' : 'qa')}
+                className={`hidden xs:flex h-10 w-10 md:h-12 md:w-12 rounded-full md:rounded-xl items-center justify-center transition-all ${activeSidebar === 'qa' ? 'bg-brand-600 text-white' : 'bg-gray-50 text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
+                title="Q&A"
+              >
+                <QuestionMarkCircleIcon className="h-5 w-5" />
+              </button>
+            </div>
+
+
+            <div className="hidden md:block w-px h-8 bg-gray-200 mx-2" />
+
+            {/* Desktop Only Sharing */}
             <button
               onClick={isScreenSharing ? stopScreenShare : shareScreen}
-              className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${isScreenSharing ? 'bg-brand-600 text-white' : 'bg-gray-50 text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
+              className={`hidden md:flex h-12 w-12 rounded-xl items-center justify-center transition-all ${isScreenSharing ? 'bg-brand-600 text-white' : 'bg-gray-50 text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
               title={isScreenSharing ? "Stop Sharing" : "Share Screen"}
             >
               {isScreenSharing ? <StopIcon className="h-5 w-5" /> : <ComputerDesktopIcon className="h-5 w-5" />}
@@ -649,38 +675,43 @@ export default function LiveSession() {
             {event?.organizerId === user?.id && (
               <button
                 onClick={isRecording ? stopRecording : startRecording}
-                className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${isRecording ? 'bg-red-600 text-white animate-pulse' : 'bg-gray-50 text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
+                className={`hidden md:flex h-12 w-12 rounded-xl items-center justify-center transition-all ${isRecording ? 'bg-red-600 text-white animate-pulse' : 'bg-gray-50 text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
                 title={isRecording ? "Stop Recording" : "Start Recording"}
               >
                 <span className={`h-4 w-4 rounded-full ${isRecording ? 'bg-white' : 'bg-red-500 border-2 border-zinc-400'}`} />
               </button>
             )}
 
+            {/* End Button */}
             <button
               onClick={handleLeave}
-              className="h-12 px-6 rounded-xl bg-red-600 text-white font-bold text-sm tracking-wide hover:bg-red-700 transition-colors shadow-lg shadow-red-500/20"
+              className="h-10 px-4 md:h-12 md:px-6 rounded-full md:rounded-xl bg-red-600 text-white font-bold text-xs md:text-sm tracking-wide hover:bg-red-700 transition-colors shadow-lg shadow-red-500/20 whitespace-nowrap"
             >
               End
             </button>
           </div>
         </div>
 
-        {/* Collapsible Sidebar */}
-        <div className={`transition-all duration-300 ease-in-out border-l border-gray-200 bg-white z-20 ${activeSidebar !== 'none' ? 'w-80 translate-x-0' : 'w-0 translate-x-full opacity-0'}`}>
-          <div className="h-full flex flex-col w-80">
-            <div className="h-14 flex items-center justify-between px-4 border-b border-gray-100">
+        {/* Responsive Sidebar - Fullscreen on Mobile, Side Panel on Desktop */}
+        <div className={`
+            fixed inset-0 z-[60] bg-white transition-transform duration-300 ease-in-out
+            md:relative md:z-20 md:w-80 md:border-l md:border-gray-200 md:translate-x-0
+            ${activeSidebar !== 'none' ? 'translate-x-0' : 'translate-x-full md:w-0 md:border-none'}
+        `}>
+          <div className="h-full flex flex-col w-full md:w-80 bg-white">
+            <div className="h-16 md:h-14 flex items-center justify-between px-4 border-b border-gray-100 shrink-0">
               <h3 className="font-bold text-sm uppercase tracking-wider text-gray-500">
                 {activeSidebar === 'chat' && 'Live Chat'}
                 {activeSidebar === 'participants' && 'Attendees'}
                 {activeSidebar === 'polls' && 'Polls'}
                 {activeSidebar === 'qa' && 'Q&A'}
               </h3>
-              <button onClick={() => setActiveSidebar('none')} className="p-2 text-gray-400 hover:text-gray-900">
-                <PhoneXMarkIcon className="h-4 w-4" />
+              <button onClick={() => setActiveSidebar('none')} className="p-2 text-gray-400 hover:text-gray-900 bg-gray-50 rounded-full md:bg-transparent">
+                <PhoneXMarkIcon className="h-5 w-5 md:h-4 md:w-4" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-hidden">
+            <div className="flex-1 overflow-hidden relative">
               <SessionSidebar
                 open={true}
                 activeView={activeSidebar === 'none' ? null : activeSidebar as any}
@@ -697,7 +728,6 @@ export default function LiveSession() {
                 onUpvoteQuestion={upvoteQuestion}
                 onAnswerQuestion={answerQuestion}
                 currentUserId={user?.id || ''}
-              // Theme Removed
               />
             </div>
           </div>

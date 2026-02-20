@@ -29,7 +29,7 @@ interface SessionSidebarProps {
 }
 
 export const SessionSidebar: React.FC<SessionSidebarProps> = ({
-    open,
+    // Open prop removed as it's handled by parent
     activeView,
     messages,
     onSendMessage,
@@ -46,7 +46,7 @@ export const SessionSidebar: React.FC<SessionSidebarProps> = ({
     currentUserId
 }) => {
     return (
-        <aside className={`${open ? 'w-80 translate-x-0' : 'w-0 translate-x-full'} transition-all duration-300 border-l flex flex-col border-gray-200 bg-white`}>
+        <aside className="w-full h-full flex flex-col bg-white">
             {activeView === 'chat' && (
                 <div className="h-full flex flex-col">
                     <LiveChat
@@ -58,7 +58,7 @@ export const SessionSidebar: React.FC<SessionSidebarProps> = ({
             )}
 
             {activeView === 'participants' && (
-                <div className="p-4">
+                <div className="p-4 h-full overflow-y-auto">
                     <h3 className="font-bold mb-4 text-text-primary">Participants</h3>
                     <p className="text-text-secondary text-sm">Participant list coming soon...</p>
                 </div>

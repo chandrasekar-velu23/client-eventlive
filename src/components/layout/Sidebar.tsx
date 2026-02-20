@@ -97,9 +97,9 @@ export default function Sidebar({ isOpen, setIsOpen, collapsed }: SidebarProps) 
           <div className={`flex h-20 items-center px-6 border-b border-gray-100 ${collapsed ? "justify-center" : "justify-between"}`}>
             <div className="flex items-center gap-3 overflow-hidden">
               {collapsed ? (
-                <img src="/iconEventLive.svg" alt="EventLive" className="h-12 w-12 text-brand-600 shrink-0" />
+                <img src="/iconEventLive.png" alt="EventLive" className="h-10 w-10 shrink-0" />
               ) : (
-                <img src="/EventLive.svg" alt="EventLive" className="h-30 w-auto text-brand-600 shrink-0" />
+                <img src="/EventLive.png" alt="EventLive" className="h-10 w-auto shrink-0" />
               )}
             </div>
             <button className="lg:hidden p-1 text-muted hover:text-brand-600 transition-colors" onClick={() => setIsOpen(false)} aria-label="Close Sidebar">

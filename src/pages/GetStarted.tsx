@@ -156,23 +156,23 @@ export default function GetStarted() {
     <div className="flex min-h-screen bg-bg-primary relative overflow-hidden">
       {/* Left Decoration - Desktop Only */}
       <div className="hidden lg:flex flex-1 relative bg-brand-950 items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1540575467063-178a5093dfd7?q=80&w=2835&auto=format&fit=crop')] bg-cover bg-center opacity-40 mix-blend-overlay"></div>
+        <div className="absolute inset-0 bg-secondary bg-cover bg-center opacity-40 mix-blend-overlay"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/80 to-transparent"></div>
 
         <div className="relative z-10 max-w-xl px-12 text-center text-white space-y-6">
-          <img src="/EventLive.svg" alt="EventLive" className="h-40 w-auto mx-auto mb-15" />
-          <h1 className="text-4xl font-bold font-display tracking-tight">Hosted Locally, Experienced Globally</h1>
+          <img src="/EventLive.png" alt="EventLive" className="h-24 w-auto mx-auto mb-15" />
+          <h1 className="text-4xl text-white/50 font-bold font-display tracking-tight">Hosted Locally, Experienced Globally</h1>
           <p className="text-lg text-white/70 font-light leading-relaxed">
             Create, manage, and scale your events with the best-in-class tools designed for modern organizers.
           </p>
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 lg:px-20 xl:px-24 bg-bg-primary relative z-20">
+      <div className="flex-1 flex flex-col justify-center px-6 sm:px-8 lg:px-20 xl:px-24 bg-bg-primary relative z-20">
         <div className="mx-auto w-full max-w-sm lg:w-96 space-y-8">
           <div className="text-center lg:text-left">
             <Link to="/" className="lg:hidden inline-block mb-8">
-              <img src="/EventLive.svg" alt="EventLive" className="h-16 w-auto" />
+              <img src="/EventLive.png" alt="EventLive" className="h-12 w-auto" />
             </Link>
             <h2 className="text-3xl font-bold font-display text-text-primary tracking-tight">Create your account</h2>
             <p className="mt-2 text-sm text-text-secondary">

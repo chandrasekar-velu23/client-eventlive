@@ -30,17 +30,14 @@ export default function ProblemSolution() {
               <Squares2X2Icon className="h-5 w-5 text-brand-dark/40" />
               Fragmented tools across platforms
             </li>
-            <li className="flex items-center gap-3">
-              <ShieldCheckIcon className="h-5 w-5 text-brand-dark/40" />
-              Weak security & link sharing risks
-            </li>
+
             <li className="flex items-center gap-3">
               <CreditCardIcon className="h-5 w-5 text-brand-dark/40" />
               Limited monetization control
             </li>
             <li className="flex items-center gap-3">
               <ChartBarIcon className="h-5 w-5 text-brand-dark/40" />
-              Poor visibility into attendee engagement
+              User dependency on other platforms
             </li>
           </ul>
         </div>
@@ -57,10 +54,7 @@ export default function ProblemSolution() {
           </div>
 
           <p className="text-brand-muted leading-relaxed">
-            <strong className="font-bold text-brand-dark">EVENTLIVE</strong> brings hosting,
-            secure authentication, global payments, real-time engagement, and
-            actionable analytics into <span className="font-bold text-brand-primary">one unified platform</span> —
-            built to run professional virtual events without complexity.
+            <strong className="font-bold text-brand-dark">EVENTLIVE</strong> consolidates hosting, authentication, payments, engagement tools, and analytics into a single, scalable event platform.
           </p>
 
           <div className="mt-8 rounded-xl bg-brand-surface px-5 py-4 text-sm font-semibold text-brand-primary">

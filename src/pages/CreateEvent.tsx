@@ -26,7 +26,12 @@ import {
     CloudArrowUpIcon,
     BuildingOfficeIcon,
     VideoCameraIcon,
-    LockClosedIcon
+    LockClosedIcon,
+    ClockIcon,
+    UserIcon,
+    BriefcaseIcon,
+    EnvelopeIcon,
+    PencilSquareIcon
 } from "@heroicons/react/24/outline";
 import { useFormDraft } from "../hooks/useFormDraft";
 
@@ -755,46 +760,46 @@ export default function CreateEvent() {
 
     // ========== RENDER ==========
     return (
-        <div className="max-w-5xl mx-auto p-4 lg:p-8 animate-fade-in pb-32">
+        <div className="w-full max-w-5xl mx-auto px-3 py-4 sm:px-6 lg:px-8 lg:py-8 animate-fade-in">
             {/* Header */}
-            <header className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <header className="mb-6 flex flex-col xs:flex-row xs:items-center justify-between gap-3">
                 <div>
-                    <h1 className="text-3xl font-bold font-display text-text-primary">Create Event</h1>
-                    <p className="text-muted mt-1">Follow the steps to publish your event.</p>
+                    <h1 className="text-2xl sm:text-3xl font-bold font-display text-text-primary">Create Event</h1>
+                    <p className="text-muted mt-0.5 text-sm">Follow the steps to publish your event.</p>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex gap-3 shrink-0">
                     <Button variant="secondary" onClick={handleSaveDraft} className="text-sm px-4 flex items-center gap-2">
                         <BookmarkIcon className="h-4 w-4" /> Save Draft
                     </Button>
                 </div>
             </header>
 
-            {/* Progress Steps */}
-            <div className="mb-10 overflow-x-auto pb-4 hide-scrollbar">
-                <div className="flex items-center justify-between relative min-w-[600px]">
-                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-surface-200 -z-10 rounded-full" />
+            {/* Progress Steps - scrollable on mobile, normal on md+ */}
+            <div className="mb-6 w-full overflow-x-auto scrollbar-hide">
+                <div className="flex items-center min-w-max md:min-w-full relative py-2">
+                    {/* Track */}
+                    <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-brand-100 -translate-y-1/2 mx-5" />
                     <div
-                        className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-brand-600 -z-10 rounded-full transition-all duration-500 ease-out"
-                        style={{ width: `${((currentStep - 1) / (STEPS.length - 1)) * 100}%` }}
+                        className="absolute left-5 top-1/2 h-0.5 bg-brand-600 -translate-y-1/2 transition-all duration-500 ease-out"
+                        style={{ width: `calc(${((currentStep - 1) / (STEPS.length - 1)) * 100}% - 40px)` }}
                     />
-
                     {STEPS.map((step) => {
                         const isActive = step.id === currentStep;
                         const isCompleted = step.id < currentStep;
                         return (
                             <button
                                 key={step.id}
-                                className="flex flex-col items-center gap-2 bg-transparent px-2 group focus:outline-none"
+                                className="relative flex flex-col items-center gap-1.5 flex-1 min-w-[72px] z-10 focus:outline-none"
                                 onClick={() => step.id < currentStep ? setCurrentStep(step.id) : null}
                             >
-                                <div
-                                    className={`w-10 h-10 rounded-xl flex items-center justify-center border-2 transition-all duration-300 ${isActive ? "border-brand-600 bg-brand-600 text-white shadow-lg shadow-brand-500/30 scale-110" :
-                                        isCompleted ? "border-brand-600 bg-white text-brand-600" : "border-surface-200 bg-white text-muted group-hover:border-surface-300"
-                                        }`}
+                                <div className={`w-9 h-9 rounded-xl flex items-center justify-center border-2 transition-all duration-300
+                                    ${isActive ? "border-brand-600 bg-brand-600 text-white shadow-md shadow-brand-500/30 scale-110" :
+                                        isCompleted ? "bg-white border-brand-600 text-brand-600" : "bg-white border-gray-200 text-gray-400"}`}
                                 >
-                                    <step.icon className="h-5 w-5" />
+                                    <step.icon className="h-4 w-4" />
                                 </div>
-                                <span className={`text-xs font-bold transition-colors ${isActive ? "text-brand-700" : isCompleted ? "text-text-primary" : "text-muted"}`}>
+                                <span className={`text-[10px] font-bold whitespace-nowrap ${isActive ? "text-brand-700" : isCompleted ? "text-text-primary" : "text-gray-400"
+                                    }`}>
                                     {step.name}
                                 </span>
                             </button>
@@ -804,7 +809,7 @@ export default function CreateEvent() {
             </div>
 
             {/* Main Form Area */}
-            <div className="card p-6 lg:p-10 min-h-[500px]">
+            <div className="rounded-2xl bg-bg-primary border border-brand-accent shadow-sm p-4 sm:p-6 lg:p-8 mb-6 overflow-x-hidden">
                 {/* Step 1: Basics */}
                 {currentStep === 1 && (
                     <div className="space-y-6 animate-fade-in">
@@ -930,10 +935,14 @@ export default function CreateEvent() {
                                         { value: 'public', label: 'Public', desc: 'Anyone can discover and join' },
                                         { value: 'private', label: 'Private', desc: 'Only invited attendees can join' }
                                     ].map(opt => (
-                                        <label key={opt.value} className={`cursor-pointer p-4 rounded-xl border flex items-center gap-4 transition-all duration-200 shadow-sm
+                                        <div
+                                            key={opt.value}
+                                            onClick={() => updateFormData({ visibility: opt.value as 'public' | 'private' })}
+                                            className={`cursor-pointer p-4 rounded-xl border flex items-center gap-4 transition-all duration-200 shadow-sm
                                             ${formData.visibility === opt.value
-                                                ? "bg-brand-primary/5 border-brand-primary ring-1 ring-brand-primary/20"
-                                                : "bg-bg-secondary/50 border-brand-accent hover:border-brand-300 hover:bg-bg-secondary"}`}>
+                                                    ? "bg-brand-primary/5 border-brand-primary ring-1 ring-brand-primary/20"
+                                                    : "bg-bg-secondary/50 border-brand-accent hover:border-brand-300 hover:bg-bg-secondary"}`}
+                                        >
                                             <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors
                                                 ${formData.visibility === opt.value ? "border-brand-primary bg-brand-primary" : "border-brand-400 bg-transparent"}`}>
                                                 {formData.visibility === opt.value && <div className="w-2 h-2 rounded-full bg-white" />}
@@ -942,7 +951,7 @@ export default function CreateEvent() {
                                                 <span className="font-bold text-sm text-text-primary block">{opt.label}</span>
                                                 <span className="text-xs text-text-secondary">{opt.desc}</span>
                                             </div>
-                                        </label>
+                                        </div>
                                     ))}
                                 </div>
                             </div>
@@ -953,10 +962,14 @@ export default function CreateEvent() {
                                         { value: 'Free', label: 'Free', desc: 'No payment required' },
                                         { value: 'Invite-only', label: 'Invite-only', desc: 'Requires invitation code' }
                                     ].map(opt => (
-                                        <label key={opt.value} className={`cursor-pointer p-4 rounded-xl border flex items-center gap-4 transition-all duration-200 shadow-sm
+                                        <div
+                                            key={opt.value}
+                                            onClick={() => updateFormData({ accessType: opt.value as 'Free' | 'Invite-only' })}
+                                            className={`cursor-pointer p-4 rounded-xl border flex items-center gap-4 transition-all duration-200 shadow-sm
                                             ${formData.accessType === opt.value
-                                                ? "bg-brand-primary/5 border-brand-primary ring-1 ring-brand-primary/20"
-                                                : "bg-bg-secondary/50 border-brand-accent hover:border-brand-300 hover:bg-bg-secondary"}`}>
+                                                    ? "bg-brand-primary/5 border-brand-primary ring-1 ring-brand-primary/20"
+                                                    : "bg-bg-secondary/50 border-brand-accent hover:border-brand-300 hover:bg-bg-secondary"}`}
+                                        >
                                             <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors
                                                 ${formData.accessType === opt.value ? "border-brand-primary bg-brand-primary" : "border-brand-400 bg-transparent"}`}>
                                                 {formData.accessType === opt.value && <div className="w-2 h-2 rounded-full bg-white" />}
@@ -965,7 +978,7 @@ export default function CreateEvent() {
                                                 <span className="font-bold text-sm text-text-primary block">{opt.label}</span>
                                                 <span className="text-xs text-text-secondary">{opt.desc}</span>
                                             </div>
-                                        </label>
+                                        </div>
                                     ))}
                                 </div>
                                 <div className="pt-2">
@@ -1091,8 +1104,8 @@ export default function CreateEvent() {
                                             </button>
                                             <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
                                                 <div className="md:col-span-3 space-y-2">
-                                                    <Input type="time" value={item.startTime} onChange={e => updateAgendaItem(idx, 'startTime', e.target.value)} className="w-full text-xs" />
-                                                    <Input type="time" value={item.endTime} onChange={e => updateAgendaItem(idx, 'endTime', e.target.value)} className="w-full text-xs" />
+                                                    <Input type="time" label="Start Time" value={item.startTime} onChange={e => updateAgendaItem(idx, 'startTime', e.target.value)} className="w-full text-xs hide-picker-icon" rightElement={<ClockIcon className="h-4 w-4" />} />
+                                                    <Input type="time" label="End Time" value={item.endTime} onChange={e => updateAgendaItem(idx, 'endTime', e.target.value)} className="w-full text-xs hide-picker-icon" rightElement={<ClockIcon className="h-4 w-4" />} />
                                                 </div>
                                                 <div className="md:col-span-9 space-y-3">
                                                     <Input value={item.title} onChange={e => updateAgendaItem(idx, 'title', e.target.value)} className="font-bold" placeholder="Session Title" />
@@ -1225,7 +1238,7 @@ export default function CreateEvent() {
                                         <h3 className="text-3xl font-black font-display text-default mb-2">{formData.title}</h3>
                                         <p className="text-lg text-muted">{formData.shortSummary}</p>
                                     </div>
-                                    <div className="bg-surface-50 p-4 rounded-xl border border-surface-200 min-w-[200px]">
+                                    <div className="bg-surface-50 p-4 rounded-xl border border-surface-200 w-full md:min-w-[200px] md:max-w-xs">
                                         <div className="flex items-center gap-2 text-default font-bold mb-1">
                                             <CalendarIcon className="h-5 w-5 text-brand-500" />
                                             <span>Date & Time</span>
@@ -1273,32 +1286,28 @@ export default function CreateEvent() {
                 )}
             </div>
 
-            {/* Navigation Footer */}
-            <div className="fixed bottom-6 left-0 right-0 z-40 pointer-events-none">
-                <div className="max-w-5xl mx-auto px-4 lg:px-8">
-                    <div className="bg-white/90 backdrop-blur-xl border border-white/20 shadow-2xl shadow-brand-900/10 rounded-2xl p-4 flex justify-between items-center pointer-events-auto">
-                        <Button
-                            variant="ghost"
-                            onClick={handleBack}
-                            className="flex items-center gap-2 text-muted hover:text-default"
-                        >
-                            <ChevronLeftIcon className="h-5 w-5" /> Back
-                        </Button>
+            {/* Navigation Footer - inline (not fixed) so it doesn't cover content */}
+            <div className="rounded-2xl bg-white/90 border border-gray-100 shadow-md p-3 sm:p-4 flex justify-between items-center gap-2 mb-6">
+                <Button
+                    variant="ghost"
+                    onClick={handleBack}
+                    className="flex items-center gap-2 text-muted hover:text-default"
+                >
+                    <ChevronLeftIcon className="h-4 w-4" /> Back
+                </Button>
 
-                        <div className="text-xs font-bold text-muted uppercase tracking-widest hidden sm:block opacity-50">
-                            Step {currentStep} of {STEPS.length}: {STEPS[currentStep - 1].name}
-                        </div>
-
-                        <Button
-                            variant="primary"
-                            onClick={currentStep === STEPS.length ? handleSubmit : handleNext}
-                            disabled={loading}
-                            className="px-8 shadow-lg shadow-brand-500/20"
-                        >
-                            {loading ? "Processing..." : currentStep === STEPS.length ? "Publish Event" : (<>Next <ChevronRightIcon className="h-5 w-5" /></>)}
-                        </Button>
-                    </div>
+                <div className="text-xs font-bold text-muted uppercase tracking-widest hidden sm:block opacity-50">
+                    Step {currentStep} of {STEPS.length}: {STEPS[currentStep - 1].name}
                 </div>
+
+                <Button
+                    variant="primary"
+                    onClick={currentStep === STEPS.length ? handleSubmit : handleNext}
+                    disabled={loading}
+                    className="px-6 shadow-lg shadow-brand-500/20"
+                >
+                    {loading ? "Processing..." : currentStep === STEPS.length ? "Publish Event" : (<>Next <ChevronRightIcon className="h-4 w-4 ml-1" /></>)}
+                </Button>
             </div>
 
             {/* Enhanced Speaker Creation Modal */}
@@ -1361,18 +1370,20 @@ export default function CreateEvent() {
                                         </div>
 
                                         {/* Basic Info */}
-                                        <div className="grid grid-cols-2 gap-6">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <Input
-                                                label="Full Name"
+                                                label="Full Name *"
                                                 value={newSpeakerData.name}
                                                 onChange={e => setNewSpeakerData({ ...newSpeakerData, name: e.target.value })}
-                                                placeholder="Dr. John Doe"
+                                                placeholder="Name *"
+                                                rightElement={<UserIcon className="h-4 w-4" />}
                                             />
                                             <Input
-                                                label="Job Title"
+                                                label="Job Title *"
                                                 value={newSpeakerData.role}
                                                 onChange={e => setNewSpeakerData({ ...newSpeakerData, role: e.target.value })}
-                                                placeholder="Chief Scientist"
+                                                placeholder="Role *"
+                                                rightElement={<BriefcaseIcon className="h-4 w-4" />}
                                             />
                                         </div>
 
@@ -1382,22 +1393,23 @@ export default function CreateEvent() {
                                             value={newSpeakerData.email}
                                             onChange={e => setNewSpeakerData({ ...newSpeakerData, email: e.target.value })}
                                             placeholder="john@example.com"
+                                            rightElement={<EnvelopeIcon className="h-4 w-4" />}
                                         />
 
                                         <Textarea
-                                            label="Bio"
+                                            label="Bio *"
                                             value={newSpeakerData.bio}
                                             onChange={e => setNewSpeakerData({ ...newSpeakerData, bio: e.target.value })}
                                             rows={3}
-                                            placeholder="A short professional biography..."
+                                            placeholder="Bio *"
                                         />
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <TagInput
-                                                label="Expertise Tags"
-                                                tags={newSpeakerData.tags}
-                                                onChange={(tags) => setNewSpeakerData({ ...newSpeakerData, tags })}
-                                                placeholder="AI, Ethics, Design..."
+                                                label="Specialties / Tags"
+                                                tags={newSpeakerData.tags || []}
+                                                onChange={tags => setNewSpeakerData({ ...newSpeakerData, tags })}
+                                                placeholder="e.g. AI, React, Design"
                                             />
                                             <TagInput
                                                 label="Display Labels"
@@ -1409,7 +1421,7 @@ export default function CreateEvent() {
 
                                         <div className="bg-surface-50 p-4 rounded-xl border border-surface-200">
                                             <label className="block text-sm font-bold text-default mb-3">Social Profiles</label>
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                                 <Input
                                                     value={newSpeakerData.socialLinks.linkedin}
                                                     onChange={e => setNewSpeakerData({ ...newSpeakerData, socialLinks: { ...newSpeakerData.socialLinks, linkedin: e.target.value } })}

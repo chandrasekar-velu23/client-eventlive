@@ -8,28 +8,30 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
     ({ className = "", label, error, placeholder, value, rightElement, ...props }, ref) => {
+        const hasValue = value !== undefined && value !== "";
         return (
-            <div className="relative w-full group">
+            <div className="relative w-full">
+                {label && (
+                    <label
+                        className={`absolute z-10 left-3.5 pointer-events-none transition-all duration-200 font-medium leading-none
+                            ${hasValue
+                                ? "-top-2 text-[10px] px-1 bg-bg-secondary rounded text-brand-primary"
+                                : "top-3.5 text-sm text-text-secondary"
+                            }
+                            ${error ? "text-red-500" : ""}`}
+                    >
+                        {label}
+                    </label>
+                )}
                 <input
-                    className={`input-field peer placeholder-transparent ${error ? "ring-red-500 focus:ring-red-500" : ""
-                        } ${rightElement ? "pr-12" : ""} ${className}`}
-                    placeholder={placeholder || label || " "}
+                    className={`input-field ${error ? "ring-red-500/60 focus:ring-red-500" : ""} ${rightElement ? "pr-12" : ""} ${className}`}
+                    placeholder={label ? "" : (placeholder ?? " ")}
                     value={value}
                     ref={ref}
                     {...props}
                 />
-                {label && (
-                    <label className={`absolute left-4 transition-all duration-200 pointer-events-none text-text-secondary/70
-                        peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-sm
-                        peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-brand-primary peer-focus:bg-bg-secondary peer-focus:px-2 rounded
-                        ${value ? "-top-2.5 text-xs bg-bg-secondary px-2 rounded" : ""}
-                        ${error ? "peer-focus:text-red-500 text-red-500" : ""}
-                    `}>
-                        {label}
-                    </label>
-                )}
                 {rightElement && (
-                    <div className="absolute right-3 top-3 text-text-secondary hover:text-text-primary transition-colors">
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary transition-colors">
                         {rightElement}
                     </div>
                 )}

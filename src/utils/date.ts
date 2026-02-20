@@ -56,19 +56,47 @@ export const getCurrentTimeInZone = (timezone: string): string => {
  * Safely format a date string or Date object into a readable time string (e.g., "10:30 AM").
  * Handles timezone conversion if provided.
  */
+/**
+ * Helper to clean HTML-encoded timezones
+ * Handles specifics like "Asia&#x2F;Calcutta" -> "Asia/Calcutta"
+ */
+const cleanTimezone = (tz: string): string => {
+    if (!tz) return "";
+
+    // First decode URI components (standard)
+    let cleaned = decodeURIComponent(tz);
+
+    // Then handle specific HTML entity issues manually if needed
+    // This is safe to run even if no entities exist
+    if (cleaned.includes("&#x2F;") || cleaned.includes("&amp;")) {
+        cleaned = cleaned
+            .replace(/&amp;/g, '&')
+            .replace(/&#x2F;/g, '/')
+            .replace(/&#x27;/g, "'")
+            .replace(/&quot;/g, '"');
+    }
+
+    return cleaned;
+};
+
+/**
+ * Safely format a date string or Date object into a readable time string (e.g., "10:30 AM").
+ * Handles timezone conversion if provided.
+ */
 export const formatEventTime = (dateInput: string | Date, timezone?: string): string => {
     try {
         const date = typeof dateInput === 'string' ? parseISO(dateInput) : dateInput;
         if (!isValid(date)) return "Invalid Time";
 
         // Validate timezone
-        let safeTimezone = timezone ? decodeURIComponent(timezone) : undefined;
+        let safeTimezone = timezone ? cleanTimezone(timezone) : undefined;
+
         if (safeTimezone) {
             try {
                 // Test if timezone is valid
                 Intl.DateTimeFormat(undefined, { timeZone: safeTimezone });
             } catch (e) {
-                console.warn(`Invalid timezone '${safeTimezone}' fallback to local.`);
+                console.warn(`Invalid timezone '${safeTimezone}' (raw: ${timezone}) fallback to local.`);
                 safeTimezone = undefined;
             }
         }

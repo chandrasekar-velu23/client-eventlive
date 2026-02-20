@@ -9,13 +9,15 @@ import { ChevronDownIcon, FaceSmileIcon, PaperAirplaneIcon, PaperClipIcon } from
  */
 interface LiveChatProps {
   messages: ChatMessage[];
+  currentUserId?: string;
   onSendMessage: (message: string) => Promise<void>;
-  onSendFile: (file: File) => Promise<void>;
+  onSendFile?: (file: File) => Promise<void>;
   isLoading?: boolean;
 }
 
 export const LiveChat: React.FC<LiveChatProps> = ({
   messages,
+  currentUserId,
   onSendMessage,
   onSendFile,
   isLoading = false,
@@ -80,19 +82,23 @@ export const LiveChat: React.FC<LiveChatProps> = ({
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (!onSendFile) {
+      toast.error('File sharing is not enabled in this session');
+      return;
+    }
+
     // Simple validation (e.g. max 50MB)
     if (file.size > 50 * 1024 * 1024) {
-      toast.error("File size limit is 50MB");
+      toast.error('File size limit is 50MB');
       return;
     }
 
     try {
       await onSendFile(file);
-      // Toast handled by hook
       if (fileInputRef.current) fileInputRef.current.value = '';
     } catch (err) {
       console.error(err);
-      toast.error("Failed to send file");
+      toast.error('Failed to send file');
     }
   };
 
@@ -118,6 +124,7 @@ export const LiveChat: React.FC<LiveChatProps> = ({
             <MessageRow
               key={msg._id || idx}
               message={msg}
+              currentUserId={currentUserId}
               isConsecutive={idx > 0 && messages[idx - 1].senderId === msg.senderId}
             />
           ))
@@ -182,9 +189,9 @@ export const LiveChat: React.FC<LiveChatProps> = ({
   );
 };
 
-const MessageRow: React.FC<{ message: ChatMessage; isConsecutive: boolean }> = ({ message, isConsecutive }) => {
+const MessageRow: React.FC<{ message: ChatMessage; isConsecutive: boolean; currentUserId?: string }> = ({ message, isConsecutive, currentUserId }) => {
   const isSystem = message.messageType === 'system';
-  const isSelf = message.senderId === 'self'; // Assuming 'self' is the current user's ID
+  const isSelf = !!currentUserId && message.senderId === currentUserId;
 
   if (isSystem) {
     return (

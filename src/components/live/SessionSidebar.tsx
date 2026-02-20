@@ -51,6 +51,7 @@ export const SessionSidebar: React.FC<SessionSidebarProps> = ({
                 <div className="h-full flex flex-col">
                     <LiveChat
                         messages={messages}
+                        currentUserId={currentUserId}
                         onSendMessage={onSendMessage}
                         onSendFile={onSendFile}
                     />

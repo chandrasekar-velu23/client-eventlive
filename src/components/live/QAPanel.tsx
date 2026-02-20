@@ -121,98 +121,96 @@ export const QAPanel: React.FC<QAPanelProps> = ({
       <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
         {questions.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center opacity-50">
-            <span className="text-4xl mb-2">💬</span>
-            <span className="text-4xl mb-2">💬</span>
-            <p className="text-gray-400">No questions yet</p>
+            <span className="text-4xl mb-3">💬</span>
+            <p className="text-gray-400 font-medium">No questions yet</p>
             <p className="text-xs text-gray-400 mt-1">Be the first to ask!</p>
           </div>
         ) : (
           sortedQuestions.map((question) => (
             <div key={question._id} className={`rounded-xl p-3 border ${question.isAnswered ? 'bg-brand-50 border-brand-100' : 'bg-white border-gray-200 shadow-sm'}`}>
 
-              {/* Question Header */}
+              {/* Question Header — avatar + name + time + content */}
               <div className="flex items-start gap-3">
                 <div className="h-8 w-8 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white shrink-0">
                   {question.askedByName?.charAt(0) || '?'}
                 </div>
-
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-bold text-gray-500">{question.askedByName}</span>
-                      <span className="text-[10px] text-gray-400">{new Date(question.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                    </div>
-                    <p className="text-sm text-gray-900 leading-relaxed break-words">{question.content}</p>
+                    <span className="text-xs font-bold text-gray-700">{question.askedByName}</span>
+                    <span className="text-[10px] text-gray-400">
+                      {new Date(question.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
                   </div>
+                  <p className="text-sm text-gray-900 leading-relaxed break-words">{question.content}</p>
                 </div>
+              </div>
 
-                {/* Actions Bar */}
-                <div className="flex items-center justify-between mt-3 pt-2 border-t border-white/5">
-                  <button
-                    onClick={() => handleUpvote(question._id)}
-                    disabled={isLoading}
-                    className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium transition-all ${question.upvotes?.includes(currentUserId)
+              {/* Actions Bar */}
+              <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100">
+                <button
+                  onClick={() => handleUpvote(question._id)}
+                  disabled={isLoading}
+                  className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium transition-all ${question.upvotes?.includes(currentUserId)
                       ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20'
                       : 'bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-900'
-                      }`}
-                  >
-                    {question.upvotes?.includes(currentUserId) ? (
-                      <HandThumbUpIconSolid className="h-3.5 w-3.5" />
-                    ) : (
-                      <HandThumbUpIcon className="h-3.5 w-3.5" />
-                    )}
-                    <span>{question.upvotes?.length || 0}</span>
-                  </button>
-
-                  {question.isAnswered ? (
-                    <span className="flex items-center gap-1 text-xs font-medium text-green-400 bg-green-400/10 px-2 py-1 rounded-lg">
-                      <CheckCircleIcon className="h-3.5 w-3.5" /> Answered
-                    </span>
+                    }`}
+                >
+                  {question.upvotes?.includes(currentUserId) ? (
+                    <HandThumbUpIconSolid className="h-3.5 w-3.5" />
                   ) : (
-                    canAnswer && (
-                      <button
-                        onClick={() => setAnsweringQuestionId(prev => prev === question._id ? null : question._id)}
-                        className="text-xs font-medium text-brand-400 hover:text-brand-300 transition-colors"
-                      >
-                        {answeringQuestionId === question._id ? 'Cancel' : 'Reply'}
-                      </button>
-                    )
+                    <HandThumbUpIcon className="h-3.5 w-3.5" />
                   )}
-                </div>
+                  <span>{question.upvotes?.length || 0}</span>
+                </button>
 
-                {/* Answer Display */}
-                {question.isAnswered && question.answer && (
-                  <div className="mt-3 pl-3 border-l-2 border-green-500/30">
-                    <p className="text-xs font-bold text-green-600 mb-1">Answered by {question.answeredBy || 'Host'}</p>
-                    <p className="text-sm text-gray-700">{question.answer}</p>
-                  </div>
+                {question.isAnswered ? (
+                  <span className="flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-lg border border-green-100">
+                    <CheckCircleIcon className="h-3.5 w-3.5" /> Answered
+                  </span>
+                ) : (
+                  canAnswer && (
+                    <button
+                      onClick={() => setAnsweringQuestionId(prev => prev === question._id ? null : question._id)}
+                      className="text-xs font-medium text-brand-600 hover:text-brand-500 transition-colors"
+                    >
+                      {answeringQuestionId === question._id ? 'Cancel' : 'Reply'}
+                    </button>
+                  )
                 )}
-
-                {/* Answer Input (For Host) */}
-                {answeringQuestionId === question._id && canAnswer && (
-                  <div className="mt-3 space-y-2 animate-in fade-in slide-in-from-top-2">
-                    <textarea
-                      value={answerInputValue}
-                      onChange={(e) => setAnswerInputValue(e.target.value)}
-                      placeholder="Type your answer..."
-                      maxLength={MAX_ANSWER_LENGTH}
-                      className="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 text-sm focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none resize-none"
-                      rows={2}
-                      autoFocus
-                    />
-                    <div className="flex justify-end gap-2">
-                      <button
-                        onClick={() => handleAnswerSubmit(question._id)}
-                        disabled={isSubmitting}
-                        className="px-3 py-1.5 rounded-lg text-xs font-bold bg-brand-500 text-white hover:bg-brand-400 transition-all shadow-lg"
-                      >
-                        {isSubmitting ? 'Sending...' : 'Send Answer'}
-                      </button>
-                    </div>
-                  </div>
-                )}
-
               </div>
+
+              {/* Answer Display */}
+              {question.isAnswered && question.answer && (
+                <div className="mt-3 pl-3 border-l-2 border-green-500/40">
+                  <p className="text-xs font-bold text-green-600 mb-1">Answered by {question.answeredBy || 'Host'}</p>
+                  <p className="text-sm text-gray-700">{question.answer}</p>
+                </div>
+              )}
+
+              {/* Answer Input (For Host/Speaker) */}
+              {answeringQuestionId === question._id && canAnswer && (
+                <div className="mt-3 space-y-2">
+                  <textarea
+                    value={answerInputValue}
+                    onChange={(e) => setAnswerInputValue(e.target.value)}
+                    placeholder="Type your answer..."
+                    maxLength={MAX_ANSWER_LENGTH}
+                    className="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 text-sm focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none resize-none"
+                    rows={2}
+                    autoFocus
+                  />
+                  <div className="flex justify-end gap-2">
+                    <button
+                      onClick={() => handleAnswerSubmit(question._id)}
+                      disabled={isSubmitting}
+                      className="px-3 py-1.5 rounded-lg text-xs font-bold bg-brand-500 text-white hover:bg-brand-400 transition-all shadow-lg disabled:opacity-50"
+                    >
+                      {isSubmitting ? 'Sending...' : 'Send Answer'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
             </div>
           ))
         )}

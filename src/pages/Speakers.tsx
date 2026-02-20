@@ -201,19 +201,19 @@ export default function Speakers() {
               </div>
 
               <input
-                placeholder="Name"
+                placeholder="Name *"
                 className="input-field w-full"
                 value={newSpeakerData.name}
                 onChange={e => updateFormData({ name: e.target.value })}
               />
               <input
-                placeholder="Role"
+                placeholder="Role *"
                 className="input-field w-full"
                 value={newSpeakerData.role}
                 onChange={e => updateFormData({ role: e.target.value })}
               />
               <textarea
-                placeholder="Bio"
+                placeholder="Bio *"
                 className="input-field w-full"
                 rows={3}
                 value={newSpeakerData.bio}

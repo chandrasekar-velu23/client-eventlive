@@ -64,6 +64,7 @@ export default function LiveSession() {
   const {
     localStream,
     remoteStreams,
+    screenStream,
     startLocalStream,
     toggleAudio,
     toggleVideo,
@@ -86,8 +87,17 @@ export default function LiveSession() {
   // Q&A Hook
   const { questions, askQuestion, upvoteQuestion, answerQuestion } = useQA(session?._id, socket, user?.id);
 
-  // Recording Hook
-  const { isRecording, startRecording, stopRecording } = useRecording();
+  // Recording Hook — passes all active streams for composite recording
+  const { isRecording, uploadProgress, startRecording, stopRecording, recordingUrl } = useRecording(session?._id);
+
+  // Convenience wrapper so the toolbar button can trigger recording with live streams
+  const handleStartRecording = () => {
+    startRecording({
+      localStream,
+      remoteStreams,
+      screenStream: screenStream, // raw screen capture stream (null when not sharing)
+    });
+  };
 
   // File Transfer Hook
   const { sendFile, handleDataMessage } = useFileTransfer((data) => {
@@ -312,7 +322,22 @@ export default function LiveSession() {
               </label>
             </div>
 
-            {/* Feedback */}
+            {/* Direct recording link when captured in this session */}
+            {recordingUrl && (
+              <div className="bg-green-50 p-4 rounded-xl border border-green-100 text-sm">
+                <p className="font-bold text-green-700 mb-1">✅ Recording ready</p>
+                <a
+                  href={recordingUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-brand-600 underline break-all"
+                >
+                  {recordingUrl}
+                </a>
+              </div>
+            )}
+
+
             <div>
               <Textarea
                 label="Additional Comments"
@@ -673,13 +698,33 @@ export default function LiveSession() {
 
             {/* Host Only Recording */}
             {event?.organizerId === user?.id && (
-              <button
-                onClick={isRecording ? stopRecording : startRecording}
-                className={`hidden md:flex h-12 w-12 rounded-xl items-center justify-center transition-all ${isRecording ? 'bg-red-600 text-white animate-pulse' : 'bg-gray-50 text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
-                title={isRecording ? "Stop Recording" : "Start Recording"}
-              >
-                <span className={`h-4 w-4 rounded-full ${isRecording ? 'bg-white' : 'bg-red-500 border-2 border-zinc-400'}`} />
-              </button>
+              <div className="relative hidden md:flex">
+                <button
+                  onClick={isRecording ? stopRecording : handleStartRecording}
+                  className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${isRecording ? 'bg-red-600 text-white animate-pulse' : 'bg-gray-50 text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
+                  title={isRecording ? 'Stop Recording (uploads to cloud)' : 'Start Recording (captures all participants)'}
+                >
+                  <span className={`h-4 w-4 rounded-full ${isRecording ? 'bg-white' : 'bg-red-500 border-2 border-zinc-400'}`} />
+                </button>
+                {/* Upload progress ring overlay */}
+                {!isRecording && uploadProgress > 0 && uploadProgress < 100 && (
+                  <div className="absolute -inset-1 rounded-xl pointer-events-none">
+                    <svg className="w-full h-full -rotate-90" viewBox="0 0 48 48">
+                      <circle cx="24" cy="24" r="21" fill="none" stroke="#e5e7eb" strokeWidth="3" />
+                      <circle
+                        cx="24" cy="24" r="21" fill="none"
+                        stroke="#4f46e5" strokeWidth="3"
+                        strokeDasharray={`${2 * Math.PI * 21}`}
+                        strokeDashoffset={`${2 * Math.PI * 21 * (1 - uploadProgress / 100)}`}
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  </div>
+                )}
+                {uploadProgress === 100 && (
+                  <span className="absolute -top-1 -right-1 text-xs bg-green-500 text-white rounded-full w-4 h-4 flex items-center justify-center">✓</span>
+                )}
+              </div>
             )}
 
             {/* End Button */}

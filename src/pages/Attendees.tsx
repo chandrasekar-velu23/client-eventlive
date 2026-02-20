@@ -181,7 +181,7 @@ export default function Attendees() {
           )}
           <div>
             <h1 className="text-2xl font-bold text-brand-dark flex items-center gap-2">
-              <UserGroupIcon className="h-8 w-8 text-brand-primary" />
+
               {eventId ? "Event Attendees" : "All Attendees"}
             </h1>
             <p className="text-sm text-brand-muted">

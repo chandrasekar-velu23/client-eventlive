@@ -60,8 +60,10 @@ export default function AllEvents() {
       const matchesSearch = event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         event.description?.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = selectedType === "All" || event.category === selectedType;
+      // Defensive check: Hide private events from public discovery
+      const isPublic = event.visibility !== 'private';
 
-      return matchesSearch && matchesCategory;
+      return matchesSearch && matchesCategory && isPublic;
     });
   }, [apiEvents, searchQuery, selectedType]);
 

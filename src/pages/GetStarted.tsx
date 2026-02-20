@@ -296,7 +296,7 @@ export default function GetStarted() {
             className="w-full flex items-center justify-center gap-3 bg-white border border-brand-accent text-text-primary font-semibold py-3 px-4 rounded-xl hover:bg-gray-50 transition-all duration-200 focus:ring-2 focus:ring-brand-primary/20 outline-none shadow-sm hover:shadow"
           >
             <img src="/google-icon-logo.svg" className="h-5 w-5" alt="Google" />
-            <span>Google</span>
+            <span>Continue With Google</span>
           </button>
         </div>
       </div >

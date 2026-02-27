@@ -877,7 +877,7 @@ export default function CreateEvent() {
                             <p className="text-sm text-muted">When will your event take place?</p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-12">
                             <Input
                                 type="datetime-local"
                                 label="Start Date & Time *"
@@ -1101,14 +1101,41 @@ export default function CreateEvent() {
                                             <button onClick={() => removeAgendaItem(idx)} className="absolute top-2 right-2 text-muted hover:text-red-500 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <TrashIcon className="h-4 w-4" />
                                             </button>
-                                            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-                                                <div className="md:col-span-3 space-y-2">
-                                                    <Input type="time" label="Start Time" value={item.startTime} onChange={e => updateAgendaItem(idx, 'startTime', e.target.value)} className="w-full text-xs hide-picker-icon" rightElement={<ClockIcon className="h-4 w-4" />} />
-                                                    <Input type="time" label="End Time" value={item.endTime} onChange={e => updateAgendaItem(idx, 'endTime', e.target.value)} className="w-full text-xs hide-picker-icon" rightElement={<ClockIcon className="h-4 w-4" />} />
+                                            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+                                                <div className="md:col-span-4 grid grid-cols-2 gap-3">
+                                                    <Input
+                                                        type="time"
+                                                        label="Start"
+                                                        value={item.startTime}
+                                                        onChange={e => updateAgendaItem(idx, 'startTime', e.target.value)}
+                                                        className="hide-picker-icon"
+                                                        rightElement={<ClockIcon className="h-3.5 w-3.5" />}
+                                                    />
+                                                    <Input
+                                                        type="time"
+                                                        label="End"
+                                                        value={item.endTime}
+                                                        onChange={e => updateAgendaItem(idx, 'endTime', e.target.value)}
+                                                        className="hide-picker-icon"
+                                                        rightElement={<ClockIcon className="h-3.5 w-3.5" />}
+                                                    />
                                                 </div>
-                                                <div className="md:col-span-9 space-y-3">
-                                                    <Input value={item.title} onChange={e => updateAgendaItem(idx, 'title', e.target.value)} className="font-bold" placeholder="Session Title" />
-                                                    <Input value={item.description} onChange={e => updateAgendaItem(idx, 'description', e.target.value)} className="text-sm" placeholder="Description (optional)" />
+                                                <div className="md:col-span-8 space-y-4">
+                                                    <Input
+                                                        label="Session Title"
+                                                        value={item.title}
+                                                        onChange={e => updateAgendaItem(idx, 'title', e.target.value)}
+                                                        className="font-semibold"
+                                                        placeholder="e.g. Opening Keynote"
+                                                    />
+                                                    <Textarea
+                                                        label="Brief Description"
+                                                        value={item.description}
+                                                        onChange={e => updateAgendaItem(idx, 'description', e.target.value)}
+                                                        className="text-sm"
+                                                        placeholder="What will this session cover?"
+                                                        rows={2}
+                                                    />
                                                 </div>
                                             </div>
                                         </div>

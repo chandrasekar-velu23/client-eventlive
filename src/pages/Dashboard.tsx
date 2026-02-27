@@ -316,13 +316,6 @@ export default function Dashboard() {
                                     log.action === 'Avatar Update' ? `Changed profile picture` :
                                       `Generic user activity`}
                             </p>
-
-                            {log.ip && (
-                              <div className="flex items-center gap-1.5 text-[9px] text-slate-400/80 font-mono">
-                                <span className="w-1 h-1 rounded-full bg-slate-200" />
-                                {log.ip}
-                              </div>
-                            )}
                           </div>
                         </motion.li>
                       );

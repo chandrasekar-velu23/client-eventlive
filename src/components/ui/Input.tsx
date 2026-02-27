@@ -13,12 +13,12 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             <div className="relative w-full">
                 {label && (
                     <label
-                        className={`absolute z-10 left-3.5 pointer-events-none transition-all duration-200 font-medium leading-none
-                            ${hasValue
-                                ? "-top-2 text-[10px] px-1 bg-bg-secondary rounded text-brand-primary"
+                        className={`absolute z-10 left-3 transition-all duration-200 font-bold pointer-events-none
+                            ${(hasValue || props.type === "date" || props.type === "time" || props.type === "datetime-local")
+                                ? "-top-2.5 text-[11px] px-1.5 bg-white rounded-md text-brand-primary shadow-sm border border-brand-100"
                                 : "top-3.5 text-sm text-text-secondary"
                             }
-                            ${error ? "text-red-500" : ""}`}
+                            ${error ? "text-red-500 border-red-100" : ""}`}
                     >
                         {label}
                     </label>

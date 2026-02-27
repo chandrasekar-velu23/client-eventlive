@@ -10,12 +10,12 @@ export default function Footer() {
                 </div>
 
                 {/* Simple Copyright / Credit */}
-                <div className="text-sm text-text-secondary">
+                {/* <div className="text-sm text-text-secondary">
                     <p>&copy; {new Date().getFullYear()} EventLive. All rights reserved.</p>
                     <p className="mt-2 text-xs opacity-60">
                         Designed & Built by <span className="font-semibold text-brand-primary">Chandrasekar</span>
                     </p>
-                </div>
+                </div> */}
 
             </div>
         </footer>

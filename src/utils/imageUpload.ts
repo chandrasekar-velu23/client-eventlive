@@ -67,7 +67,8 @@ const normalizeUrl = (url: string): string => {
  * Get base API URL
  */
 const getBaseUrl = (): string => {
-    return import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+    const rawUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+    return rawUrl.endsWith('/api') ? rawUrl : `${rawUrl.replace(/\/$/, '')}/api`;
 };
 
 /**

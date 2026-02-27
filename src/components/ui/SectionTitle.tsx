@@ -1,7 +1,7 @@
 type SectionTitleProps = {
   title: string;
   subtitle?: string;
-  className?: string; 
+  className?: string;
 };
 
 export default function SectionTitle({
@@ -11,7 +11,7 @@ export default function SectionTitle({
 }: SectionTitleProps) {
   return (
     <div className={`mx-auto max-w-3xl text-center ${className}`}>
-      <h2 className="section-title">
+      <h2 className="section-title pb-8">
         {title}
       </h2>
 

@@ -115,14 +115,20 @@ export const useSession = (sessionId: string | null): UseSessionReturn => {
     }
 
     try {
-      const newSocket = io(SOCKET_URL, {
+      const newSocket = io(`${SOCKET_URL}/session`, {
         path: '/socket.io', // Ensure path matches backend
         auth: { token },
         reconnection: true,
         reconnectionDelay: 1000,
         reconnectionDelayMax: 5000,
-        reconnectionAttempts: 5,
-        transports: ['websocket', 'polling'] // Allow fallback
+        reconnectionAttempts: 10, // Increased for production stability
+        transports: ['websocket', 'polling'], // Allow fallback
+        timeout: 20000, // 20s timeout
+      });
+
+      newSocket.on('connect_error', (err) => {
+        console.error('❌ Session Socket connection error:', err.message);
+        setError(`Connection failed: ${err.message}`);
       });
 
       newSocket.on('connect', () => {

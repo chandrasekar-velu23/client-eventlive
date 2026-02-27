@@ -4,6 +4,7 @@ import Header from "./components/layout/Header";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import { useAuth } from "./hooks/useAuth";
 import { NotificationProvider } from "./context/NotificationContext";
+import ChatWidget from "./components/ui/ChatWidget";
 
 // Pages  
 // Pages  
@@ -97,6 +98,9 @@ export default function App() {
           {/* Catch-all: Redirects to home if path doesn't exist */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+
+        {/* Global Chatbot Widget — appears on all pages */}
+        <ChatWidget />
       </NotificationProvider>
     </>
   );

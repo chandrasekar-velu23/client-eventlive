@@ -408,7 +408,10 @@ export default function ManageEvent() {
                   <Textarea label="Description" name="description" value={formData.description || ""} onChange={handleChange} disabled={!editing} rows={4} />
                   <div className="grid grid-cols-2 gap-4">
                     <Input label="Organizer" value={organizerName} disabled className="bg-gray-50 text-gray-500" />
-                    <Select label="Visibility" name="visibility" value={formData.visibility || "public"} onChange={handleChange} disabled={!editing} options={[{ value: 'public', label: 'Public' }, { value: 'private', label: 'Private' }]} />
+                    <Select label="Visibility" name="visibility" value={formData.visibility || "public"} onChange={handleChange} disabled={!editing}>
+                      <option value="public">Public</option>
+                      <option value="private">Private</option>
+                    </Select>
                   </div>
                 </div>
               </div>

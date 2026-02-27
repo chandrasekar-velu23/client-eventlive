@@ -320,7 +320,7 @@ export const useRecording = (sessionId?: string): UseRecordingReturn => {
                 }
 
                 // Remote participants
-                Object.entries(remoteStreams).forEach(([uid, stream], i) => {
+                Object.entries(remoteStreams).forEach(([_uid, stream], i) => {
                     if (!stream || stream.getVideoTracks().length === 0) return;
                     const v = document.createElement('video');
                     v.srcObject = stream;

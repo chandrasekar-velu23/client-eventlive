@@ -31,7 +31,6 @@ import {
     UserIcon,
     BriefcaseIcon,
     EnvelopeIcon,
-    PencilSquareIcon
 } from "@heroicons/react/24/outline";
 import { useFormDraft } from "../hooks/useFormDraft";
 

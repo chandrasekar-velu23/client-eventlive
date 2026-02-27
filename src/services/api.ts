@@ -65,6 +65,14 @@ export interface EventData {
   status?: 'draft' | 'published';
 }
 
+export interface ActivityLog {
+  _id: string;
+  action: string;
+  details: Record<string, any>;
+  ip?: string;
+  createdAt: string;
+}
+
 export {
   uploadCoverImage,
   uploadSpeakerImage,
@@ -558,9 +566,9 @@ export const updateUserProfile = async (
   return result.data;
 };
 
-export const getUserActivityLogs = async (): Promise<Array<{ action: string; details: any; createdAt: string; ip?: string }>> => {
+export const getUserActivityLogs = async (): Promise<ActivityLog[]> => {
   try {
-    const result = await apiFetch<Array<{ action: string; details: any; createdAt: string; ip?: string }>>("users/logs", {
+    const result = await apiFetch<ActivityLog[]>("users/logs", {
       method: "GET",
     });
     return result.data || [];
@@ -723,3 +731,33 @@ export const getUserRequests = async (): Promise<UserRequest[]> => {
     return [];
   }
 };
+
+// ─────────────────────────────────────────────────────────────
+// Chatbot
+// ─────────────────────────────────────────────────────────────
+export interface ChatHistoryMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export const sendChatMessage = async (
+  message: string,
+  role: string,
+  page: string,
+  history: ChatHistoryMessage[]
+): Promise<{ reply: string; suggestions: string[] }> => {
+  const result = await apiFetch<{ reply: string; suggestions: string[] }>("chat", {
+    method: "POST",
+    body: JSON.stringify({ message, role, page, history }),
+  });
+
+  if (!result.data?.reply) {
+    throw new Error(result.message || "No reply received from assistant.");
+  }
+
+  return {
+    reply: result.data.reply,
+    suggestions: result.data.suggestions || []
+  };
+};
+

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { useWebRTC } from '../hooks/useWebRTC';
+import { useWebRTCContext } from '../context/WebRTCContext';
 import { VideoGrid } from '../components/live/VideoGrid';
 import { SessionSidebar } from '../components/live/SessionSidebar';
 import { useRealtimeChat } from '../hooks/useRealtimeChat';
@@ -59,24 +59,25 @@ export default function LiveSession() {
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [videoEnabled, setVideoEnabled] = useState(true);
   const [activeSidebar, setActiveSidebar] = useState<'chat' | 'participants' | 'polls' | 'qa' | 'none'>('none');
+  const [isWaitingForApproval, setIsWaitingForApproval] = useState(false);
+  const [waitingParticipants, setWaitingParticipants] = useState<any[]>([]);
 
-  // WebRTC
+  // WebRTC Context
   const {
     localStream,
     remoteStreams,
     screenStream,
     startLocalStream,
+    stopLocalStream,
     toggleAudio,
     toggleVideo,
     shareScreen,
     stopScreenShare,
     isScreenSharing,
+    joinSession,
+    leaveSession,
     socket
-  } = useWebRTC({
-    sessionId: session?._id,
-    isHost: event?.organizerId === user?.id,
-    enabled: !inLobby && !isSessionEnded && !!session && !!user
-  });
+  } = useWebRTCContext();
 
   // Chat Hook
   const { messages, sendMessage } = useRealtimeChat(session?._id, socket);
@@ -116,8 +117,38 @@ export default function LiveSession() {
 
     socket.on('file-transfer', onFileTransfer);
 
+    // Approval Listeners
+    socket.on('waiting-for-approval', () => {
+      setIsWaitingForApproval(true);
+      setInLobby(true);
+    });
+
+    socket.on('approved', () => {
+      setIsWaitingForApproval(false);
+      setInLobby(false);
+      toast.success("Joined session");
+    });
+
+    socket.on('rejected', (data) => {
+      toast.error(data.message || "Your request to join was declined.");
+      setIsWaitingForApproval(false);
+      setInLobby(true);
+    });
+
+    socket.on('participant-waiting', (participant) => {
+      setWaitingParticipants(prev => {
+        if (prev.find(p => p.userId === participant.userId)) return prev;
+        return [...prev, participant];
+      });
+      toast.info(`${participant.userName} is waiting to join.`);
+    });
+
     return () => {
       socket.off('file-transfer', onFileTransfer);
+      socket.off('waiting-for-approval');
+      socket.off('approved');
+      socket.off('rejected');
+      socket.off('participant-waiting');
     };
   }, [socket, handleDataMessage]);
 
@@ -210,6 +241,7 @@ export default function LiveSession() {
           ...prev,
           attendees: [...(prev.attendees || []), user.id]
         }));
+        joinSession({ sessionId: session._id, roomId: code }, { audioEnabled, videoEnabled });
         setInLobby(false);
       } catch (err) {
         console.error(err);
@@ -218,17 +250,26 @@ export default function LiveSession() {
         setIsEnrolling(false);
       }
     } else {
+      joinSession({ sessionId: session._id, roomId: code }, { audioEnabled, videoEnabled });
       setInLobby(false);
-      toast.success("Joined session");
+      // Wait for 'approved' signal if requireApproval is true
     }
+  };
+
+  const handleApprove = (participantUserId: string) => {
+    socket?.emit('approve-participant', { sessionId: session._id, participantUserId });
+    setWaitingParticipants(prev => prev.filter(p => p.userId !== participantUserId));
+  };
+
+  const handleReject = (participantUserId: string) => {
+    socket?.emit('reject-participant', { sessionId: session._id, participantUserId });
+    setWaitingParticipants(prev => prev.filter(p => p.userId !== participantUserId));
   };
 
   const handleLeave = () => {
     if (confirm("Are you sure you want to leave the session?")) {
-      // Cleanup local stream
-      if (localStream) {
-        localStream.getTracks().forEach(track => track.stop());
-      }
+      leaveSession(session?._id);
+      stopLocalStream();
       setIsSessionEnded(true);
     }
   };
@@ -249,7 +290,8 @@ export default function LiveSession() {
   };
 
   // Convert remoteStreams dict to array for VideoGrid
-  const remoteStreamArray = Object.entries(remoteStreams).map(([userId, stream]) => ({
+  const remoteStreamArray = Object.entries(remoteStreams).map(([socketId, { userId, stream }]) => ({
+    socketId,
     userId,
     stream
   }));
@@ -504,6 +546,24 @@ export default function LiveSession() {
                   </div>
                 </div>
               )}
+
+              {/* Waiting for Approval Overlay */}
+              {isWaitingForApproval && (
+                <div className="mt-8 p-8 bg-brand-50 rounded-3xl border-2 border-brand-200 shadow-xl animate-pulse">
+                  <div className="flex flex-col items-center text-center space-y-4">
+                    <div className="h-16 w-16 bg-brand-100 rounded-full flex items-center justify-center text-brand-600">
+                      <LockClosedIcon className="h-8 w-8" />
+                    </div>
+                    <h2 className="text-2xl font-black text-gray-900">Waiting for Approval</h2>
+                    <p className="text-gray-600">The organizer has been notified of your request to join. Please wait a moment.</p>
+                    <div className="flex items-center gap-2 text-brand-500 font-bold">
+                      <div className="h-2 w-2 bg-brand-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                      <div className="h-2 w-2 bg-brand-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                      <div className="h-2 w-2 bg-brand-500 rounded-full animate-bounce" />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Right/Top: Video Preview */}
@@ -513,7 +573,7 @@ export default function LiveSession() {
                   <>
                     {localStream && (
                       <video
-                        ref={el => { if (el) el.srcObject = localStream }}
+                        ref={el => { if (el && localStream) el.srcObject = localStream }}
                         autoPlay
                         muted
                         playsInline
@@ -611,6 +671,55 @@ export default function LiveSession() {
 
         {/* Content Area (Video Grid) */}
         <div className={`flex-1 flex flex-col items-center justify-center relative bg-bg-secondary transition-all duration-300 ${activeSidebar !== 'none' ? 'hidden md:flex md:w-[calc(100%-20rem)]' : 'w-full'}`}>
+
+          {/* Organizer Approval Queue Overlay */}
+          {event?.organizerId === user?.id && waitingParticipants.length > 0 && (
+            <div className="absolute top-4 right-4 z-[50] w-80 max-h-[400px] overflow-y-auto bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-brand-100 p-4 animate-fade-in-up">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-black uppercase tracking-widest text-brand-600 flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-brand-500 animate-pulse" />
+                  Approval Queue
+                </h3>
+                <span className="text-xs bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full font-bold">
+                  {waitingParticipants.length}
+                </span>
+              </div>
+              <div className="space-y-3">
+                {waitingParticipants.map(participant => (
+                  <div key={participant.userId} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    <div className="flex items-center gap-3">
+                      {participant.userAvatar ? (
+                        <img src={participant.userAvatar} className="h-10 w-10 rounded-full" alt="" />
+                      ) : (
+                        <div className="h-10 w-10 rounded-full bg-brand-100 flex items-center justify-center font-bold text-brand-600">
+                          {participant.userName?.charAt(0)}
+                        </div>
+                      )}
+                      <div>
+                        <p className="text-sm font-bold text-gray-900 truncate max-w-[100px]">{participant.userName}</p>
+                        <p className="text-[10px] text-gray-500 tracking-tight">Requesting entry...</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleReject(participant.userId)}
+                        className="p-1.5 rounded-lg bg-white border border-red-100 text-red-500 hover:bg-red-50 transition-colors"
+                      >
+                        <PhoneXMarkIcon className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => handleApprove(participant.userId)}
+                        className="p-1.5 rounded-lg bg-brand-600 text-white hover:bg-brand-700 transition-colors shadow-sm"
+                      >
+                        <CheckCircleIcon className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Video Grid takes available space - accounting for bottom bar on mobile */}
           <div className="w-full h-full pb-20 md:pb-0 px-2 md:px-4 py-2 flex items-center justify-center">
             <div className="w-full h-full max-w-[1600px] flex items-center justify-center">
@@ -634,14 +743,22 @@ export default function LiveSession() {
           {/* Main Actions Group */}
           <div className="flex items-center gap-2 md:gap-4 flex-1 justify-center md:flex-none">
             <button
-              onClick={() => setAudioEnabled(!audioEnabled)}
+              onClick={() => {
+                const newState = !audioEnabled;
+                setAudioEnabled(newState);
+                toggleAudio(newState);
+              }}
               className={`h-10 w-10 md:h-12 md:w-12 rounded-full md:rounded-xl flex items-center justify-center transition-all ${audioEnabled ? 'bg-gray-100 text-text-primary hover:bg-gray-200' : 'bg-red-500 text-white hover:bg-red-600'}`}
               title="Toggle Mic"
             >
               {audioEnabled ? <MicrophoneIcon className="h-5 w-5" /> : <MicrophoneIcon className="h-5 w-5 opacity-70" />}
             </button>
             <button
-              onClick={() => setVideoEnabled(!videoEnabled)}
+              onClick={() => {
+                const newState = !videoEnabled;
+                setVideoEnabled(newState);
+                toggleVideo(newState);
+              }}
               className={`h-10 w-10 md:h-12 md:w-12 rounded-full md:rounded-xl flex items-center justify-center transition-all ${videoEnabled ? 'bg-gray-100 text-text-primary hover:bg-gray-200' : 'bg-red-500 text-white hover:bg-red-600'}`}
               title="Toggle Camera"
             >
@@ -689,7 +806,7 @@ export default function LiveSession() {
 
             {/* Desktop Only Sharing */}
             <button
-              onClick={isScreenSharing ? stopScreenShare : shareScreen}
+              onClick={isScreenSharing ? () => stopScreenShare({ sessionId: session._id, roomId: code }) : () => shareScreen({ sessionId: session._id, roomId: code })}
               className={`hidden md:flex h-12 w-12 rounded-xl items-center justify-center transition-all ${isScreenSharing ? 'bg-brand-600 text-white' : 'bg-gray-50 text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
               title={isScreenSharing ? "Stop Sharing" : "Share Screen"}
             >

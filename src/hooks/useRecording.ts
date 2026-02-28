@@ -7,7 +7,7 @@ import { BASE_URL } from '../services/api';
  * ───────────────────────────────────────────── */
 export interface RecordingStreams {
     localStream: MediaStream | null;
-    remoteStreams: { [userId: string]: MediaStream };
+    remoteStreams: { [socketId: string]: { userId: string, stream: MediaStream } };
     screenStream?: MediaStream | null; // optional active screen-share stream
 }
 
@@ -320,14 +320,14 @@ export const useRecording = (sessionId?: string): UseRecordingReturn => {
                 }
 
                 // Remote participants
-                Object.entries(remoteStreams).forEach(([_uid, stream], i) => {
+                Object.values(remoteStreams).forEach(({ userId: remoteUserId, stream }) => {
                     if (!stream || stream.getVideoTracks().length === 0) return;
                     const v = document.createElement('video');
                     v.srcObject = stream;
                     v.muted = true;
                     v.autoplay = true;
                     v.play().catch(() => { });
-                    elems.push({ video: v, label: `👤 Participant ${i + 1}` });
+                    elems.push({ video: v, label: `👤 Participant (${remoteUserId.slice(0, 5)})` });
                 });
 
                 videoElemsRef.current = elems;
@@ -358,7 +358,7 @@ export const useRecording = (sessionId?: string): UseRecordingReturn => {
                 // Screen-share system audio (if captured)
                 connectAudio(activeScreen, 0.85);
                 // ALL remote participants
-                Object.values(remoteStreams).forEach(s => connectAudio(s, 0.9));
+                Object.values(remoteStreams).forEach(({ stream }) => connectAudio(stream, 0.9));
 
                 /* 5 ─ Compose final stream */
                 const canvasStream = canvas.captureStream(30);

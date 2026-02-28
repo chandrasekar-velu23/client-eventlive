@@ -4,6 +4,7 @@ import Header from "./components/layout/Header";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import { useAuth } from "./hooks/useAuth";
 import { NotificationProvider } from "./context/NotificationContext";
+import { WebRTCProvider } from "./context/WebRTCContext";
 import ChatWidget from "./components/ui/ChatWidget";
 
 // Pages  
@@ -34,74 +35,76 @@ export default function App() {
 
   return (
     <>
-      <NotificationProvider>
-        <Toaster position="bottom-right" richColors closeButton />
-        {/* Show header only if NOT in dashboard and NOT logged in */}
-        {!isDashboardPath && !user && <Header />}
+      <WebRTCProvider>
+        <NotificationProvider>
+          <Toaster position="bottom-right" richColors closeButton />
+          {/* Show header only if NOT in dashboard and NOT logged in */}
+          {!isDashboardPath && !user && <Header />}
 
-        <Routes>
-          {/* --- Public Routes --- */}
-          <Route path="/" element={<Home />} />
-          <Route path="/features" element={<Features />} />
-          <Route path="/use-cases" element={<UseCases />} />
-          <Route path="/use-cases" element={<UseCases />} />
-          <Route path="/all-events" element={<AllEvent />} />
-          <Route path="/join/:code" element={<LiveSession />} />
-          {/* Auth Logic */}
-          <Route
-            path="/login"
-            element={user ? <Navigate to={user.onboardingCompleted ? "/dashboard" : "/onboarding"} replace /> : <Login />}
-          />
-          <Route
-            path="/get-started"
-            element={user ? <Navigate to={user.onboardingCompleted ? "/dashboard" : "/onboarding"} replace /> : <GetStarted />}
-          />
-          <Route
-            path="/onboarding"
-            element={
-              user ? (
-                user.onboardingCompleted ? <Navigate to="/dashboard" replace /> : <Onboarding />
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            }
-          />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Routes>
+            {/* --- Public Routes --- */}
+            <Route path="/" element={<Home />} />
+            <Route path="/features" element={<Features />} />
+            <Route path="/use-cases" element={<UseCases />} />
+            <Route path="/use-cases" element={<UseCases />} />
+            <Route path="/all-events" element={<AllEvent />} />
+            <Route path="/join/:code" element={<LiveSession />} />
+            {/* Auth Logic */}
+            <Route
+              path="/login"
+              element={user ? <Navigate to={user.onboardingCompleted ? "/dashboard" : "/onboarding"} replace /> : <Login />}
+            />
+            <Route
+              path="/get-started"
+              element={user ? <Navigate to={user.onboardingCompleted ? "/dashboard" : "/onboarding"} replace /> : <GetStarted />}
+            />
+            <Route
+              path="/onboarding"
+              element={
+                user ? (
+                  user.onboardingCompleted ? <Navigate to="/dashboard" replace /> : <Onboarding />
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              }
+            />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-          {/* --- Protected Dashboard --- */}
-          <Route
-            path="/dashboard/*"
-            element={
-              user ? (
-                <DashboardLayout>
-                  <Routes>
-                    <Route index element={<Dashboard />} />
-                    <Route path="create-event" element={<CreateEvent />} />
-                    <Route path="events" element={<Events />} />
-                    <Route path="drafts" element={<Drafts />} />
-                    <Route path="requests" element={<Requests />} />
-                    <Route path="attendees" element={<Attendees />} />
-                    <Route path="settings" element={<Settings />} />
-                    <Route path="all-events" element={<AllEvent />} />
-                    <Route path="enrolled" element={<Events />} />
-                    <Route path="events/:eventId" element={<ManageEvent />} />
-                    <Route path="events/:eventId/attendees" element={<Attendees />} />
-                  </Routes>
-                </DashboardLayout>
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            }
-          />
+            {/* --- Protected Dashboard --- */}
+            <Route
+              path="/dashboard/*"
+              element={
+                user ? (
+                  <DashboardLayout>
+                    <Routes>
+                      <Route index element={<Dashboard />} />
+                      <Route path="create-event" element={<CreateEvent />} />
+                      <Route path="events" element={<Events />} />
+                      <Route path="drafts" element={<Drafts />} />
+                      <Route path="requests" element={<Requests />} />
+                      <Route path="attendees" element={<Attendees />} />
+                      <Route path="settings" element={<Settings />} />
+                      <Route path="all-events" element={<AllEvent />} />
+                      <Route path="enrolled" element={<Events />} />
+                      <Route path="events/:eventId" element={<ManageEvent />} />
+                      <Route path="events/:eventId/attendees" element={<Attendees />} />
+                    </Routes>
+                  </DashboardLayout>
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              }
+            />
 
-          {/* Catch-all: Redirects to home if path doesn't exist */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+            {/* Catch-all: Redirects to home if path doesn't exist */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
 
-        {/* Global Chatbot Widget — appears on all pages */}
-        <ChatWidget />
-      </NotificationProvider>
+          {/* Global Chatbot Widget — appears on all pages */}
+          <ChatWidget />
+        </NotificationProvider>
+      </WebRTCProvider>
     </>
   );
 }

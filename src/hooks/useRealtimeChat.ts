@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
+import { BASE_URL } from '../services/api';
 
 export interface ChatMessage {
   _id: string;
@@ -67,7 +68,7 @@ export const useRealtimeChat = (
 
         const token = localStorage.getItem('token');
         const response = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/sessions/${sessionId}/chat?page=${pageNum}&limit=50`,
+          `${BASE_URL}/sessions/${sessionId}/chat?page=${pageNum}&limit=50`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

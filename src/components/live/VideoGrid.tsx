@@ -1,10 +1,10 @@
 import React, { useRef, useEffect } from 'react';
-import type { RemoteStream } from '../../hooks/useWebRTC';
-import { UserCircleIcon, VideoCameraSlashIcon } from '@heroicons/react/24/outline';
+import type { RemoteParticipant } from '../../context/WebRTCContext';
+import { VideoCameraSlashIcon } from '@heroicons/react/24/outline';
 
 interface VideoGridProps {
   localStream: MediaStream | null;
-  remoteStreams: RemoteStream[];
+  remoteStreams: RemoteParticipant[];
   isSelf?: boolean;
 }
 
@@ -59,7 +59,12 @@ export const VideoGrid: React.FC<VideoGridProps> = ({
 
       {/* Remote Videos */}
       {remoteStreams.map((remote) => (
-        <RemoteVideoPlayer key={remote.userId} stream={remote.stream} userId={remote.userId} cardHeight={cardHeight} />
+        <RemoteVideoPlayer
+          key={remote.socketId}
+          stream={remote.stream}
+          userId={remote.userId}
+          cardHeight={cardHeight}
+        />
       ))}
 
       {/* Empty State */}
@@ -92,25 +97,26 @@ const RemoteVideoPlayer: React.FC<RemoteVideoPlayerProps> = ({ stream, userId, c
   }, [stream]);
 
   return (
-    <div className={`relative rounded-2xl overflow-hidden shadow-xl bg-gray-900 border border-gray-200 group ${cardHeight} ring-1 ring-gray-900/5`}>
+    <div className={`relative rounded-2xl overflow-hidden shadow-xl bg-gray-900 border border-gray-100 group ${cardHeight} ring-1 ring-gray-900/5`}>
       <video
         ref={videoRef}
         autoPlay
         playsInline
         className="w-full h-full object-cover"
       />
+
       {/* Participant Label */}
-      <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 border border-white/10">
-        <UserCircleIcon className="w-4 h-4 text-zinc-400" />
-        <span>Participant {userId.slice(0, 4)}</span>
+      <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-md text-white px-3 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-2 border border-white/10 z-10">
+        <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+        <span className="truncate max-w-[120px]">User: {userId}</span>
       </div>
 
-      {/* Audio Indicator (Mock for visual consistency) */}
-      <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md p-1.5 rounded-full border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity">
+      {/* Audio Activity Visualizer */}
+      <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md p-1.5 rounded-full border border-white/10 group-hover:opacity-100 transition-opacity">
         <div className="w-4 h-4 flex items-center justify-center gap-[2px]">
-          <div className="w-[2px] h-2 bg-green-500 animate-pulse"></div>
-          <div className="w-[2px] h-3 bg-green-500 animate-pulse delay-75"></div>
-          <div className="w-[2px] h-1 bg-green-500 animate-pulse delay-150"></div>
+          <div className="w-[1.5px] h-2 bg-brand-400 animate-bounce"></div>
+          <div className="w-[1.5px] h-3 bg-brand-400 animate-bounce delay-75"></div>
+          <div className="w-[1.5px] h-1 bg-brand-400 animate-bounce delay-150"></div>
         </div>
       </div>
     </div>

@@ -9,7 +9,7 @@ import { usePolls } from '../hooks/usePolls';
 import { useQA } from '../hooks/useQA';
 import { useRecording } from '../hooks/useRecording';
 import { useFileTransfer } from '../hooks/useFileTransfer';
-import { joinEventSession, submitSessionFeedback, enrollEvent } from '../services/api';
+import { joinEventSession, submitSessionFeedback, enrollEvent, type EventData } from '../services/api';
 import { toast } from 'sonner';
 
 // UI Components
@@ -41,7 +41,7 @@ export default function LiveSession() {
   const { user } = useAuth();
 
   // State
-  const [event, setEvent] = useState<any>(null);
+  const [event, setEvent] = useState<EventData | null>(null);
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [inLobby, setInLobby] = useState(true);
@@ -171,7 +171,6 @@ export default function LiveSession() {
         setEvent(eventData);
         setSession(sessionData);
       } catch (err) {
-        console.error(err);
         toast.error(err instanceof Error ? err.message : "Failed to load session");
         navigate('/dashboard');
       } finally {
@@ -234,7 +233,9 @@ export default function LiveSession() {
     if (!isHost && !isEnrolled) {
       setIsEnrolling(true);
       try {
-        await enrollEvent(event._id || event.id);
+        const idToEnroll = event._id || event.id;
+        if (!idToEnroll) throw new Error("Event ID not found");
+        await enrollEvent(idToEnroll);
         toast.success("Registration confirmed! Joining session...");
         // Optimistically update attendees
         setEvent((prev: any) => ({

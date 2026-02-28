@@ -1,9 +1,10 @@
 import React from 'react';
 import { VideoGrid } from './VideoGrid';
+import type { RemoteParticipant } from '../../context/WebRTCContext';
 
 interface SessionStageProps {
     localStream: MediaStream | null;
-    remoteStreams: { userId: string; stream: MediaStream }[];
+    remoteStreams: RemoteParticipant[];
     theme: 'light' | 'dark';
 }
 

@@ -123,7 +123,6 @@ export const WebRTCProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         };
 
         pc.oniceconnectionstatechange = () => {
-            console.log(`[WebRTCContext] ICE State (${remoteSocketId}):`, pc.iceConnectionState);
             if (pc.iceConnectionState === 'failed') {
                 if ('restartIce' in pc && typeof pc.restartIce === 'function') {
                     (pc.restartIce as any)();
@@ -206,7 +205,6 @@ export const WebRTCProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         });
 
         newSocket.on('webrtc-offer', async ({ from: remoteSocketId, fromUserId: remoteUserId, offer }: { from: string; fromUserId: string; offer: RTCSessionDescriptionInit }) => {
-            console.log('[WebRTCContext] Signal: Offer from', remoteSocketId);
             const pc = getOrCreatePeerConnection(remoteSocketId, remoteUserId, sessionId || "", roomId || "", newSocket);
 
             const isPolite = newSocket.id ? (newSocket.id < remoteSocketId) : true;
@@ -250,7 +248,6 @@ export const WebRTCProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         });
 
         newSocket.on('webrtc-answer', async ({ from: remoteSocketId, answer }: { from: string; answer: RTCSessionDescriptionInit }) => {
-            console.log('[WebRTCContext] Signal: Answer from', remoteSocketId);
             const pc = peersRef.current[remoteSocketId];
             if (pc) {
                 try {
